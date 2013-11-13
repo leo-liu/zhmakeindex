@@ -1,21 +1,41 @@
 package main
 
-type indexentry struct {
-	level     []indexentrykv
-	pagefmt   string
-	page      int
-	pagerange pagerange
+type InputIndex []IndexEntry
+
+func NewInputIndex(i int, option *Options, style *InputStyle) *InputIndex {
+	in := new(InputIndex)
+
+	return in
 }
 
-type pagerange int
+//func (ind InputIndex) Len() int {
+//	return len(ind)
+//}
+
+//func (ind InputIndex) Swap(i, j int) {
+//	ind[i], ind[j] = ind[j], ind[i]
+//}
+
+//func (ind InputIndex) Less(i, j int) bool {
+//	return true
+//}
+
+type IndexEntry struct {
+	level     []IndexEntryKV
+	pagefmt   string
+	page      int
+	pagerange PageRange
+}
+
+type PageRange int
 
 const (
-	page_normal pagerange = iota
-	page_open   pagerange = iota
-	page_close  pagerange = iota
+	PageNormal PageRange = iota
+	PageOpen   PageRange = iota
+	PageClose  PageRange = iota
 )
 
-type indexentrykv struct {
-	sortkey string
-	text    string
+type IndexEntryKV struct {
+	key  string
+	text string
 }
