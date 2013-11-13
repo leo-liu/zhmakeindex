@@ -2,22 +2,28 @@ package main
 
 import (
 	"flag"
-	"fmt"
+
+//	"fmt"
 )
 
 func main() {
-	option := new(options)
-	option.init()
+	option := NewOptions()
 	option.parse()
 	if !option.valid() {
 		return
 	}
-	for _, arg := range option.input {
-		fmt.Println("File", arg)
+
+	instyle, outstyle := NewStyles(option)
+
+	for i, _ := range option.input {
+		in := NewInputIndex(i, option, instyle)
+		out := NewOutputIndex(in, option, outstyle)
+		out.Output()
 	}
+
 }
 
-type options struct {
+type Options struct {
 	comp          bool
 	stdin         bool
 	output        string
@@ -29,7 +35,8 @@ type options struct {
 	input         []string
 }
 
-func (o *options) init() {
+func NewOptions() *Options {
+	o := new(Options)
 	flag.BoolVar(&o.comp, "c", false, "忽略条目首尾空格")
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
@@ -38,13 +45,14 @@ func (o *options) init() {
 	flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
 	flag.StringVar(&o.style, "s", "", "格式文件名")
 	flag.StringVar(&o.log, "t", "", "日志文件名")
+	return o
 }
 
-func (o *options) parse() {
+func (o *Options) parse() {
 	flag.Parse()
 	o.input = flag.Args()
 }
 
-func (o *options) valid() bool {
+func (o *Options) valid() bool {
 	return true
 }
