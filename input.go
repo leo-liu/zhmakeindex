@@ -2,9 +2,8 @@ package main
 
 type InputIndex []IndexEntry
 
-func NewInputIndex(i int, option *Options, style *InputStyle) *InputIndex {
+func NewInputIndex(option *Options, style *InputStyle) *InputIndex {
 	in := new(InputIndex)
-
 	return in
 }
 
