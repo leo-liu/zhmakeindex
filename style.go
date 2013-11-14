@@ -1,12 +1,17 @@
 package main
 
-func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
-	in := NewInputStyle()
-	out := NewOutputStyle()
+import (
+	"bufio"
+	"log"
+	"os"
+	"strconv"
+	"unicode"
+	"unicode/utf8"
+)
 
-	return in, out
-}
-
+// 输入格式
+// 这里使用简单 struct 实现，需要大量分情况讨论。
+// 也可以用 map 实现，代码可能会简短并易于扩展，但要动态处理类型
 type InputStyle struct {
 	keyword         string
 	arg_open        rune
@@ -111,4 +116,211 @@ func NewOutputStyle() *OutputStyle {
 		suffix_mp:        "",
 	}
 	return out
+}
+
+func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
+	in := NewInputStyle()
+	out := NewOutputStyle()
+
+	if option.style == "" {
+		return in, out
+	}
+	// 读取格式文件，处理格式
+	styleFile, err := os.Open(option.style)
+	if err != nil {
+		println(err.Error())
+	}
+	scanner := bufio.NewScanner(styleFile)
+	scanner.Split(ScanStyleTokens)
+	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			println(err.Error())
+		}
+		key := scanner.Text()
+		if !scanner.Scan() {
+			println("格式文件不完整")
+		}
+		if err := scanner.Err(); err != nil {
+			println(err.Error())
+		}
+		value := scanner.Text()
+		//log.Printf("key = %s, value = %s\n", key, value)
+		switch key {
+		// 输入参数
+		case "keyword":
+			in.keyword = unquote(value)
+		case "arg_open":
+			in.arg_open = unquoteChar(value)
+		case "arg_close":
+			in.arg_close = unquoteChar(value)
+		case "actual":
+			in.actual = unquoteChar(value)
+		case "encap":
+			in.encap = unquoteChar(value)
+		case "escape":
+			in.escape = unquoteChar(value)
+		case "level":
+			in.level = unquoteChar(value)
+		case "quote":
+			in.quote = unquoteChar(value)
+		case "page_compositor":
+			in.page_compositor = unquote(value)
+		case "range_open":
+			in.range_open = unquoteChar(value)
+		case "range_close":
+			in.range_close = unquoteChar(value)
+		// 输出参数
+		case "preamble":
+			out.preamble = unquote(value)
+		case "postamble":
+			out.postamble = unquote(value)
+		case "setpage_prefix":
+			out.setpage_prefix = unquote(value)
+		case "setpage_suffix":
+			out.setpage_suffix = unquote(value)
+		case "group_skip":
+			out.group_skip = unquote(value)
+		case "headings_flag":
+			out.headings_flag = parseInt(value)
+		case "heading_prefix":
+			out.heading_prefix = unquote(value)
+		case "symhead_positive":
+			out.symhead_positive = unquote(value)
+		case "symhead_negative":
+			out.symhead_negative = unquote(value)
+		case "numhead_positive":
+			out.numhead_positive = unquote(value)
+		case "numhead_negative":
+			out.numhead_negative = unquote(value)
+		case "item_0":
+			out.item_0 = unquote(value)
+		case "item_1":
+			out.item_1 = unquote(value)
+		case "item_2":
+			out.item_2 = unquote(value)
+		case "item_01":
+			out.item_01 = unquote(value)
+		case "item_x1":
+			out.item_x1 = unquote(value)
+		case "item_12":
+			out.item_12 = unquote(value)
+		case "item_x2":
+			out.item_x2 = unquote(value)
+		case "delim_0":
+			out.delim_0 = unquote(value)
+		case "delim_1":
+			out.delim_1 = unquote(value)
+		case "delim_2":
+			out.delim_2 = unquote(value)
+		case "delim_n":
+			out.delim_n = unquote(value)
+		case "delim_r":
+			out.delim_r = unquote(value)
+		case "delim_t":
+			out.delim_t = unquote(value)
+		case "encap_prefix":
+			out.encap_prefix = unquote(value)
+		case "encap_infix":
+			out.encap_infix = unquote(value)
+		case "encap_suffix":
+			out.encap_suffix = unquote(value)
+		case "line_max":
+			out.line_max = parseInt(value)
+		case "indent_space":
+			out.indent_space = unquote(value)
+		case "indent_length":
+			out.indent_length = parseInt(value)
+		case "suffix_2p":
+			out.suffix_2p = unquote(value)
+		case "suffix_3p":
+			out.suffix_3p = unquote(value)
+		case "suffix_mp":
+			out.suffix_mp = unquote(value)
+		// 其他
+		default:
+			log.Printf("忽略未知格式 %s\n", key)
+		}
+	}
+
+	return in, out
+}
+
+func unquote(src string) string {
+	dst, err := strconv.Unquote(src)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	return dst
+}
+
+func unquoteChar(src string) rune {
+	src = unquote(src)
+	dst, _, tail, err := strconv.UnquoteChar(src, 0)
+	if tail != "" {
+		err = strconv.ErrSyntax
+	}
+	if err != nil {
+		println(err.Error())
+	}
+	return dst
+}
+
+func parseInt(src string) int {
+	i, err := strconv.ParseInt(src, 0, 0)
+	if err != nil {
+		println(err.Error())
+	}
+	return int(i)
+}
+
+// bufio.SplitFunc 的实例
+// 查找标识符、数字、单引号内的 rune、双引号或反引号内的串；跳过以 % 开头的注释（未完成）
+// 实现参考了 bufio.ScanWords
+func ScanStyleTokens(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// 跳过空格
+	start := 0
+	for width := 0; start < len(data); start += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[start:])
+		if !unicode.IsSpace(r) {
+			break
+		}
+	}
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+	// 首先读出第一个字符，按不同类型扫描 token
+	switch first, firstwidth := utf8.DecodeRune(data[start:]); first {
+	// 读引号内的 rune 或串，从引号后开始扫描
+	case '\'', '"', '`':
+		for width, i := 0, start+firstwidth; i < len(data); i += width {
+			var r rune
+			r, width = utf8.DecodeRune(data[i:])
+			// 处理有部分双引号内有换行的病态 .ist 文件，把换行符换成空格
+			if r == '\n' && first == '"' {
+				data[i] = ' '
+			}
+			if r == '\\' { // 跳过逃逸符
+				_, newwidth := utf8.DecodeRune(data[i+width:])
+				width += newwidth
+			} else if r == first { // 找到终点
+				return i + width, data[start : i+width], nil
+			}
+		}
+	// 读标识符、数字等，读到空格或注释符为止
+	default:
+		for width, i := 0, start; i < len(data); i += width {
+			var r rune
+			r, width = utf8.DecodeRune(data[i:])
+			if unicode.IsSpace(r) || r == '%' {
+				return i + width, data[start:i], nil
+			}
+		}
+	}
+	// 进入 EOF，剩下的部分全是一个 token（规则不足）
+	if atEOF && len(data) > start {
+		return len(data), data[start:], nil
+	}
+	// 要求更长的数据
+	return 0, nil, nil
 }

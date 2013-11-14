@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
-
-//	"fmt"
+	"log"
 )
+
+func init() {
+	log.SetFlags(log.Lshortfile)
+}
 
 func main() {
 	option := NewOptions()
@@ -43,7 +46,7 @@ func NewOptions() *Options {
 	flag.StringVar(&o.page, "p", "", "页码设置")
 	flag.BoolVar(&o.quiet, "q", false, "静默模式，不输出错误信息")
 	flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
-	flag.StringVar(&o.style, "s", "", "格式文件名")
+	flag.StringVar(&o.style, "s", "t.ist", "格式文件名")
 	flag.StringVar(&o.log, "t", "", "日志文件名")
 	return o
 }

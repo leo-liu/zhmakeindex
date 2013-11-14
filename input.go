@@ -30,9 +30,9 @@ type IndexEntry struct {
 type PageRange int
 
 const (
-	PageNormal PageRange = iota
-	PageOpen   PageRange = iota
-	PageClose  PageRange = iota
+	PAGE_NORMAL PageRange = iota
+	PAGE_OPEN
+	PAGE_CLOSE
 )
 
 type IndexEntryKV struct {
