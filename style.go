@@ -131,6 +131,7 @@ func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+	defer styleFile.Close()
 	scanner := bufio.NewScanner(styleFile)
 	scanner.Split(ScanStyleTokens)
 	for scanner.Scan() {
