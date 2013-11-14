@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -128,20 +129,20 @@ func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
 	// 读取格式文件，处理格式
 	styleFile, err := os.Open(option.style)
 	if err != nil {
-		println(err.Error())
+		log.Fatalln(err.Error())
 	}
 	scanner := bufio.NewScanner(styleFile)
 	scanner.Split(ScanStyleTokens)
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
-			println(err.Error())
+			log.Println(err.Error())
 		}
 		key := scanner.Text()
 		if !scanner.Scan() {
-			println("格式文件不完整")
+			log.Println("格式文件不完整")
 		}
 		if err := scanner.Err(); err != nil {
-			println(err.Error())
+			log.Println(err.Error())
 		}
 		value := scanner.Text()
 		switch key {
@@ -244,6 +245,10 @@ func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
 }
 
 func unquote(src string) string {
+	// 处理双引号中有换行符的串
+	if src[0] == '"' {
+		src = strings.Replace(src, "\n", "\\n", -1)
+	}
 	dst, err := strconv.Unquote(src)
 	if err != nil {
 		log.Println(err.Error())
@@ -258,7 +263,7 @@ func unquoteChar(src string) rune {
 		err = strconv.ErrSyntax
 	}
 	if err != nil {
-		println(err.Error())
+		log.Println(err.Error())
 	}
 	return dst
 }
@@ -266,7 +271,7 @@ func unquoteChar(src string) rune {
 func parseInt(src string) int {
 	i, err := strconv.ParseInt(src, 0, 0)
 	if err != nil {
-		println(err.Error())
+		log.Println(err.Error())
 	}
 	return int(i)
 }
@@ -300,10 +305,6 @@ func ScanStyleTokens(data []byte, atEOF bool) (advance int, token []byte, err er
 		for width, i := 0, start+firstwidth; i < len(data); i += width {
 			var r rune
 			r, width = utf8.DecodeRune(data[i:])
-			// 处理有部分双引号内有换行的病态 .ist 文件，把换行符换成空格
-			if r == '\n' && first == '"' {
-				data[i] = ' '
-			}
 			if r == '\\' { // 跳过逃逸符
 				_, newwidth := utf8.DecodeRune(data[i+width:])
 				width += newwidth

@@ -18,11 +18,9 @@ func main() {
 
 	instyle, outstyle := NewStyles(option)
 
-	for i, _ := range option.input {
-		in := NewInputIndex(i, option, instyle)
-		out := NewOutputIndex(in, option, outstyle)
-		out.Output()
-	}
+	in := NewInputIndex(option, instyle)
+	out := NewOutputIndex(in, option, outstyle)
+	out.Output()
 
 }
 
