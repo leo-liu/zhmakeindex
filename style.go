@@ -144,7 +144,6 @@ func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
 			println(err.Error())
 		}
 		value := scanner.Text()
-		//log.Printf("key = %s, value = %s\n", key, value)
 		switch key {
 		// 输入参数
 		case "keyword":
@@ -241,7 +240,6 @@ func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
 			log.Printf("忽略未知格式 %s\n", key)
 		}
 	}
-
 	return in, out
 }
 
@@ -277,14 +275,20 @@ func parseInt(src string) int {
 // 查找标识符、数字、单引号内的 rune、双引号或反引号内的串；跳过以 % 开头的注释（未完成）
 // 实现参考了 bufio.ScanWords
 func ScanStyleTokens(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// 跳过空格
+	// 跳过空白和注释
 	start := 0
+	in_comment := false
 	for width := 0; start < len(data); start += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[start:])
-		if !unicode.IsSpace(r) {
+		if !in_comment && r == '%' {
+			in_comment = true
+		} else if in_comment && r == '\n' {
+			in_comment = false
+		} else if !in_comment && !unicode.IsSpace(r) {
 			break
 		}
+		// 其他情况跳过：注释中未遇到换行符，或者注释外遇到空白符
 	}
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -313,7 +317,7 @@ func ScanStyleTokens(data []byte, atEOF bool) (advance int, token []byte, err er
 			var r rune
 			r, width = utf8.DecodeRune(data[i:])
 			if unicode.IsSpace(r) || r == '%' {
-				return i + width, data[start:i], nil
+				return i, data[start:i], nil
 			}
 		}
 	}
