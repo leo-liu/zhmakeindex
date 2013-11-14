@@ -1,10 +1,24 @@
 package main
 
+import (
+	"log"
+	"os"
+)
+
 type InputIndex []IndexEntry
 
 func NewInputIndex(option *Options, style *InputStyle) *InputIndex {
-	in := new(InputIndex)
-	return in
+	in := make(InputIndex, 0)
+	for _, idxname := range option.input {
+		idxfile, err := os.Open(idxname)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		defer idxfile.Close()
+		for .Scan() {
+		}
+	}
+	return &in
 }
 
 //func (ind InputIndex) Len() int {
