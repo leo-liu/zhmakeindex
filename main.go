@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 )
 
+var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
+
 func init() {
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(0)
 }
 
 func main() {
