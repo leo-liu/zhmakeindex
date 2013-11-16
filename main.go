@@ -25,6 +25,7 @@ func main() {
 	out := NewOutputIndex(in, option, outstyle)
 	out.Output()
 
+	debug.Println(len(CJKstrokes))
 }
 
 type Options struct {
