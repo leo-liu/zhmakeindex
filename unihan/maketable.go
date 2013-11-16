@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -14,24 +16,69 @@ func init() {
 }
 
 func main() {
-	make_reading_table()
+	outdir := flag.String("d", ".", "输出目录")
+	flag.Parse()
+	make_stroke_table(*outdir)
+	make_reading_table(*outdir)
 }
 
-func make_reading_table() {
+func make_stroke_table(outdir string) {
+	reading_file, err := os.Open("Unihan_DictionaryLikeData.txt")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer reading_file.Close()
+	outfile, err := os.Create(path.Join(outdir, "strokes.go"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer outfile.Close()
+	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
+	fmt.Fprintln(outfile, `// 来源：Unihan_DictionaryLikeData.txt`)
+	scanner := bufio.NewScanner(reading_file)
+	for scanner.Scan() {
+		if scanner.Err() != nil {
+			log.Fatalln(scanner.Err())
+		}
+		line := scanner.Text()
+		if strings.Contains(line, "Unicode version:") {
+			version := strings.TrimPrefix(line, "# ")
+			fmt.Fprintln(outfile, `//`, version)
+			fmt.Fprintln(outfile, `package main`)
+			fmt.Fprintln(outfile, `var CJKstrokes = []int{`)
+		}
+		if strings.HasPrefix(line, "U+") && strings.Contains(line, "kTotalStrokes") {
+			fields := strings.Split(line, "\t")
+			var r rune
+			fmt.Sscanf(fields[0], "U+%X", &r)
+			var stroke int8
+			fmt.Sscanf(fields[2], "%d", &stroke)
+			fmt.Fprintf(outfile, "\t%#x: %d, // %c\n", r, stroke, r)
+		}
+	}
+	fmt.Fprintln(outfile, `}`)
+
+}
+
+func make_reading_table(outdir string) {
 	// 读取 Unihan 读音表
 	reading_table := make(map[rune]*ReadingEntry)
 	reading_file, err := os.Open("Unihan_Readings.txt")
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatalln(err)
 	}
 	defer reading_file.Close()
 	scanner := bufio.NewScanner(reading_file)
 	largest := rune(0)
+	var version string
 	for scanner.Scan() {
 		if scanner.Err() != nil {
-			log.Fatalln(scanner.Err().Error())
+			log.Fatalln(scanner.Err())
 		}
 		line := scanner.Text()
+		if strings.Contains(line, "Unicode version:") {
+			version = strings.TrimPrefix(line, "# ")
+		}
 		if strings.HasPrefix(line, "U+") {
 			fields := strings.Split(line, "\t")
 			var r rune
@@ -62,9 +109,22 @@ func make_reading_table() {
 		out_reading_table[k] = numbered
 	}
 	// 输出
-	for _, v := range out_reading_table {
-		fmt.Printf("%s,\n", strconv.Quote(v))
+	outfile, err := os.Create(path.Join(outdir, "readings.go"))
+	if err != nil {
+		log.Fatalln(err)
 	}
+	defer outfile.Close()
+	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
+	fmt.Fprintln(outfile, `// 来源：Unihan_Readings.txt`)
+	fmt.Fprintln(outfile, `//`, version)
+	fmt.Fprintln(outfile, `package main`)
+	fmt.Fprintln(outfile, `var CJKreadings = []string{`)
+	for k, v := range out_reading_table {
+		if v != "" {
+			fmt.Fprintf(outfile, "\t%#x: %s, // %c\n", k, strconv.Quote(v), k)
+		}
+	}
+	fmt.Fprintln(outfile, `}`)
 }
 
 type ReadingEntry struct {
