@@ -26,6 +26,7 @@ func main() {
 	out.Output()
 
 	debug.Println(len(CJKstrokes))
+	debug.Println(len(CJKreadings))
 }
 
 type Options struct {
