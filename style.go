@@ -119,15 +119,15 @@ func NewOutputStyle() *OutputStyle {
 	return out
 }
 
-func NewStyles(option *Options) (*InputStyle, *OutputStyle) {
+func NewStyles(stylename string) (*InputStyle, *OutputStyle) {
 	in := NewInputStyle()
 	out := NewOutputStyle()
 
-	if option.style == "" {
+	if stylename == "" {
 		return in, out
 	}
 	// 读取格式文件，处理格式
-	styleFile, err := os.Open(option.style)
+	styleFile, err := os.Open(stylename)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

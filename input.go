@@ -11,7 +11,7 @@ import (
 
 type InputIndex []IndexEntry
 
-func NewInputIndex(option *Options, style *InputStyle) *InputIndex {
+func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	in := InputIndex{}
 	for _, idxname := range option.input {
 		idxfile, err := os.Open(idxname)
@@ -251,13 +251,13 @@ type IndexEntry struct {
 	level     []IndexEntryKV
 	pagefmt   string
 	page      string
-	pagerange PageRange
+	pagerange RangeType
 }
 
-type PageRange int
+type RangeType int
 
 const (
-	PAGE_NORMAL PageRange = iota
+	PAGE_NORMAL RangeType = iota
 	PAGE_OPEN
 	PAGE_CLOSE
 )
@@ -266,15 +266,3 @@ type IndexEntryKV struct {
 	key  string
 	text string
 }
-
-//func (ind InputIndex) Len() int {
-//	return len(ind)
-//}
-
-//func (ind InputIndex) Swap(i, j int) {
-//	ind[i], ind[j] = ind[j], ind[i]
-//}
-
-//func (ind InputIndex) Less(i, j int) bool {
-//	return true
-//}
