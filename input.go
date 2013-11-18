@@ -192,7 +192,7 @@ L_scan_kv:
 			} else if r == style.arg_open || r == style.actual || r == style.encap || r == style.level {
 				return nil, ScanSyntaxError
 			} else if r == style.arg_close {
-				entry.pagefmt = string(token)
+				entry.page_encap = string(token)
 				break L_scan_kv
 			} else if r == style.quote && !escaped {
 				quoted = true
@@ -248,10 +248,10 @@ L_scan_page:
 var ScanSyntaxError = errors.New("索引项语法错误")
 
 type IndexEntry struct {
-	level     []IndexEntryKV
-	pagefmt   string
-	page      string
-	pagerange RangeType
+	level      []IndexEntryKV
+	page_encap string
+	page       string
+	pagerange  RangeType
 }
 
 type RangeType int

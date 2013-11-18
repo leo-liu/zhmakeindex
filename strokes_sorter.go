@@ -10,6 +10,6 @@ func (sorter *StrokesSorter) SortIndex(input *InputIndex) *OutputIndex {
 	out.groups[0].items = make([]IndexItem, 1)
 	out.groups[0].items[0].text = "乙"
 	out.groups[0].items[0].level = 0
-	out.groups[0].items[0].page = []PageRange{{tag: PAGE_NORMAL, begin: "1", end: ""}}
+	out.groups[0].items[0].page = []PageRange{{encap: "textit", begin: "1", end: "1"}}
 	return out
 }

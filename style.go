@@ -52,6 +52,7 @@ type OutputStyle struct {
 	group_skip       string
 	headings_flag    int
 	heading_prefix   string
+	heading_suffix   string
 	symhead_positive string
 	symhead_negative string
 	numhead_positive string
@@ -89,11 +90,12 @@ func NewOutputStyle() *OutputStyle {
 		group_skip:       "\n\n  \\indexspace\n",
 		headings_flag:    0,
 		heading_prefix:   "",
+		heading_suffix:   "",
 		symhead_positive: "Symbols",
 		symhead_negative: "symbols",
 		numhead_positive: "Numbers",
 		numhead_negative: "numbers",
-		item_0:           "\n  \\tiem ",
+		item_0:           "\n  \\item ",
 		item_1:           "\n    \\subitem ",
 		item_2:           "\n      \\subsubitem ",
 		item_01:          "\n    \\subitem ",
@@ -181,10 +183,12 @@ func NewStyles(stylename string) (*InputStyle, *OutputStyle) {
 			out.setpage_suffix = unquote(value)
 		case "group_skip":
 			out.group_skip = unquote(value)
-		case "headings_flag":
+		case "headings_flag", "lethead_flag":
 			out.headings_flag = parseInt(value)
-		case "heading_prefix":
+		case "heading_prefix", "lethead_prefix":
 			out.heading_prefix = unquote(value)
+		case "heading_suffix", "lethead_suffix":
+			out.heading_suffix = unquote(value)
 		case "symhead_positive":
 			out.symhead_positive = unquote(value)
 		case "symhead_negative":
