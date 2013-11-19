@@ -38,7 +38,12 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 			} else if err != nil {
 				log.Fatalln(err.Error())
 			} else {
-				inset.Insert(entry)
+				if old := inset.Get(entry); old != nil {
+					oldentry := old.(*IndexEntry)
+					oldentry.pagelist = append(oldentry.pagelist, entry.pagelist...)
+				} else {
+					inset.Insert(entry)
+				}
 			}
 		}
 	}
@@ -279,20 +284,8 @@ func CompareIndexEntry(a, b rbtree.Item) int {
 			return 1
 		}
 	}
-	if x.pagelist[0].page < y.pagelist[0].page {
+	if len(x.level) < len(y.level) {
 		return -1
-	} else if x.pagelist[0].page > y.pagelist[0].page {
-		return 1
-	}
-	if x.pagelist[0].rangetype < y.pagelist[0].rangetype {
-		return -1
-	} else if x.pagelist[0].rangetype > y.pagelist[0].rangetype {
-		return 1
-	}
-	if x.pagelist[0].encap < y.pagelist[0].encap {
-		return -1
-	} else if x.pagelist[0].encap > y.pagelist[0].encap {
-		return 1
 	}
 	return 0
 }
@@ -306,6 +299,25 @@ type PageInput struct {
 	page      string
 	encap     string
 	rangetype RangeType
+}
+
+func ComparePageInput(a, b PageInput) int {
+	if a.page < b.page {
+		return -1
+	} else if a.page > b.page {
+		return 1
+	}
+	if a.rangetype < b.rangetype {
+		return -1
+	} else if a.rangetype > b.rangetype {
+		return 1
+	}
+	if a.encap < b.encap {
+		return -1
+	} else if a.encap > b.encap {
+		return 1
+	}
+	return 0
 }
 
 type RangeType int
