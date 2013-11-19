@@ -5,12 +5,11 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 // 分类排序方式
 type IndexSorter interface {
-	SortIndex(input *InputIndex) *OutputIndex
+	SortIndex(input *InputIndex, style *OutputStyle) *OutputIndex
 }
 
 // 输出索引
@@ -28,7 +27,7 @@ func NewOutputIndex(input *InputIndex, option *OutputOptions, style *OutputStyle
 	default:
 		log.Fatalln("未知排序方式")
 	}
-	outindex := sorter.SortIndex(input)
+	outindex := sorter.SortIndex(input, style)
 	outindex.style = style
 	outindex.option = option
 	return outindex
@@ -51,9 +50,9 @@ func (o *OutputIndex) Output() {
 		}
 		fmt.Fprint(outfile, o.style.group_skip)
 		if o.style.headings_flag > 0 {
-			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, strings.ToUpper(group.name), o.style.heading_suffix)
+			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		} else if o.style.headings_flag < 0 {
-			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, strings.ToLower(group.name), o.style.heading_suffix)
+			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		}
 		for _, item0 := range group.items {
 			fmt.Fprintf(outfile, "%s%s", o.style.item_0, item0.text)
