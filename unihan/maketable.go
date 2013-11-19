@@ -35,6 +35,7 @@ func make_stroke_table(outdir string) {
 	defer outfile.Close()
 	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
 	fmt.Fprintln(outfile, `// 来源：Unihan_DictionaryLikeData.txt`)
+	var maxStroke int8 = 0
 	scanner := bufio.NewScanner(reading_file)
 	for scanner.Scan() {
 		if scanner.Err() != nil {
@@ -54,10 +55,13 @@ func make_stroke_table(outdir string) {
 			var stroke int8
 			fmt.Sscanf(fields[2], "%d", &stroke)
 			fmt.Fprintf(outfile, "\t%#x: %d, // %c\n", r, stroke, r)
+			if stroke > maxStroke {
+				maxStroke = stroke
+			}
 		}
 	}
 	fmt.Fprintln(outfile, `}`)
-
+	fmt.Fprintf(outfile, "\nconst MAX_STROKE = %d\n", maxStroke)
 }
 
 func make_reading_table(outdir string) {

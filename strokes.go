@@ -74915,3 +74915,5 @@ var CJKstrokes = []int{
 	0x2f9b5: 17, // 虧
 	0x2f9b6: 18, // 虩
 }
+
+const MAX_STROKE = 64

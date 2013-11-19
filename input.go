@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"errors"
+	"github.com/yasushi-saito/rbtree"
 	"io"
 	"log"
 	"os"
@@ -12,7 +13,7 @@ import (
 type InputIndex []IndexEntry
 
 func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
-	in := InputIndex{}
+	inset := rbtree.NewTree(CompareIndexEntry)
 	for _, idxname := range option.input {
 		idxfile, err := os.Open(idxname)
 		if err != nil {
@@ -37,9 +38,15 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 			} else if err != nil {
 				log.Fatalln(err.Error())
 			} else {
-				in = append(in, *entry)
+				inset.Insert(entry)
 			}
 		}
+	}
+
+	in := InputIndex{}
+	for iter := inset.Min(); !iter.Limit(); iter = iter.Next() {
+		pentry := iter.Item().(*IndexEntry)
+		in = append(in, *pentry)
 	}
 	return &in
 }
@@ -59,6 +66,7 @@ func skipspaces(reader *bufio.Reader) error {
 
 func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error) {
 	entry := IndexEntry{}
+	entry.pagelist = make([]PageInput, 1)
 	// 跳过空白符
 	if err := skipspaces(reader); err != nil {
 		return nil, err
@@ -170,13 +178,13 @@ L_scan_kv:
 			} else if r == style.arg_close {
 				break L_scan_kv
 			} else if r == style.range_open {
-				entry.pagerange = PAGE_OPEN
+				entry.pagelist[0].rangetype = PAGE_OPEN
 			} else if r == style.range_close {
-				entry.pagerange = PAGE_CLOSE
+				entry.pagelist[0].rangetype = PAGE_CLOSE
 			} else if r == style.quote {
 				quoted = true
 			} else {
-				entry.pagerange = PAGE_NORMAL
+				entry.pagelist[0].rangetype = PAGE_NORMAL
 				token = append(token, r)
 			}
 			state = SCAN_COMMAND
@@ -192,7 +200,7 @@ L_scan_kv:
 			} else if r == style.arg_open || r == style.actual || r == style.encap || r == style.level {
 				return nil, ScanSyntaxError
 			} else if r == style.arg_close {
-				entry.page_encap = string(token)
+				entry.pagelist[0].encap = string(token)
 				break L_scan_kv
 			} else if r == style.quote && !escaped {
 				quoted = true
@@ -231,7 +239,7 @@ L_scan_page:
 			}
 		case SCAN_PAGE:
 			if r == style.arg_close {
-				entry.page = string(token)
+				entry.pagelist[0].page = string(token)
 				break L_scan_page
 			} else {
 				token = append(token, r)
@@ -248,10 +256,56 @@ L_scan_page:
 var ScanSyntaxError = errors.New("索引项语法错误")
 
 type IndexEntry struct {
-	level      []IndexEntryKV
-	page_encap string
-	page       string
-	pagerange  RangeType
+	level    []IndexEntryKV
+	pagelist []PageInput
+}
+
+// 实现 rbtree.CompareFunc
+func CompareIndexEntry(a, b rbtree.Item) int {
+	x := a.(*IndexEntry)
+	y := b.(*IndexEntry)
+	for i := range x.level {
+		if i >= len(y.level) {
+			return 1
+		}
+		if x.level[i].key < y.level[i].key {
+			return -1
+		} else if x.level[i].key > y.level[i].key {
+			return 1
+		}
+		if x.level[i].text < y.level[i].text {
+			return -1
+		} else if x.level[i].text > y.level[i].text {
+			return 1
+		}
+	}
+	if x.pagelist[0].page < y.pagelist[0].page {
+		return -1
+	} else if x.pagelist[0].page > y.pagelist[0].page {
+		return 1
+	}
+	if x.pagelist[0].rangetype < y.pagelist[0].rangetype {
+		return -1
+	} else if x.pagelist[0].rangetype > y.pagelist[0].rangetype {
+		return 1
+	}
+	if x.pagelist[0].encap < y.pagelist[0].encap {
+		return -1
+	} else if x.pagelist[0].encap > y.pagelist[0].encap {
+		return 1
+	}
+	return 0
+}
+
+type IndexEntryKV struct {
+	key  string
+	text string
+}
+
+type PageInput struct {
+	page      string
+	encap     string
+	rangetype RangeType
 }
 
 type RangeType int
@@ -261,8 +315,3 @@ const (
 	PAGE_OPEN
 	PAGE_CLOSE
 )
-
-type IndexEntryKV struct {
-	key  string
-	text string
-}
