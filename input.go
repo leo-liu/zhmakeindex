@@ -203,6 +203,7 @@ L_scan_kv:
 				token = append(token, r)
 				quoted = false
 			} else if r == style.arg_open || r == style.actual || r == style.encap || r == style.level {
+				// 有问题，应该允许 \indexentry{foo|see{bar}} 的用法
 				return nil, ScanSyntaxError
 			} else if r == style.arg_close {
 				entry.pagelist[0].encap = string(token)
@@ -299,25 +300,6 @@ type PageInput struct {
 	page      string
 	encap     string
 	rangetype RangeType
-}
-
-func ComparePageInput(a, b PageInput) int {
-	if a.page < b.page {
-		return -1
-	} else if a.page > b.page {
-		return 1
-	}
-	if a.rangetype < b.rangetype {
-		return -1
-	} else if a.rangetype > b.rangetype {
-		return 1
-	}
-	if a.encap < b.encap {
-		return -1
-	} else if a.encap > b.encap {
-		return 1
-	}
-	return 0
 }
 
 type RangeType int
