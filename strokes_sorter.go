@@ -2,6 +2,9 @@
 package main
 
 import (
+	"code.google.com/p/go.text/collate"
+	"code.google.com/p/go.text/language"
+	"sort"
 	"strconv"
 	"unicode"
 )
@@ -32,19 +35,70 @@ func (sorter *StrokesSorter) SortIndex(input *InputIndex, style *OutputStyle) *O
 		i++
 	}
 
+	// 先整体排序
+	sort.Sort(IndexEntrySliceByStroke{*input})
+
+	// 再依次分组添加
 	pagesorter := NewPageSorter(style)
 	for _, entry := range *input {
+		// 前面可能需要加一些无页码的空项，在输入时就增加
+
 		pageranges := pagesorter.Sort(entry.pagelist)
+		item := IndexItem{
+			level: len(entry.level),
+			text:  entry.level[len(entry.level)-1].text,
+			page:  pageranges,
+		}
 		group := sorter.Group(&entry)
+		out.groups[group].items = append(out.groups[group].items, item)
 	}
 
-	out.groups[0].items = make([]IndexItem, 1)
-	out.groups[0].items[0].text = "乙"
-	out.groups[0].items[0].level = 0
-	out.groups[0].items[0].page = []PageRange{{encap: "textit", begin: "1", end: "1"}}
 	return out
 }
 
+type IndexEntrySliceByStroke struct {
+	entries []IndexEntry
+}
+
+func (s IndexEntrySliceByStroke) Len() int {
+	return len(s.entries)
+}
+
+func (s IndexEntrySliceByStroke) Swap(i, j int) {
+	s.entries[i], s.entries[j] = s.entries[j], s.entries[i]
+}
+
+func (s IndexEntrySliceByStroke) Less(i, j int) bool {
+	a, b := s.entries[i], s.entries[j]
+	for i := range a.level {
+		if i > len(b.level) {
+			return false
+		}
+		keycmp := CmpstrByStroke(a.level[i].key, b.level[i].key)
+		if keycmp < 0 {
+			return true
+		} else if keycmp > 0 {
+			return false
+		}
+		textcmp := CmpstrByStroke(a.level[i].text, b.level[i].text)
+		if textcmp < 0 {
+			return true
+		} else if textcmp > 0 {
+			return false
+		}
+	}
+	// if len(a.level) > len(b.level) {return false}
+	return false
+}
+
+var CollatorByStroke = collate.New(language.Make("zh_stroke"))
+
+// 按笔划序比较两个串的大小
+func CmpstrByStroke(s, t string) int {
+	return CollatorByStroke.CompareString(s, t)
+}
+
+// 取得分组
 func (sorter *StrokesSorter) Group(entry *IndexEntry) int {
 	first := ([]rune(entry.level[0].key))[0]
 	first = unicode.ToLower(first)
