@@ -3,6 +3,7 @@ package main
 
 import (
 	"strconv"
+	"unicode"
 )
 
 type StrokesSorter struct{}
@@ -30,9 +31,31 @@ func (sorter *StrokesSorter) SortIndex(input *InputIndex, style *OutputStyle) *O
 		out.groups[i].name = strconv.Itoa(stroke) + " 划"
 		i++
 	}
+
+	pagesorter := NewPageSorter(style)
+	for _, entry := range *input {
+		pageranges := pagesorter.Sort(entry.pagelist)
+		group := sorter.Group(&entry)
+	}
+
 	out.groups[0].items = make([]IndexItem, 1)
 	out.groups[0].items[0].text = "乙"
 	out.groups[0].items[0].level = 0
 	out.groups[0].items[0].page = []PageRange{{encap: "textit", begin: "1", end: "1"}}
 	return out
+}
+
+func (sorter *StrokesSorter) Group(entry *IndexEntry) int {
+	first := ([]rune(entry.level[0].key))[0]
+	first = unicode.ToLower(first)
+	switch {
+	case unicode.IsNumber(first):
+		return 0
+	case 'a' <= first && first <= 'z':
+		return 2 + int(first) - 'a'
+	case CJKstrokes[first] > 0:
+		return 2 + 26 + CJKstrokes[first]
+	default:
+		return 1
+	}
 }
