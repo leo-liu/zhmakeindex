@@ -73,6 +73,7 @@ type OutputStyle struct {
 	encap_prefix     string
 	encap_infix      string
 	encap_suffix     string
+	page_precedence  string
 	line_max         int
 	indent_space     string
 	indent_length    int
@@ -111,6 +112,7 @@ func NewOutputStyle() *OutputStyle {
 		encap_prefix:     "\\",
 		encap_infix:      "{",
 		encap_suffix:     "}",
+		page_precedence:  "rnaRA",
 		line_max:         72,
 		indent_space:     "\t\t",
 		indent_length:    16,

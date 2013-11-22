@@ -3,10 +3,12 @@ package main
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"github.com/yasushi-saito/rbtree"
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"unicode"
 )
 
@@ -245,7 +247,7 @@ L_scan_page:
 			}
 		case SCAN_PAGE:
 			if r == style.arg_close {
-				entry.pagelist[0].page = string(token)
+				entry.pagelist[0].format, entry.pagelist[0].page = scanNumber(token)
 				break L_scan_page
 			} else {
 				token = append(token, r)
@@ -297,15 +299,49 @@ type IndexEntryKV struct {
 }
 
 type PageInput struct {
-	page      string
+	page      int
+	format    NumFormat
 	encap     string
 	rangetype RangeType
+}
+
+func (p *PageInput) NumString() string {
+	return p.format.String(p.page)
+}
+
+type NumFormat int
+
+const (
+	NUM_ARABIC NumFormat = iota
+	NUM_ROMAN_LOWER
+	NUM_ROMAN_UPPER
+	NUM_ALPH_LOWER
+	NUM_ALPH_UPPER
+)
+
+// 未完整实现，目前仅有阿拉伯数字
+func scanNumber(token []rune) (NumFormat, int) {
+	return NUM_ARABIC, scanArabic(token)
+}
+
+func scanArabic(token []rune) int {
+	num, _ := strconv.Atoi(string(token))
+	return num
+}
+
+// 未完整实现，仅阿拉伯数字
+func (fmt NumFormat) String(num int) string {
+	return arabicNumString(num)
+}
+
+func arabicNumString(num int) string {
+	return fmt.Sprint(num)
 }
 
 type RangeType int
 
 const (
-	PAGE_NORMAL RangeType = iota
-	PAGE_OPEN
+	PAGE_OPEN RangeType = iota
+	PAGE_NORMAL
 	PAGE_CLOSE
 )
