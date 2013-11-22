@@ -7,11 +7,6 @@ import (
 	"os"
 )
 
-// 分类排序方式
-type IndexSorter interface {
-	SortIndex(input *InputIndex, style *OutputStyle) *OutputIndex
-}
-
 // 输出索引
 type OutputIndex struct {
 	groups []IndexGroup

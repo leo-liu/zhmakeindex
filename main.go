@@ -9,7 +9,7 @@ import (
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
 
 func init() {
-	log.SetFlags(0)
+	log.SetFlags(log.Lshortfile)
 }
 
 func main() {
