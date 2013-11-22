@@ -49,36 +49,36 @@ func (o *OutputIndex) Output() {
 		} else if o.style.headings_flag < 0 {
 			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		}
-		for _, item0 := range group.items {
-			fmt.Fprintf(outfile, "%s%s", o.style.item_0, item0.text)
-			writePage(outfile, 0, item0.page, o.style)
-			for i1, item1 := range item0.nextlevel {
-				if i1 == 0 {
-					if item0.page != nil {
-						fmt.Fprint(outfile, o.style.item_01)
-					} else {
-						fmt.Fprint(outfile, o.style.item_x1)
-					}
-				} else {
-					fmt.Fprint(outfile, o.style.item_1)
-				}
-				fmt.Fprint(outfile, item1.text)
-				writePage(outfile, 1, item1.page, o.style)
-				for i2, item2 := range item1.nextlevel {
-					if i2 == 0 {
-						if item1.page != nil {
-							fmt.Fprint(outfile, o.style.item_12)
-						} else {
-							fmt.Fprint(outfile, o.style.item_x2)
-						}
-					} else {
-						fmt.Fprint(outfile, o.style.item_2)
-					}
-					fmt.Fprint(outfile, item2.text)
-					writePage(outfile, 2, item2.page, o.style)
-				}
-			}
-		}
+		//for _, item0 := range group.items {
+		//	fmt.Fprintf(outfile, "%s%s", o.style.item_0, item0.text)
+		//	writePage(outfile, 0, item0.page, o.style)
+		//	for i1, item1 := range item0.nextlevel {
+		//		if i1 == 0 {
+		//			if item0.page != nil {
+		//				fmt.Fprint(outfile, o.style.item_01)
+		//			} else {
+		//				fmt.Fprint(outfile, o.style.item_x1)
+		//			}
+		//		} else {
+		//			fmt.Fprint(outfile, o.style.item_1)
+		//		}
+		//		fmt.Fprint(outfile, item1.text)
+		//		writePage(outfile, 1, item1.page, o.style)
+		//		for i2, item2 := range item1.nextlevel {
+		//			if i2 == 0 {
+		//				if item1.page != nil {
+		//					fmt.Fprint(outfile, o.style.item_12)
+		//				} else {
+		//					fmt.Fprint(outfile, o.style.item_x2)
+		//				}
+		//			} else {
+		//				fmt.Fprint(outfile, o.style.item_2)
+		//			}
+		//			fmt.Fprint(outfile, item2.text)
+		//			writePage(outfile, 2, item2.page, o.style)
+		//		}
+		//	}
+		//}
 	}
 	fmt.Fprint(outfile, o.style.postamble)
 }
@@ -110,13 +110,11 @@ type IndexGroup struct {
 	items []IndexItem
 }
 
-// 一个输出项，包括级别、文字、用来排序的键、一系列页码区间，下一级的项列表
+// 一个输出项，包括级别、文字、一系列页码区间
 type IndexItem struct {
-	level     int
-	text      string
-	key       string
-	page      []PageRange
-	nextlevel []IndexItem
+	level int
+	text  string
+	page  []PageRange
 }
 
 type PageRange struct {
