@@ -44,7 +44,19 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 					oldentry := old.(*IndexEntry)
 					oldentry.pagelist = append(oldentry.pagelist, entry.pagelist...)
 				} else {
-					inset.Insert(entry)
+					// entry 不在集合 inset 中时，插入 entry 本身和所有祖先节点，祖先不含页码
+					for len(entry.level) > 0 {
+						inset.Insert(entry)
+						parent := &IndexEntry{
+							level:    entry.level[:len(entry.level)-1],
+							pagelist: []PageInput{},
+						}
+						if inset.Get(parent) != nil {
+							break
+						} else {
+							entry = parent
+						}
+					}
 				}
 			}
 		}
@@ -102,6 +114,7 @@ func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error
 	quoted := false
 	escaped := false
 	token := []rune{}
+	entry.pagelist[0].rangetype = PAGE_NORMAL
 L_scan_kv:
 	for {
 		r, _, err := reader.ReadRune()
@@ -191,7 +204,6 @@ L_scan_kv:
 			} else if r == style.quote {
 				quoted = true
 			} else {
-				entry.pagelist[0].rangetype = PAGE_NORMAL
 				token = append(token, r)
 			}
 			state = SCAN_COMMAND

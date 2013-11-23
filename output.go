@@ -49,36 +49,41 @@ func (o *OutputIndex) Output() {
 		} else if o.style.headings_flag < 0 {
 			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		}
-		//for _, item0 := range group.items {
-		//	fmt.Fprintf(outfile, "%s%s", o.style.item_0, item0.text)
-		//	writePage(outfile, 0, item0.page, o.style)
-		//	for i1, item1 := range item0.nextlevel {
-		//		if i1 == 0 {
-		//			if item0.page != nil {
-		//				fmt.Fprint(outfile, o.style.item_01)
-		//			} else {
-		//				fmt.Fprint(outfile, o.style.item_x1)
-		//			}
-		//		} else {
-		//			fmt.Fprint(outfile, o.style.item_1)
-		//		}
-		//		fmt.Fprint(outfile, item1.text)
-		//		writePage(outfile, 1, item1.page, o.style)
-		//		for i2, item2 := range item1.nextlevel {
-		//			if i2 == 0 {
-		//				if item1.page != nil {
-		//					fmt.Fprint(outfile, o.style.item_12)
-		//				} else {
-		//					fmt.Fprint(outfile, o.style.item_x2)
-		//				}
-		//			} else {
-		//				fmt.Fprint(outfile, o.style.item_2)
-		//			}
-		//			fmt.Fprint(outfile, item2.text)
-		//			writePage(outfile, 2, item2.page, o.style)
-		//		}
-		//	}
-		//}
+		for i, item := range group.items {
+			// debug.Println(i, item)
+			// 如果修改一下 OutputStyle 的数据结构，容易改成任意层的索引
+			switch item.level {
+			case 0:
+				fmt.Fprintf(outfile, "%s%s", o.style.item_0, item.text)
+				writePage(outfile, 0, item.page, o.style)
+			case 1:
+				if last := group.items[i-1]; last.level == 0 {
+					if last.page != nil {
+						fmt.Fprint(outfile, o.style.item_01)
+					} else {
+						fmt.Fprint(outfile, o.style.item_x1)
+					}
+				} else {
+					fmt.Fprint(outfile, o.style.item_1)
+				}
+				fmt.Fprint(outfile, item.text)
+				writePage(outfile, 1, item.page, o.style)
+			case 2:
+				if last := group.items[i-1]; last.level == 1 {
+					if last.page != nil {
+						fmt.Fprint(outfile, o.style.item_12)
+					} else {
+						fmt.Fprint(outfile, o.style.item_x2)
+					}
+				} else {
+					fmt.Fprint(outfile, o.style.item_2)
+				}
+				fmt.Fprint(outfile, item.text)
+				writePage(outfile, 2, item.page, o.style)
+			default:
+				log.Printf("索引项“%s”层次数过深，忽略此项\n", item.text)
+			}
+		}
 	}
 	fmt.Fprint(outfile, o.style.postamble)
 }
