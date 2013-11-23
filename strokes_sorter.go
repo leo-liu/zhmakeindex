@@ -41,11 +41,9 @@ func (sorter *StrokesSorter) SortIndex(input *InputIndex, style *OutputStyle) *O
 	// 再依次分组添加
 	pagesorter := NewPageSorter(style)
 	for _, entry := range *input {
-		// 前面可能需要加一些无页码的空项，在输入时就增加
-
 		pageranges := pagesorter.Sort(entry.pagelist)
 		item := IndexItem{
-			level: len(entry.level),
+			level: len(entry.level) - 1,
 			text:  entry.level[len(entry.level)-1].text,
 			page:  pageranges,
 		}
@@ -71,9 +69,10 @@ func (s IndexEntrySliceByStroke) Swap(i, j int) {
 func (s IndexEntrySliceByStroke) Less(i, j int) bool {
 	a, b := s.entries[i], s.entries[j]
 	for i := range a.level {
-		if i > len(b.level) {
+		if i >= len(b.level) {
 			return false
 		}
+		//debug.Println(i, a.level[i], b.level[i])
 		keycmp := CmpstrByStroke(a.level[i].key, b.level[i].key)
 		if keycmp < 0 {
 			return true
@@ -87,7 +86,9 @@ func (s IndexEntrySliceByStroke) Less(i, j int) bool {
 			return false
 		}
 	}
-	// if len(a.level) > len(b.level) {return false}
+	if len(a.level) < len(b.level) {
+		return true
+	}
 	return false
 }
 
@@ -108,8 +109,9 @@ func (sorter *StrokesSorter) Group(entry *IndexEntry) int {
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'
 	case CJKstrokes[first] > 0:
-		return 2 + 26 + CJKstrokes[first]
+		return 2 + 26 + (CJKstrokes[first] - 1)
 	default:
+		// 符号组
 		return 1
 	}
 }

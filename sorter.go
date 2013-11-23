@@ -46,6 +46,7 @@ func NewPageSorter(style *OutputStyle) *PageSorter {
 
 // 处理输入的页码，生成页码区间组
 func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
+	//	debug.Println(pages)
 	out := []PageRange{}
 	sort.Sort(PageInputSlice{pages: pages, sorter: sorter})
 	// 使用一个栈来合并页码区间
@@ -89,6 +90,7 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 			}
 		}
 	}
+	//	debug.Println(out)
 	return out
 }
 
