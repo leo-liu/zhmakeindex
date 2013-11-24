@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	ProgramVersion = stripDollors("$Revision: 0e8870c07a32 $")
-	ProgramDate    = stripDollors("$Date: 2013/11/24 14:36:17 $")
-	ProgramAuthor  = stripDollors("$Author: leoliu $")
+	ProgramVersion = stripDollors("$Revision: 9c7de139b61b $", "Revision:")
+	ProgramDate    = stripDollors("$Date: 2013/11/24 14:44:54 $", "Date:")
+	ProgramAuthor  = stripDollors("$Author: leoliu $", "Author:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -30,8 +30,8 @@ func main() {
 
 	setupLog(option)
 
-	log.Println(ProgramDate, ProgramVersion)
-	log.Println(ProgramAuthor)
+	log.Printf("版本 %s，%s\n", ProgramVersion, ProgramDate)
+	log.Printf("作者：%s\n", ProgramAuthor)
 
 	instyle, outstyle := NewStyles(option.style)
 
@@ -137,8 +137,11 @@ func stripExt(fpath string) string {
 	return fpath[:len(fpath)-len(ext)]
 }
 
-func stripDollors(svnstring string) string {
-	begin := strings.Index(svnstring, "$") + 1
+func stripDollors(svnstring, prefix string) string {
+	if prefix == "" {
+		prefix = "$"
+	}
+	begin := strings.Index(svnstring, prefix) + len(prefix)
 	end := strings.LastIndex(svnstring, "$")
-	return svnstring[begin:end]
+	return strings.TrimSpace(svnstring[begin:end])
 }
