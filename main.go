@@ -1,11 +1,20 @@
+// zhmakeindex
 package main
 
 import (
 	"flag"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
+)
+
+var (
+	ProgramVersion = stripDollors("$Revision: 0e8870c07a32 $")
+	ProgramDate    = stripDollors("$Date: 2013/11/24 14:36:17 $")
+	ProgramAuthor  = stripDollors("$Author: leoliu $")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -19,13 +28,29 @@ func main() {
 	option := NewOptions()
 	option.parse()
 
-	setupLog(option.log)
+	setupLog(option)
+
+	log.Println(ProgramDate, ProgramVersion)
+	log.Println(ProgramAuthor)
 
 	instyle, outstyle := NewStyles(option.style)
 
+	log.Println("正在读取输入文件……")
 	in := NewInputIndex(&option.InputOptions, instyle)
+	log.Printf("共 %d 项。\n", len(*in))
+
+	log.Println("正在排序……")
 	out := NewOutputIndex(in, &option.OutputOptions, outstyle)
+
+	log.Println("正在输出……")
 	out.Output()
+
+	if option.output != "" {
+		log.Printf("输出文件写入 %s\n", option.output)
+	}
+	if option.log != "" {
+		log.Printf("日志文件写入 %s\n", option.log)
+	}
 }
 
 type Options struct {
@@ -51,7 +76,7 @@ type OutputOptions struct {
 
 func NewOptions() *Options {
 	o := new(Options)
-	flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格")
+	// flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格") // 未实现
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
 	flag.StringVar(&o.sort, "x", "pinyin", "中文排序方式，可以使用 pinyin 或 stroke")
@@ -90,20 +115,30 @@ func (o *Options) parse() {
 	}
 }
 
-func setupLog(logname string) {
-	if logname == "" {
+func setupLog(option *Options) {
+	var stderr io.Writer = os.Stderr
+	if option.quiet {
+		stderr = ioutil.Discard
+	}
+	if option.log == "" {
 		// 只使用标准错误流
 		return
 	}
-	flog, err := os.Create(logname)
+	flog, err := os.Create(option.log)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.SetOutput(io.MultiWriter(os.Stderr, flog))
+	log.SetOutput(io.MultiWriter(stderr, flog))
 }
 
 // 删除文件后缀名
 func stripExt(fpath string) string {
 	ext := filepath.Ext(fpath)
 	return fpath[:len(fpath)-len(ext)]
+}
+
+func stripDollors(svnstring string) string {
+	begin := strings.Index(svnstring, "$") + 1
+	end := strings.LastIndex(svnstring, "$")
+	return svnstring[begin:end]
 }
