@@ -1,16 +1,15 @@
-// strokes_sorter.go
+// stroke_collator.go
 package main
 
 import (
-	"code.google.com/p/go.text/collate"
-	"code.google.com/p/go.text/language"
 	"strconv"
 	"unicode"
 )
 
-type StrokesIndexCollator struct{}
+// 汉字按笔画排序，汉字按笔画分组排在英文字母组后面
+type StrokeIndexCollator struct{}
 
-func (_ StrokesIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
+func (_ StrokeIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 	// 分组：数字、符号、字母 A..Z、笔划 1..MAX_STROKE
 	groups := make([]IndexGroup, 2+26+MAX_STROKE)
 	if style.headings_flag > 0 {
@@ -36,7 +35,7 @@ func (_ StrokesIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 }
 
 // 取得分组
-func (_ StrokesIndexCollator) Group(entry *IndexEntry) int {
+func (_ StrokeIndexCollator) Group(entry *IndexEntry) int {
 	first := ([]rune(entry.level[0].key))[0]
 	first = unicode.ToLower(first)
 	switch {
@@ -52,9 +51,37 @@ func (_ StrokesIndexCollator) Group(entry *IndexEntry) int {
 	}
 }
 
-var CollatorByStroke = collate.New(language.Make("zh_stroke"))
-
 // 按笔划序比较两个串的大小
-func (_ StrokesIndexCollator) Strcmp(a, b string) int {
-	return CollatorByStroke.CompareString(a, b)
+func (_ StrokeIndexCollator) Strcmp(a, b string) int {
+	a_rune, b_rune := []rune(a), []rune(b)
+	for i := range a_rune {
+		if i >= len(b_rune) {
+			return 1
+		}
+		cmp := runecmpByStroke(a_rune[i], b_rune[i])
+		if cmp != 0 { // 笔画数不同
+			return cmp
+		} else if a_rune[i] != b_rune[i] { // 笔画数相同、字符不同
+			return int(a_rune[i] - b_rune[i])
+		}
+	}
+	if len(a_rune) < len(b_rune) {
+		return -1
+	}
+	return 0
+}
+
+// 按汉字笔划序比较两个字符大小
+func runecmpByStroke(a, b rune) int {
+	a_strokes, b_strokes := CJKstrokes[a], CJKstrokes[b]
+	switch {
+	case a_strokes == 0 && b_strokes == 0:
+		return int(a - b)
+	case a_strokes == 0 && b_strokes != 0:
+		return -1
+	case a_strokes != 0 && b_strokes == 0:
+		return 1
+	default:
+		return a_strokes - b_strokes
+	}
 }

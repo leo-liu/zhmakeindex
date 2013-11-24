@@ -24,9 +24,6 @@ func main() {
 	in := NewInputIndex(&option.InputOptions, instyle)
 	out := NewOutputIndex(in, &option.OutputOptions, outstyle)
 	out.Output()
-
-	debug.Println(len(CJKstrokes))
-	debug.Println(len(CJKreadings))
 }
 
 type Options struct {
@@ -55,7 +52,7 @@ func NewOptions() *Options {
 	flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格")
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
-	flag.StringVar(&o.sort, "x", "stroke", "中文排序方式")
+	flag.StringVar(&o.sort, "x", "pinyin", "中文排序方式，可以使用 pinyin 或 stroke")
 	flag.StringVar(&o.page, "p", "", "页码设置")
 	flag.BoolVar(&o.quiet, "q", false, "静默模式，不输出错误信息")
 	flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
