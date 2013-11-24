@@ -2,7 +2,7 @@
 // 来源：Unihan_DictionaryLikeData.txt
 // Unicode version: 6.3.0
 package main
-var CJKstrokes = []int{
+var CJKstrokes = map[rune]int{
 	0x3400: 5, // 㐀
 	0x3401: 6, // 㐁
 	0x3402: 6, // 㐂

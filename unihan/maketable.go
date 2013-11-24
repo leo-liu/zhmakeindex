@@ -46,7 +46,7 @@ func make_stroke_table(outdir string) {
 			version := strings.TrimPrefix(line, "# ")
 			fmt.Fprintln(outfile, `//`, version)
 			fmt.Fprintln(outfile, `package main`)
-			fmt.Fprintln(outfile, `var CJKstrokes = []int{`)
+			fmt.Fprintln(outfile, `var CJKstrokes = map[rune]int{`)
 		}
 		if strings.HasPrefix(line, "U+") && strings.Contains(line, "kTotalStrokes") {
 			fields := strings.Split(line, "\t")
@@ -122,7 +122,7 @@ func make_reading_table(outdir string) {
 	fmt.Fprintln(outfile, `// 来源：Unihan_Readings.txt`)
 	fmt.Fprintln(outfile, `//`, version)
 	fmt.Fprintln(outfile, `package main`)
-	fmt.Fprintln(outfile, `var CJKreadings = []string{`)
+	fmt.Fprintln(outfile, `var CJKreadings = map[rune]string{`)
 	for k, v := range out_reading_table {
 		if v != "" {
 			fmt.Fprintf(outfile, "\t%#x: %s, // %c\n", k, strconv.Quote(v), k)
