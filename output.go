@@ -26,11 +26,17 @@ func NewOutputIndex(input *InputIndex, option *OutputOptions, style *OutputStyle
 // suffix_2p, suffix_3p, suffix_mp 暂未实现
 // line_max, indent_space, indent_length 未实现
 func (o *OutputIndex) Output() {
-	outfile, err := os.Create(o.option.output)
-	if err != nil {
-		log.Fatalln(err)
+	var outfile *os.File
+	if o.option.output == "" {
+		outfile = os.Stdout
+	} else {
+		var err error
+		outfile, err = os.Create(o.option.output)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer outfile.Close()
 	}
-	defer outfile.Close()
 
 	fmt.Fprint(outfile, o.style.preamble)
 	for _, group := range o.groups {
