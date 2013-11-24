@@ -5,9 +5,93 @@ import (
 	"sort"
 )
 
-// 分类排序方式
-type IndexSorter interface {
-	SortIndex(input *InputIndex, style *OutputStyle) *OutputIndex
+// 对应不同的分类排序方式
+type IndexCollator interface {
+	InitGroups(style *OutputStyle) []IndexGroup
+	Group(entry *IndexEntry) int
+	Strcmp(a, b string) int
+}
+
+// 排序器
+type IndexSorter struct {
+	IndexCollator
+}
+
+func NewIndexSorter(method string) *IndexSorter {
+	switch method {
+	case "stroke":
+		return &IndexSorter{
+			IndexCollator: StrokesIndexCollator{},
+		}
+	default:
+		log.Fatalln("未知排序方式")
+	}
+	return nil
+}
+
+func (sorter *IndexSorter) SortIndex(input *InputIndex, style *OutputStyle) *OutputIndex {
+	out := new(OutputIndex)
+	// 分组
+	out.groups = sorter.InitGroups(style)
+
+	// 先整体排序
+	sort.Sort(IndexEntrySlice{
+		entries:  *input,
+		colattor: sorter.IndexCollator,
+	})
+
+	// 再依次对页码排序，并分组添加
+	pagesorter := NewPageSorter(style)
+	for _, entry := range *input {
+		pageranges := pagesorter.Sort(entry.pagelist)
+		item := IndexItem{
+			level: len(entry.level) - 1,
+			text:  entry.level[len(entry.level)-1].text,
+			page:  pageranges,
+		}
+		group := sorter.Group(&entry)
+		out.groups[group].items = append(out.groups[group].items, item)
+	}
+
+	return out
+}
+
+type IndexEntrySlice struct {
+	entries  []IndexEntry
+	colattor IndexCollator
+}
+
+func (s IndexEntrySlice) Len() int {
+	return len(s.entries)
+}
+
+func (s IndexEntrySlice) Swap(i, j int) {
+	s.entries[i], s.entries[j] = s.entries[j], s.entries[i]
+}
+
+func (s IndexEntrySlice) Less(i, j int) bool {
+	a, b := s.entries[i], s.entries[j]
+	for i := range a.level {
+		if i >= len(b.level) {
+			return false
+		}
+		keycmp := s.colattor.Strcmp(a.level[i].key, b.level[i].key)
+		if keycmp < 0 {
+			return true
+		} else if keycmp > 0 {
+			return false
+		}
+		textcmp := s.colattor.Strcmp(a.level[i].text, b.level[i].text)
+		if textcmp < 0 {
+			return true
+		} else if textcmp > 0 {
+			return false
+		}
+	}
+	if len(a.level) < len(b.level) {
+		return true
+	}
+	return false
 }
 
 // 页码排序器
@@ -16,7 +100,7 @@ type PageSorter struct {
 }
 
 func NewPageSorter(style *OutputStyle) *PageSorter {
-	sorter := PageSorter{}
+	var sorter PageSorter
 	sorter.precedence = make(map[NumFormat]int)
 	for i, r := range style.page_precedence {
 		switch r {
@@ -47,10 +131,10 @@ func NewPageSorter(style *OutputStyle) *PageSorter {
 // 处理输入的页码，生成页码区间组
 func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 	//	debug.Println(pages)
-	out := []PageRange{}
+	var out []PageRange
 	sort.Sort(PageInputSlice{pages: pages, sorter: sorter})
 	// 使用一个栈来合并页码区间
-	stack := make([]PageInput, 0)
+	var stack []PageInput
 	for _, p := range pages {
 		pstr := p.NumString()
 		if len(stack) == 0 {
@@ -72,7 +156,7 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 				log.Printf("页码区间有误，未找到与 %s 匹配的区间尾。\n", stack[0].NumString())
 				// 输出从当前页到空白的伪区间，并清空栈
 				out = append(out, PageRange{encap: p.encap, begin: stack[0].NumString(), end: ""})
-				stack = make([]PageInput, 0)
+				stack = nil
 				continue
 			}
 			switch p.rangetype {

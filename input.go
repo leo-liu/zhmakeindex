@@ -49,7 +49,7 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 						inset.Insert(entry)
 						parent := &IndexEntry{
 							level:    entry.level[:len(entry.level)-1],
-							pagelist: []PageInput{},
+							pagelist: nil,
 						}
 						if inset.Get(parent) != nil {
 							break
@@ -62,7 +62,7 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 		}
 	}
 
-	in := InputIndex{}
+	var in InputIndex
 	for iter := inset.Min(); !iter.Limit(); iter = iter.Next() {
 		pentry := iter.Item().(*IndexEntry)
 		in = append(in, *pentry)
@@ -84,7 +84,7 @@ func skipspaces(reader *bufio.Reader) error {
 }
 
 func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error) {
-	entry := IndexEntry{}
+	var entry IndexEntry
 	entry.pagelist = make([]PageInput, 1)
 	// 跳过空白符
 	if err := skipspaces(reader); err != nil {
@@ -113,7 +113,7 @@ func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error
 	state := SCAN_OPEN
 	quoted := false
 	escaped := false
-	token := []rune{}
+	var token []rune
 	entry.pagelist[0].rangetype = PAGE_NORMAL
 L_scan_kv:
 	for {
@@ -133,7 +133,7 @@ L_scan_kv:
 			pushtoken := func(next int) {
 				str := string(token)
 				entry.level = append(entry.level, IndexEntryKV{key: str, text: str})
-				token = []rune{}
+				token = nil
 				state = next
 			}
 			if quoted {
@@ -164,7 +164,7 @@ L_scan_kv:
 			pushtoken := func(next int) {
 				str := string(token)
 				entry.level[len(entry.level)-1].text = str
-				token = []rune{}
+				token = nil
 				state = next
 			}
 			if quoted {
@@ -242,7 +242,7 @@ L_scan_kv:
 	}
 	// 从 arg_open 开始扫描到 arg_close，处理页码
 	state = SCAN_OPEN
-	token = []rune{}
+	token = nil
 L_scan_page:
 	for {
 		r, _, err := reader.ReadRune()

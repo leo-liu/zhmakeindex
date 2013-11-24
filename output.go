@@ -15,13 +15,7 @@ type OutputIndex struct {
 }
 
 func NewOutputIndex(input *InputIndex, option *OutputOptions, style *OutputStyle) *OutputIndex {
-	var sorter IndexSorter
-	switch option.sort {
-	case "stroke":
-		sorter = &StrokesSorter{}
-	default:
-		log.Fatalln("未知排序方式")
-	}
+	sorter := NewIndexSorter(option.sort)
 	outindex := sorter.SortIndex(input, style)
 	outindex.style = style
 	outindex.option = option
