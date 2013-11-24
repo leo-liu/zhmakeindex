@@ -16,49 +16,17 @@ type InputIndex []IndexEntry
 
 func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	inset := rbtree.NewTree(CompareIndexEntry)
-	for _, idxname := range option.input {
-		idxfile, err := os.Open(idxname)
-		if err != nil {
-			log.Fatalln(err.Error())
-		}
-		defer idxfile.Close()
-		idxreader := bufio.NewReader(idxfile)
-		for {
-			entry, err := ScanIndexEntry(idxreader, style)
-			if err == io.EOF {
-				break
-			} else if err == ScanSyntaxError {
-				log.Println(err.Error())
-				// 跳过一行
-				for isprefix := true; isprefix; {
-					var err error
-					_, isprefix, err = idxreader.ReadLine()
-					if err != nil {
-						break
-					}
-				}
-			} else if err != nil {
+
+	if option.stdin {
+		readIdxFile(inset, os.Stdin, style)
+	} else {
+		for _, idxname := range option.input {
+			idxfile, err := os.Open(idxname)
+			if err != nil {
 				log.Fatalln(err.Error())
-			} else {
-				if old := inset.Get(entry); old != nil {
-					oldentry := old.(*IndexEntry)
-					oldentry.pagelist = append(oldentry.pagelist, entry.pagelist...)
-				} else {
-					// entry 不在集合 inset 中时，插入 entry 本身和所有祖先节点，祖先不含页码
-					for len(entry.level) > 0 {
-						inset.Insert(entry)
-						parent := &IndexEntry{
-							level:    entry.level[:len(entry.level)-1],
-							pagelist: nil,
-						}
-						if inset.Get(parent) != nil {
-							break
-						} else {
-							entry = parent
-						}
-					}
-				}
 			}
+			readIdxFile(inset, idxfile, style)
+			idxfile.Close()
 		}
 	}
 
@@ -68,6 +36,47 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 		in = append(in, *pentry)
 	}
 	return &in
+}
+
+func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
+	idxreader := bufio.NewReader(idxfile)
+	for {
+		entry, err := ScanIndexEntry(idxreader, style)
+		if err == io.EOF {
+			break
+		} else if err == ScanSyntaxError {
+			log.Println(err.Error())
+			// 跳过一行
+			for isprefix := true; isprefix; {
+				var err error
+				_, isprefix, err = idxreader.ReadLine()
+				if err != nil {
+					break
+				}
+			}
+		} else if err != nil {
+			log.Fatalln(err.Error())
+		} else {
+			if old := inset.Get(entry); old != nil {
+				oldentry := old.(*IndexEntry)
+				oldentry.pagelist = append(oldentry.pagelist, entry.pagelist...)
+			} else {
+				// entry 不在集合 inset 中时，插入 entry 本身和所有祖先节点，祖先不含页码
+				for len(entry.level) > 0 {
+					inset.Insert(entry)
+					parent := &IndexEntry{
+						level:    entry.level[:len(entry.level)-1],
+						pagelist: nil,
+					}
+					if inset.Get(parent) != nil {
+						break
+					} else {
+						entry = parent
+					}
+				}
+			}
+		}
+	}
 }
 
 func skipspaces(reader *bufio.Reader) error {
