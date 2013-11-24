@@ -21,7 +21,11 @@ func NewIndexSorter(method string) *IndexSorter {
 	switch method {
 	case "stroke":
 		return &IndexSorter{
-			IndexCollator: StrokesIndexCollator{},
+			IndexCollator: StrokeIndexCollator{},
+		}
+	case "pinyin", "reading":
+		return &IndexSorter{
+			IndexCollator: ReadingIndexCollator{},
 		}
 	default:
 		log.Fatalln("未知排序方式")
