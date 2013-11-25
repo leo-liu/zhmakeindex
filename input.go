@@ -422,7 +422,7 @@ func scanRoman(token []rune, romantable map[rune]int) (int, error) {
 		if i == 0 || romantable[r] <= romantable[token[i-1]] {
 			num += romantable[r]
 		} else {
-			num -= romantable[r]
+			num += romantable[r] - 2*romantable[token[i-1]]
 		}
 	}
 	return num, nil
