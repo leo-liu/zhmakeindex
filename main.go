@@ -1,4 +1,6 @@
-// zhmakeindex
+// $Id: main.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+
+// zhmakeindex: 带中文支持的 makeindex 实现
 package main
 
 import (
@@ -12,16 +14,16 @@ import (
 )
 
 var (
-	ProgramVersion = stripDollors("$Revision: c3b7ed4e5bff $", "Revision:")
-	ProgramDate    = stripDollors("$Date: 2013/11/25 05:30:48 $", "Date:")
-	ProgramAuthor  = stripDollors("$Author: leoliu $", "Author:")
+	ProgramAuthor   = "刘海洋"
+	ProgramVersion  = "alpha"
+	ProgramRevision = stripDollors("$Revision: da37196806c9 $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
 
 func init() {
 	log.SetFlags(0)
-	log.SetPrefix("zhmakeindex: ")
+	log.SetPrefix("")
 }
 
 func main() {
@@ -30,8 +32,7 @@ func main() {
 
 	setupLog(option)
 
-	log.Printf("版本 %s，%s\n", ProgramVersion, ProgramDate)
-	log.Printf("作者：%s\n", ProgramAuthor)
+	log.Printf("zhmakeindex 版本：%s (r%s)\t作者：%s\n", ProgramVersion, ProgramRevision, ProgramAuthor)
 
 	if option.style != "" {
 		log.Println("正在读取格式文件……")

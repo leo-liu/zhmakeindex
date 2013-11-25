@@ -1,3 +1,5 @@
+// $Id: reading_collator.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+
 // reading_collator.go
 package main
 
