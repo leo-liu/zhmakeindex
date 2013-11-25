@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"github.com/yasushi-saito/rbtree"
@@ -9,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -38,46 +38,6 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	return &in
 }
 
-type NumberdReader struct {
-	reader   *bufio.Reader
-	line     int
-	lastRune rune
-}
-
-func NewNumberdReader(reader io.Reader) *NumberdReader {
-	return &NumberdReader{
-		reader:   bufio.NewReader(reader),
-		line:     1,
-		lastRune: -1,
-	}
-}
-
-func (reader *NumberdReader) ReadRune() (r rune, size int, err error) {
-	r, size, err = reader.reader.ReadRune()
-	reader.lastRune = r
-	if r == '\n' {
-		reader.line++
-	}
-	return r, size, err
-}
-
-func (reader *NumberdReader) UnreadRune() error {
-	err := reader.reader.UnreadRune()
-	if err == nil {
-		if reader.lastRune == '\n' {
-			reader.line--
-		}
-		reader.lastRune = -1
-	}
-	return err
-}
-
-func (reader *NumberdReader) SkipLine() error {
-	reader.line++
-	_, err := reader.reader.ReadBytes('\n')
-	return err
-}
-
 func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
 	log.Printf("读取输入文件 %s ……\n", idxfile.Name())
 	accepted, rejected := 0, 0
@@ -88,7 +48,7 @@ func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
 			break
 		} else if err == ScanSyntaxError {
 			rejected++
-			log.Printf("%s:%d: %s\n", idxfile.Name(), idxreader.line, err.Error())
+			log.Printf("%s:%d: %s\n", idxfile.Name(), idxreader.Line(), err.Error())
 			// 跳过一行
 			if err := idxreader.SkipLine(); err == io.EOF {
 				break
@@ -336,7 +296,10 @@ L_scan_page:
 			}
 		case SCAN_PAGE:
 			if r == style.arg_close {
-				entry.pagelist[0].format, entry.pagelist[0].page = scanNumber(token)
+				entry.pagelist[0].format, entry.pagelist[0].page, err = scanNumber(token)
+				if err != nil {
+					return nil, err
+				}
 				break L_scan_page
 			} else if r == style.arg_open {
 				return nil, ScanSyntaxError
@@ -410,23 +373,162 @@ const (
 	NUM_ALPH_UPPER
 )
 
-// 未完整实现，目前仅有阿拉伯数字
-func scanNumber(token []rune) (NumFormat, int) {
-	return NUM_ARABIC, scanArabic(token)
+// 读入数字，并粗略判断其格式
+func scanNumber(token []rune) (NumFormat, int, error) {
+	if len(token) == 0 {
+		return 0, 0, ScanSyntaxError
+	}
+	if r := token[0]; unicode.IsDigit(r) {
+		num, err := scanArabic(token)
+		return NUM_ARABIC, num, err
+	} else if RomanLowerValue[r] != 0 {
+		num, err := scanRomanLower(token)
+		return NUM_ROMAN_LOWER, num, err
+	} else if RomanUpperValue[r] != 0 {
+		num, err := scanRomanUpper(token)
+		return NUM_ROMAN_UPPER, num, err
+	} else if 'a' <= r && r <= 'z' {
+		num, err := scanAlphLower(token)
+		return NUM_ALPH_LOWER, num, err
+	} else if 'A' <= r && r <= 'Z' {
+		num, err := scanAlphUpper(token)
+		return NUM_ALPH_UPPER, num, err
+	}
+	return 0, 0, ScanSyntaxError
 }
 
-func scanArabic(token []rune) int {
-	num, _ := strconv.Atoi(string(token))
-	return num
+func scanArabic(token []rune) (int, error) {
+	num, err := strconv.Atoi(string(token))
+	if err != nil {
+		err = ScanSyntaxError
+	}
+	return num, err
 }
 
-// 未完整实现，仅阿拉伯数字
-func (fmt NumFormat) String(num int) string {
-	return arabicNumString(num)
+func scanRomanLower(token []rune) (int, error) {
+	return scanRoman(token, RomanLowerValue)
 }
 
-func arabicNumString(num int) string {
-	return fmt.Sprint(num)
+func scanRomanUpper(token []rune) (int, error) {
+	return scanRoman(token, RomanUpperValue)
+}
+
+func scanRoman(token []rune, romantable map[rune]int) (int, error) {
+	num := 0
+	for i, r := range token {
+		if romantable[r] == 0 {
+			return 0, ScanSyntaxError
+		}
+		if i == 0 || romantable[r] <= romantable[token[i-1]] {
+			num += romantable[r]
+		} else {
+			num -= romantable[r]
+		}
+	}
+	return num, nil
+}
+
+var RomanLowerValue = map[rune]int{
+	'i': 1, 'v': 5, 'x': 10, 'l': 50, 'c': 100, 'd': 500, 'm': 1000,
+}
+var RomanUpperValue = map[rune]int{
+	'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000,
+}
+
+func scanAlphLower(token []rune) (int, error) {
+	if len(token) != 1 || token[0] < 'a' || token[0] > 'z' {
+		return 0, ScanSyntaxError
+	}
+	return int(token[0]-'a') + 1, nil
+}
+
+func scanAlphUpper(token []rune) (int, error) {
+	if len(token) != 1 || token[0] < 'A' || token[0] > 'Z' {
+		return 0, ScanSyntaxError
+	}
+	return int(token[0]-'A') + 1, nil
+}
+
+// 按格式输出数字
+func (numfmt NumFormat) String(num int) string {
+	switch numfmt {
+	case NUM_ARABIC:
+		return fmt.Sprint(num)
+	case NUM_ALPH_LOWER:
+		return string('a' + num)
+	case NUM_ALPH_UPPER:
+		return string('A' + num)
+	case NUM_ROMAN_LOWER:
+		return romanNumString(num, false)
+	case NUM_ROMAN_UPPER:
+		return romanNumString(num, true)
+	default:
+		return ""
+	}
+}
+
+func romanNumString(num int, upper bool) string {
+	if num < 1 {
+		return ""
+	}
+	var numstr []rune
+	for num > 1000 {
+		numstr = append(numstr, 'm')
+		num -= 1000
+	}
+	if num >= 900 {
+		numstr = append(numstr, 'c', 'm')
+		num -= 900
+	}
+	if num >= 500 {
+		numstr = append(numstr, 'd')
+		num -= 500
+	}
+	if num >= 400 {
+		numstr = append(numstr, 'c', 'd')
+		num -= 400
+	}
+	for num >= 100 {
+		numstr = append(numstr, 'c')
+		num -= 100
+	}
+	if num >= 90 {
+		numstr = append(numstr, 'x', 'c')
+		num -= 90
+	}
+	if num >= 50 {
+		numstr = append(numstr, 'l')
+		num -= 50
+	}
+	if num >= 40 {
+		numstr = append(numstr, 'x', 'l')
+		num -= 40
+	}
+	for num >= 10 {
+		numstr = append(numstr, 'x')
+		num -= 10
+	}
+	if num >= 9 {
+		numstr = append(numstr, 'i', 'x')
+		num -= 9
+	}
+	if num >= 5 {
+		numstr = append(numstr, 'v')
+		num -= 5
+	}
+	if num >= 4 {
+		numstr = append(numstr, 'i', 'v')
+		num -= 4
+	}
+	for num >= 1 {
+		numstr = append(numstr, 'i')
+		num--
+	}
+	if upper {
+		return strings.ToUpper(string(numstr))
+	} else {
+		return string(numstr)
+	}
 }
 
 type RangeType int
