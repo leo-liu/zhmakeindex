@@ -38,25 +38,67 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	return &in
 }
 
+type NumberdReader struct {
+	reader   *bufio.Reader
+	line     int
+	lastRune rune
+}
+
+func NewNumberdReader(reader io.Reader) *NumberdReader {
+	return &NumberdReader{
+		reader:   bufio.NewReader(reader),
+		line:     1,
+		lastRune: -1,
+	}
+}
+
+func (reader *NumberdReader) ReadRune() (r rune, size int, err error) {
+	r, size, err = reader.reader.ReadRune()
+	reader.lastRune = r
+	if r == '\n' {
+		reader.line++
+	}
+	return r, size, err
+}
+
+func (reader *NumberdReader) UnreadRune() error {
+	err := reader.reader.UnreadRune()
+	if err == nil {
+		if reader.lastRune == '\n' {
+			reader.line--
+		}
+		reader.lastRune = -1
+	}
+	return err
+}
+
+func (reader *NumberdReader) SkipLine() error {
+	reader.line++
+	_, err := reader.reader.ReadBytes('\n')
+	return err
+}
+
 func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
-	idxreader := bufio.NewReader(idxfile)
+	log.Printf("读取输入文件 %s ……\n", idxfile.Name())
+	accepted, rejected := 0, 0
+	idxreader := NewNumberdReader(idxfile)
 	for {
 		entry, err := ScanIndexEntry(idxreader, style)
 		if err == io.EOF {
 			break
 		} else if err == ScanSyntaxError {
-			log.Println(err.Error())
+			rejected++
+			log.Printf("%s:%d: %s\n", idxfile.Name(), idxreader.line, err.Error())
 			// 跳过一行
-			for isprefix := true; isprefix; {
-				var err error
-				_, isprefix, err = idxreader.ReadLine()
-				if err != nil {
-					break
-				}
+			if err := idxreader.SkipLine(); err == io.EOF {
+				break
+			} else if err != nil {
+				log.Fatalln(err.Error())
 			}
 		} else if err != nil {
 			log.Fatalln(err.Error())
 		} else {
+			accepted++
 			if old := inset.Get(entry); old != nil {
 				oldentry := old.(*IndexEntry)
 				oldentry.pagelist = append(oldentry.pagelist, entry.pagelist...)
@@ -77,9 +119,10 @@ func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
 			}
 		}
 	}
+	log.Printf("接受 %d 项，拒绝 %d 项。\n", accepted, rejected)
 }
 
-func skipspaces(reader *bufio.Reader) error {
+func skipspaces(reader *NumberdReader) error {
 	for {
 		r, _, err := reader.ReadRune()
 		if err != nil {
@@ -92,7 +135,7 @@ func skipspaces(reader *bufio.Reader) error {
 	return nil
 }
 
-func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error) {
+func ScanIndexEntry(reader *NumberdReader, style *InputStyle) (*IndexEntry, error) {
 	var entry IndexEntry
 	entry.pagelist = make([]PageInput, 1)
 	// 跳过空白符
@@ -100,12 +143,12 @@ func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error
 		return nil, err
 	}
 	// 跳过 keyword
-	for i := 0; i < len(style.keyword); i++ {
-		c, err := reader.ReadByte()
+	for _, r := range style.keyword {
+		new_r, _, err := reader.ReadRune()
 		if err != nil {
 			return nil, err
 		}
-		if c != style.keyword[i] {
+		if new_r != r {
 			return nil, ScanSyntaxError
 		}
 	}
@@ -131,7 +174,7 @@ L_scan_kv:
 		if err != nil {
 			return nil, err
 		}
-		// debug.Printf("字符 %c, 状态 %d\n", r, state) //// DEBUG only
+		//debug.Printf("字符 %2c, 状态 %d, quoted %5v, escaped %5v, arg_depth %d\n", r, state, quoted, escaped, arg_depth) //// DEBUG only
 		switch state {
 		case SCAN_OPEN:
 			if !quoted && r == style.arg_open {
@@ -149,6 +192,7 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
+				break
 			} else if r == style.arg_open {
 				token = append(token, r)
 				arg_depth++
@@ -186,6 +230,7 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
+				break
 			} else if r == style.actual {
 				return nil, ScanSyntaxError
 			} else if r == style.arg_open {
@@ -217,6 +262,7 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
+				break
 			} else if r == style.arg_open || r == style.arg_close || r == style.actual || r == style.encap || r == style.level {
 				// 注意 encap 符号后不能直接加 arg_open、arg_close 等符号
 				return nil, ScanSyntaxError
@@ -239,6 +285,7 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
+				break
 			} else if r == style.actual || r == style.encap || r == style.level {
 				return nil, ScanSyntaxError
 			} else if r == style.arg_open {

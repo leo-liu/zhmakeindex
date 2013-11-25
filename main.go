@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	ProgramVersion = stripDollors("$Revision: 9c7de139b61b $", "Revision:")
-	ProgramDate    = stripDollors("$Date: 2013/11/24 14:44:54 $", "Date:")
+	ProgramVersion = stripDollors("$Revision: c3b7ed4e5bff $", "Revision:")
+	ProgramDate    = stripDollors("$Date: 2013/11/25 05:30:48 $", "Date:")
 	ProgramAuthor  = stripDollors("$Author: leoliu $", "Author:")
 )
 
@@ -33,11 +33,13 @@ func main() {
 	log.Printf("版本 %s，%s\n", ProgramVersion, ProgramDate)
 	log.Printf("作者：%s\n", ProgramAuthor)
 
+	if option.style != "" {
+		log.Println("正在读取格式文件……")
+	}
 	instyle, outstyle := NewStyles(option.style)
 
-	log.Println("正在读取输入文件……")
 	in := NewInputIndex(&option.InputOptions, instyle)
-	log.Printf("共 %d 项。\n", len(*in))
+	log.Printf("合并后共 %d 项。\n", len(*in))
 
 	log.Println("正在排序……")
 	out := NewOutputIndex(in, &option.OutputOptions, outstyle)
