@@ -122,6 +122,7 @@ func ScanIndexEntry(reader *bufio.Reader, style *InputStyle) (*IndexEntry, error
 	state := SCAN_OPEN
 	quoted := false
 	escaped := false
+	arg_depth := 0
 	var token []rune
 	entry.pagelist[0].rangetype = PAGE_NORMAL
 L_scan_kv:
@@ -149,10 +150,16 @@ L_scan_kv:
 				token = append(token, r)
 				quoted = false
 			} else if r == style.arg_open {
-				return nil, ScanSyntaxError
+				token = append(token, r)
+				arg_depth++
 			} else if r == style.arg_close {
-				pushtoken(0)
-				break L_scan_kv
+				if arg_depth == 0 {
+					pushtoken(0)
+					break L_scan_kv
+				} else {
+					token = append(token, r)
+					arg_depth--
+				}
 			} else if r == style.actual {
 				pushtoken(SCAN_VALUE)
 			} else if r == style.encap {
@@ -179,11 +186,19 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
-			} else if r == style.arg_open || r == style.actual {
+			} else if r == style.actual {
 				return nil, ScanSyntaxError
+			} else if r == style.arg_open {
+				token = append(token, r)
+				arg_depth++
 			} else if r == style.arg_close {
-				pushtoken(0)
-				break L_scan_kv
+				if arg_depth == 0 {
+					pushtoken(0)
+					break L_scan_kv
+				} else {
+					token = append(token, r)
+					arg_depth--
+				}
 			} else if r == style.encap {
 				pushtoken(SCAN_PAGERANGE)
 			} else if r == style.level {
@@ -202,10 +217,9 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
-			} else if r == style.arg_open || r == style.actual || r == style.encap || r == style.level {
+			} else if r == style.arg_open || r == style.arg_close || r == style.actual || r == style.encap || r == style.level {
+				// 注意 encap 符号后不能直接加 arg_open、arg_close 等符号
 				return nil, ScanSyntaxError
-			} else if r == style.arg_close {
-				break L_scan_kv
 			} else if r == style.range_open {
 				entry.pagelist[0].rangetype = PAGE_OPEN
 			} else if r == style.range_close {
@@ -225,12 +239,19 @@ L_scan_kv:
 			if quoted {
 				token = append(token, r)
 				quoted = false
-			} else if r == style.arg_open || r == style.actual || r == style.encap || r == style.level {
-				// 有问题，应该允许 \indexentry{foo|see{bar}} 的用法
+			} else if r == style.actual || r == style.encap || r == style.level {
 				return nil, ScanSyntaxError
+			} else if r == style.arg_open {
+				token = append(token, r)
+				arg_depth++
 			} else if r == style.arg_close {
-				entry.pagelist[0].encap = string(token)
-				break L_scan_kv
+				if arg_depth == 0 {
+					entry.pagelist[0].encap = string(token)
+					break L_scan_kv
+				} else {
+					token = append(token, r)
+					arg_depth--
+				}
 			} else if r == style.quote && !escaped {
 				quoted = true
 			} else {
@@ -270,6 +291,8 @@ L_scan_page:
 			if r == style.arg_close {
 				entry.pagelist[0].format, entry.pagelist[0].page = scanNumber(token)
 				break L_scan_page
+			} else if r == style.arg_open {
+				return nil, ScanSyntaxError
 			} else {
 				token = append(token, r)
 			}
