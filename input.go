@@ -1,4 +1,4 @@
-// $Id: input.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+// $Id: input.go,v 0894bfaeed7f 2013/11/26 10:22:38 leoliu $
 
 package main
 
@@ -272,7 +272,7 @@ L_scan_kv:
 				escaped = false
 			}
 		default:
-			log.Fatalln("内部错误")
+			debug.Fatalln("内部错误")
 		}
 	}
 	// 跳过空白符
@@ -309,7 +309,7 @@ L_scan_page:
 				token = append(token, r)
 			}
 		default:
-			log.Fatalln("内部错误")
+			debug.Fatalln("内部错误")
 		}
 		// 未实现对 style.page_compositor 的处理
 	}
@@ -540,3 +540,17 @@ const (
 	PAGE_NORMAL
 	PAGE_CLOSE
 )
+
+func (rt RangeType) String() string {
+	switch rt {
+	case PAGE_OPEN:
+		return "("
+	case PAGE_NORMAL:
+		return "."
+	case PAGE_CLOSE:
+		return ")"
+	default:
+		debug.Fatalln("内部错误")
+		return ""
+	}
+}
