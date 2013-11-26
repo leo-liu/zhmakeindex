@@ -1,4 +1,4 @@
-// $Id: output.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+// $Id: output.go,v 0894bfaeed7f 2013/11/26 10:22:38 leoliu $
 
 package main
 
@@ -18,7 +18,7 @@ type OutputIndex struct {
 
 func NewOutputIndex(input *InputIndex, option *OutputOptions, style *OutputStyle) *OutputIndex {
 	sorter := NewIndexSorter(option.sort)
-	outindex := sorter.SortIndex(input, style)
+	outindex := sorter.SortIndex(input, style, option)
 	outindex.style = style
 	outindex.option = option
 	return outindex
@@ -41,11 +41,16 @@ func (o *OutputIndex) Output() {
 	}
 
 	fmt.Fprint(outfile, o.style.preamble)
+	first_group := true
 	for _, group := range o.groups {
 		if group.items == nil {
 			continue
 		}
-		fmt.Fprint(outfile, o.style.group_skip)
+		if first_group {
+			first_group = false
+		} else {
+			fmt.Fprint(outfile, o.style.group_skip)
+		}
 		if o.style.headings_flag > 0 {
 			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		} else if o.style.headings_flag < 0 {
