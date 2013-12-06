@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 0894bfaeed7f 2013/11/26 10:22:38 leoliu $
+// $Id: sorter.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
 
 package main
 
@@ -50,6 +50,7 @@ func (sorter *IndexSorter) SortIndex(input *InputIndex, style *OutputStyle, opti
 	pagesorter := NewPageSorter(style, option)
 	for _, entry := range *input {
 		pageranges := pagesorter.Sort(entry.pagelist)
+		pageranges = pagesorter.Merge(pageranges)
 		item := IndexItem{
 			level: len(entry.level) - 1,
 			text:  entry.level[len(entry.level)-1].text,
@@ -102,8 +103,9 @@ func (s IndexEntrySlice) Less(i, j int) bool {
 
 // 页码排序器
 type PageSorter struct {
-	precedence map[NumFormat]int
-	strict     bool
+	precedence    map[NumFormat]int
+	strict        bool
+	disable_range bool
 }
 
 func NewPageSorter(style *OutputStyle, option *OutputOptions) *PageSorter {
@@ -133,6 +135,7 @@ func NewPageSorter(style *OutputStyle, option *OutputOptions) *PageSorter {
 		}
 	}
 	sorter.strict = option.strict
+	sorter.disable_range = option.disable_range
 	return &sorter
 }
 
@@ -158,27 +161,27 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 			switch p.rangetype {
 			case PAGE_NORMAL:
 				// 输出独立页
-				out = append(out, PageRange{encap: p.encap, begin: p.NumString(), end: p.NumString()})
+				out = append(out, PageRange{begin: p, end: p})
 			case PAGE_OPEN:
 				// 压栈
 				stack = append(stack, p)
 			case PAGE_CLOSE:
-				log.Printf("页码区间有误，区间末尾 %s{%s} 没有匹配的区间头。\n", p.encap, p.NumString())
+				log.Printf("页码区间有误，区间末尾 %s{%s} 没有匹配的区间头。\n", p.encap, p)
 				// 输出从空白到当前页的伪区间
-				out = append(out, PageRange{encap: p.encap, begin: "", end: p.NumString()})
+				out = append(out, PageRange{begin: p.Empty(), end: p})
 			}
 		} else {
 			front := stack[0]
 			top := stack[len(stack)-1]
 			if p.format != top.format {
 				// 标准 Makeindex 会尝试把区间断开，这里只给出警告
-				log.Printf("页码区间可能有误，页码 %s{%s -- %s} 跨过多种数字格式\n", top.encap, top.NumString(), p.NumString())
+				log.Printf("页码区间可能有误，页码 %s{%s -- %s} 跨过多种数字格式\n", top.encap, top, p)
 			}
 			if p.encap != front.encap {
 				if sorter.strict {
-					log.Printf("页码区间可能有误，区间头 %s 没有对应的区间尾\n", front.NumString())
+					log.Printf("页码区间可能有误，区间头 %s 没有对应的区间尾\n", front)
 					// 输出从区间头到空白的伪区间，并清空栈
-					out = append(out, PageRange{encap: p.encap, begin: front.NumString(), end: ""})
+					out = append(out, PageRange{begin: front, end: front.Empty()})
 					stack = nil
 					// 退回重新处理此项
 					i--
@@ -186,10 +189,10 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 				} else {
 					// 只输出独立页面，与 Makeindex 行为类似
 					if p.rangetype == PAGE_NORMAL {
-						out = append(out, PageRange{encap: p.encap, begin: p.NumString(), end: p.NumString()})
+						out = append(out, PageRange{begin: p, end: p})
 					} else {
 						log.Printf("页码区间 %s{%s--} 内 %s%s{%s} 命令格式不同，可能丢失信息",
-							front.encap, front.NumString(), p.rangetype, p.encap, p.NumString())
+							front.encap, front, p.rangetype, p.encap, p)
 					}
 				}
 			}
@@ -202,18 +205,65 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 			case PAGE_CLOSE:
 				// 栈中只有一个元素时输出正常区间，弹栈
 				if len(stack) == 1 {
-					out = append(out, PageRange{encap: front.encap, begin: front.NumString(), end: p.NumString()})
+					out = append(out, PageRange{begin: front, end: p})
 				}
 				stack = stack[:len(stack)-1]
 			}
 		}
 	}
 	if len(stack) > 0 {
-		log.Printf("页码区间有误，未找到与 %s{%s} 匹配的区间尾。\n", stack[0].encap, stack[0].NumString())
+		log.Printf("页码区间有误，未找到与 %s{%s} 匹配的区间尾。\n", stack[0].encap, stack[0])
 		// 输出从当前页到空白的伪区间
-		out = append(out, PageRange{encap: stack[0].encap, begin: stack[0].NumString(), end: ""})
+		out = append(out, PageRange{begin: stack[0], end: stack[0].Empty()})
 	}
 	//	debug.Println(out)
+	return out
+}
+
+// 合并相邻的页码区间
+// TODO: 目前 1, 2 会被合并为 1--2，但标准 Makeindex 的行为是不合并
+func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
+	var out []PageRange
+	for i, r := range pages {
+		// 跳过首项；按设置跳过单页页码
+		if i == 0 {
+			out = append(out, r)
+			continue
+		}
+		// 合并重复页和区间
+		prev := out[len(out)-1]
+		if sorter.disable_range &&
+			(r.begin.rangetype == PAGE_NORMAL || prev.begin.rangetype == PAGE_NORMAL) {
+			// 合并重复页
+			if prev.begin.rangetype == r.begin.rangetype &&
+				r.begin.format == prev.begin.format &&
+				prev.begin.page == r.begin.page {
+				continue
+			} else {
+				out = append(out, r)
+			}
+		} else if prev.begin.encap == r.begin.encap &&
+			r.begin.format == prev.begin.format &&
+			r.begin.page-prev.end.page <= 1 {
+			// 合并区间
+			out[len(out)-1].end = r.end
+		} else {
+			out = append(out, r)
+		}
+	}
+	// 修正区间类型
+	for i := range out {
+		if out[i].begin.encap == out[i].end.encap {
+			if out[i].begin.format == out[i].end.format &&
+				out[i].begin.page == out[i].end.page {
+				out[i].begin.rangetype = PAGE_NORMAL
+				out[i].end.rangetype = PAGE_NORMAL
+			} else {
+				out[i].begin.rangetype = PAGE_OPEN
+				out[i].end.rangetype = PAGE_CLOSE
+			}
+		}
+	}
 	return out
 }
 

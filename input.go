@@ -1,4 +1,4 @@
-// $Id: input.go,v 0894bfaeed7f 2013/11/26 10:22:38 leoliu $
+// $Id: input.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
 
 package main
 
@@ -361,14 +361,21 @@ type PageInput struct {
 	rangetype RangeType
 }
 
-func (p *PageInput) NumString() string {
-	return p.format.String(p.page)
+func (p *PageInput) Empty() PageInput {
+	return PageInput{
+		page: 0, format: NUM_UNKNOWN, encap: p.encap, rangetype: 0,
+	}
+}
+
+func (p PageInput) String() string {
+	return p.format.Format(p.page)
 }
 
 type NumFormat int
 
 const (
-	NUM_ARABIC NumFormat = iota
+	NUM_UNKNOWN NumFormat = iota
+	NUM_ARABIC
 	NUM_ROMAN_LOWER
 	NUM_ROMAN_UPPER
 	NUM_ALPH_LOWER
@@ -452,8 +459,10 @@ func scanAlphUpper(token []rune) (int, error) {
 }
 
 // 按格式输出数字
-func (numfmt NumFormat) String(num int) string {
+func (numfmt NumFormat) Format(num int) string {
 	switch numfmt {
+	case NUM_UNKNOWN:
+		return "?"
 	case NUM_ARABIC:
 		return fmt.Sprint(num)
 	case NUM_ALPH_LOWER:
