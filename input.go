@@ -1,4 +1,4 @@
-// $Id: input.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
+// $Id: input.go,v a101eb310522 2013/12/06 17:33:28 leoliu $
 
 package main
 
@@ -272,7 +272,7 @@ L_scan_kv:
 				escaped = false
 			}
 		default:
-			debug.Fatalln("内部错误")
+			panic("扫描状态错误")
 		}
 	}
 	// 跳过空白符
@@ -309,7 +309,7 @@ L_scan_page:
 				token = append(token, r)
 			}
 		default:
-			debug.Fatalln("内部错误")
+			panic("扫描状态错误")
 		}
 		// 未实现对 style.page_compositor 的处理
 	}
@@ -474,7 +474,7 @@ func (numfmt NumFormat) Format(num int) string {
 	case NUM_ROMAN_UPPER:
 		return romanNumString(num, true)
 	default:
-		return ""
+		panic("数字格式错误")
 	}
 }
 
@@ -559,7 +559,6 @@ func (rt RangeType) String() string {
 	case PAGE_CLOSE:
 		return ")"
 	default:
-		debug.Fatalln("内部错误")
-		return ""
+		panic("区间格式错误")
 	}
 }
