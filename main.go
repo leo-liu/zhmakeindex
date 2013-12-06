@@ -1,4 +1,4 @@
-// $Id: main.go,v 0894bfaeed7f 2013/11/26 10:22:38 leoliu $
+// $Id: main.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -16,7 +16,7 @@ import (
 var (
 	ProgramAuthor   = "刘海洋"
 	ProgramVersion  = "alpha"
-	ProgramRevision = stripDollors("$Revision: 0894bfaeed7f $", "Revision:")
+	ProgramRevision = stripDollors("$Revision: 7e36b80ea5d4 $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -86,7 +86,7 @@ func NewOptions() *Options {
 	flag.StringVar(&o.sort, "x", "pinyin", "中文排序方式，可以使用 pinyin 或 stroke")
 	// flag.StringVar(&o.page, "p", "", "设置起始页码") // 未实现
 	flag.BoolVar(&o.quiet, "q", false, "静默模式，不输出错误信息")
-	// flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
+	flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
 	flag.BoolVar(&o.strict, "strict", false, "严格区分不同 encapsulated 命令的页码")
 	flag.StringVar(&o.style, "s", "", "格式文件名")
 	flag.StringVar(&o.log, "t", "", "日志文件名")

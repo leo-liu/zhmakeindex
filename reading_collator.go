@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+// $Id: reading_collator.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
 
 // reading_collator.go
 package main
@@ -48,7 +48,6 @@ func (_ ReadingIndexCollator) Group(entry *IndexEntry) int {
 		// 符号组
 		return 1
 	}
-	return 0
 }
 
 // 按汉字读音比较两个串的大小
