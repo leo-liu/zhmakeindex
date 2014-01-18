@@ -1,4 +1,4 @@
-// $Id: maketables.go,v 3e984c9371e6 2014/01/18 16:02:42 leoliu $
+// $Id: maketables.go,v 9290b2c739ab 2014/01/18 18:35:30 leoliu $
 
 package main
 
@@ -113,7 +113,7 @@ func make_stroke_table(outdir string) {
 	fmt.Fprintln(outfile, `// 笔画数来源：Unihan_DictionaryLikeData.txt`)
 	fmt.Fprintf(outfile, "// Unicode 版本：%s\n", unicodeVersion)
 	fmt.Fprintln(outfile, `package main`)
-	fmt.Fprintln(outfile, `var CJKstrokes = []string{`)
+	fmt.Fprintln(outfile, `var CJKstrokes = map[rune]string{`)
 	for r, order := range CJKstrokes {
 		if order == nil {
 			continue
