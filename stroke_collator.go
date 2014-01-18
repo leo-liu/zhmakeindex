@@ -1,4 +1,4 @@
-// $Id: stroke_collator.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
+// $Id: stroke_collator.go,v 9290b2c739ab 2014/01/18 18:35:30 leoliu $
 
 package main
 
@@ -52,17 +52,24 @@ func (_ StrokeIndexCollator) Group(entry *IndexEntry) int {
 	}
 }
 
-// 按汉字笔划序比较两个字符大小
+// 按汉字笔画、笔顺序比较两个字符大小
+// 笔画数不同的，短的在前；笔画数相同的，笔顺字典序；笔顺相同的，内码序
 func (_ StrokeIndexCollator) RuneCmp(a, b rune) int {
 	a_strokes, b_strokes := len(CJKstrokes[a]), len(CJKstrokes[b])
 	switch {
 	case a_strokes == 0 && b_strokes == 0:
-		return int(a - b)
+		return RuneCmpIgnoreCases(a, b)
 	case a_strokes == 0 && b_strokes != 0:
 		return -1
 	case a_strokes != 0 && b_strokes == 0:
 		return 1
-	default:
+	case a_strokes != b_strokes:
 		return a_strokes - b_strokes
+	case CJKstrokes[a] < CJKstrokes[b]:
+		return -1
+	case CJKstrokes[a] > CJKstrokes[b]:
+		return 1
+	default:
+		return int(a - b)
 	}
 }

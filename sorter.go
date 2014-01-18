@@ -1,11 +1,19 @@
-// $Id: sorter.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
+// $Id: sorter.go,v 9290b2c739ab 2014/01/18 18:35:30 leoliu $
 
 package main
 
 import (
 	"log"
 	"sort"
+	"unicode"
 )
+
+// 忽略大小写，按内码比较两个字符
+// 此过程被其他 collator 的 RuneCmp 调用
+func RuneCmpIgnoreCases(a, b rune) int {
+	la, lb := unicode.ToLower(a), unicode.ToLower(b)
+	return int(la - lb)
+}
 
 // 对应不同的分类排序方式
 type IndexCollator interface {
@@ -84,16 +92,21 @@ func (s IndexEntrySlice) Strcmp(a, b string) int {
 			return 1
 		}
 		cmp := s.colattor.RuneCmp(a_rune[i], b_rune[i])
-		if cmp != 0 { // 笔画数不同
+		if cmp != 0 {
 			return cmp
-		} else if a_rune[i] != b_rune[i] { // 笔画数相同、字符不同
-			return int(a_rune[i] - b_rune[i])
 		}
 	}
 	if len(a_rune) < len(b_rune) {
 		return -1
 	}
-	return 0
+	// 不忽略大小写重新比较串
+	if a < b {
+		return -1
+	} else if a > b {
+		return 1
+	} else {
+		return 0
+	}
 }
 
 func (s IndexEntrySlice) Less(i, j int) bool {
