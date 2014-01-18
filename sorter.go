@@ -1,19 +1,13 @@
-// $Id: sorter.go,v 9290b2c739ab 2014/01/18 18:35:30 leoliu $
+// $Id: sorter.go,v d3c36c5a7972 2014/01/18 20:26:01 leoliu $
 
 package main
 
 import (
 	"log"
 	"sort"
+	"strconv"
 	"unicode"
 )
-
-// 忽略大小写，按内码比较两个字符
-// 此过程被其他 collator 的 RuneCmp 调用
-func RuneCmpIgnoreCases(a, b rune) int {
-	la, lb := unicode.ToLower(a), unicode.ToLower(b)
-	return int(la - lb)
-}
 
 // 对应不同的分类排序方式
 type IndexCollator interface {
@@ -86,6 +80,11 @@ func (s IndexEntrySlice) Swap(i, j int) {
 
 // 比较两个串的大小
 func (s IndexEntrySlice) Strcmp(a, b string) int {
+	// 先尝试按数字比较
+	if cmp := DecimalStrcmp(a, b); cmp != 0 {
+		return cmp
+	}
+	// 忽略大小写，按字典序比较
 	a_rune, b_rune := []rune(a), []rune(b)
 	for i := range a_rune {
 		if i >= len(b_rune) {
@@ -370,5 +369,48 @@ func (p PageInputSliceLoose) Less(i, j int) bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+// 忽略大小写，按内码比较两个字符
+// 此过程被其他 collator 的 RuneCmp 调用
+func RuneCmpIgnoreCases(a, b rune) int {
+	la, lb := unicode.ToLower(a), unicode.ToLower(b)
+	return int(la - lb)
+}
+
+// 测试是否是数字，但把“〇”单独算做汉字
+func IsNumRune(r rune) bool {
+	return unicode.IsNumber(r) && r != '〇'
+}
+
+// 测试是否为数字串
+// 此过程被其他 collator 的 RuneCmp 调用
+func IsNumString(s string) bool {
+	for _, r := range s {
+		if !IsNumRune(r) {
+			return false
+		}
+	}
+	return true
+}
+
+// 按数字大小比较自然数串，如果不是自然数串视为相等
+func DecimalStrcmp(a, b string) int {
+	aint, err := strconv.ParseUint(a, 10, 64)
+	if err != nil {
+		return 0
+	}
+	bint, err := strconv.ParseUint(b, 10, 64)
+	if err != nil {
+		return 0
+	}
+	switch {
+	case aint < bint:
+		return -1
+	case aint > bint:
+		return 1
+	default:
+		return 0
 	}
 }
