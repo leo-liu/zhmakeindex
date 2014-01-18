@@ -280,7 +280,7 @@ var CJKreadings = map[rune]string{
 	0x3572: "hua2", // 㕲
 	0x3574: "chen2", // 㕴
 	0x3575: "guo2", // 㕵
-	0x3576: "ň5", // 㕶
+	0x3576: "n3", // 㕶
 	0x3577: "hua4", // 㕷
 	0x3578: "li4", // 㕸
 	0x3579: "fa2", // 㕹
@@ -7791,7 +7791,7 @@ var CJKreadings = map[rune]string{
 	0x55ec: "he1", // 嗬
 	0x55ed: "zhi2", // 嗭
 	0x55ee: "sai4", // 嗮
-	0x55ef: "ń5", // 嗯
+	0x55ef: "n2", // 嗯
 	0x55f0: "ge4", // 嗰
 	0x55f1: "na2", // 嗱
 	0x55f2: "dia3", // 嗲
@@ -27456,7 +27456,7 @@ var CJKreadings = map[rune]string{
 	0x20bb4: "yang1", // 𠮴
 	0x20bb5: "mang4", // 𠮵
 	0x20bbd: "long4", // 𠮽
-	0x20bbe: "ǹ5", // 𠮾
+	0x20bbe: "n4", // 𠮾
 	0x20bbf: "sa5", // 𠮿
 	0x20bc0: "chuan1", // 𠯀
 	0x20bc2: "ci2", // 𠯂
