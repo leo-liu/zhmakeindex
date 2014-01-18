@@ -1,4 +1,4 @@
-// $Id: maketables.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
+// $Id: maketables.go,v 3e984c9371e6 2014/01/18 16:02:42 leoliu $
 
 package main
 
@@ -27,8 +27,8 @@ func main() {
 
 func make_stroke_table(outdir string) {
 	const MAX_CODEPOINT = 0x40000 // 覆盖 Unicode 第 0、1、2、3 平面
-	var CJKstrokes [MAX_CODEPOINT][]int8
-	var maxStroke int8 = 0
+	var CJKstrokes [MAX_CODEPOINT][]byte
+	var maxStroke int = 0
 	var unicodeVersion string
 	// 使用海峰五笔码表数据，生成笔顺表
 	sunwb_file, err := os.Open("sunwb_strokeorder.txt")
@@ -54,14 +54,14 @@ func make_stroke_table(outdir string) {
 			continue
 		}
 		var r rune = []rune(fields[0])[0]
-		var order []int8
+		var order []byte
 		for _, rdigit := range fields[1] {
 			digit, _ := strconv.ParseInt(string(rdigit), 10, 8)
-			order = append(order, int8(digit))
+			order = append(order, byte(digit))
 		}
 		CJKstrokes[r] = order
-		if int8(len(order)) > maxStroke {
-			maxStroke = int8(len(order))
+		if len(order) > maxStroke {
+			maxStroke = len(order)
 		}
 	}
 	// 使用 Unihan 数据库，读取笔画数补全其他字符
@@ -83,15 +83,15 @@ func make_stroke_table(outdir string) {
 			fields := strings.Split(line, "\t")
 			var r rune
 			fmt.Sscanf(fields[0], "U+%X", &r)
-			var stroke int8
+			var stroke int
 			fmt.Sscanf(fields[2], "%d", &stroke)
 			if CJKstrokes[r] != nil { // 笔顺数据已有，检查一致性
-				if stroke != int8(len(CJKstrokes[r])) {
+				if stroke != len(CJKstrokes[r]) {
 					log.Printf("U+%04X (%c) 的笔顺数据（%d 画）与 unihan 笔画数（%d 画）不一致，跳过 unihan 数据\n",
 						r, r, len(CJKstrokes[r]), stroke)
 				}
 			} else { // 无笔顺数据，假定每个笔画都是 6 号（未知）
-				var order = make([]int8, stroke)
+				var order = make([]byte, stroke)
 				for i := range order {
 					order[i] = 6
 				}
@@ -113,16 +113,16 @@ func make_stroke_table(outdir string) {
 	fmt.Fprintln(outfile, `// 笔画数来源：Unihan_DictionaryLikeData.txt`)
 	fmt.Fprintf(outfile, "// Unicode 版本：%s\n", unicodeVersion)
 	fmt.Fprintln(outfile, `package main`)
-	fmt.Fprintln(outfile, `var CJKstrokes = [][]int8{`)
+	fmt.Fprintln(outfile, `var CJKstrokes = []string{`)
 	for r, order := range CJKstrokes {
 		if order == nil {
 			continue
 		}
-		fmt.Fprintf(outfile, "\t%#x: {", r)
+		fmt.Fprintf(outfile, "\t%#x: \"", r)
 		for _, s := range order {
-			fmt.Fprintf(outfile, "%d,", s)
+			fmt.Fprintf(outfile, "\\x%02x", s)
 		}
-		fmt.Fprintf(outfile, "}, // %c\n", r)
+		fmt.Fprintf(outfile, "\", // %c\n", r)
 	}
 	fmt.Fprintln(outfile, `}`)
 	fmt.Fprintf(outfile, "\nconst MAX_STROKE = %d\n", maxStroke)
