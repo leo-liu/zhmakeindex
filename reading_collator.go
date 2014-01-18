@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v 9290b2c739ab 2014/01/18 18:35:30 leoliu $
+// $Id: reading_collator.go,v efb316c5ead9 2014/01/18 19:01:16 leoliu $
 
 // reading_collator.go
 package main
@@ -12,7 +12,7 @@ type ReadingIndexCollator struct{}
 
 func (_ ReadingIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 	// 分组：数字、符号、字母 A..Z
-	groups := make([]IndexGroup, 2+26+MAX_STROKE)
+	groups := make([]IndexGroup, 2+26)
 	if style.headings_flag > 0 {
 		groups[0].name = style.numhead_positive
 		groups[1].name = style.symhead_positive
