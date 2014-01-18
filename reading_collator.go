@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
+// $Id: reading_collator.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
 
 // reading_collator.go
 package main
@@ -50,28 +50,8 @@ func (_ ReadingIndexCollator) Group(entry *IndexEntry) int {
 	}
 }
 
-// 按汉字读音比较两个串的大小
-func (_ ReadingIndexCollator) Strcmp(a, b string) int {
-	a_rune, b_rune := []rune(a), []rune(b)
-	for i := range a_rune {
-		if i >= len(b_rune) {
-			return 1
-		}
-		cmp := runecmpByReading(a_rune[i], b_rune[i])
-		if cmp != 0 { // 读音不同
-			return cmp
-		} else if a_rune[i] != b_rune[i] { // 读音相同、字符不同
-			return int(a_rune[i] - b_rune[i])
-		}
-	}
-	if len(a_rune) < len(b_rune) {
-		return -1
-	}
-	return 0
-}
-
 // 按汉字读音比较两个字符
-func runecmpByReading(a, b rune) int {
+func (_ ReadingIndexCollator) RuneCmp(a, b rune) int {
 	a_reading, b_reading := CJKreadings[a], CJKreadings[b]
 	switch {
 	case a_reading == "" && b_reading == "":

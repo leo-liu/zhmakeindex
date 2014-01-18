@@ -1,4 +1,4 @@
-// $Id: stroke_collator.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+// $Id: stroke_collator.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
 
 package main
 
@@ -44,37 +44,17 @@ func (_ StrokeIndexCollator) Group(entry *IndexEntry) int {
 		return 0
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'
-	case CJKstrokes[first] > 0:
-		return 2 + 26 + (CJKstrokes[first] - 1)
+	case len(CJKstrokes[first]) > 0:
+		return 2 + 26 + (len(CJKstrokes[first]) - 1)
 	default:
 		// 符号组
 		return 1
 	}
 }
 
-// 按笔划序比较两个串的大小
-func (_ StrokeIndexCollator) Strcmp(a, b string) int {
-	a_rune, b_rune := []rune(a), []rune(b)
-	for i := range a_rune {
-		if i >= len(b_rune) {
-			return 1
-		}
-		cmp := runecmpByStroke(a_rune[i], b_rune[i])
-		if cmp != 0 { // 笔画数不同
-			return cmp
-		} else if a_rune[i] != b_rune[i] { // 笔画数相同、字符不同
-			return int(a_rune[i] - b_rune[i])
-		}
-	}
-	if len(a_rune) < len(b_rune) {
-		return -1
-	}
-	return 0
-}
-
 // 按汉字笔划序比较两个字符大小
-func runecmpByStroke(a, b rune) int {
-	a_strokes, b_strokes := CJKstrokes[a], CJKstrokes[b]
+func (_ StrokeIndexCollator) RuneCmp(a, b rune) int {
+	a_strokes, b_strokes := len(CJKstrokes[a]), len(CJKstrokes[b])
 	switch {
 	case a_strokes == 0 && b_strokes == 0:
 		return int(a - b)

@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
+// $Id: sorter.go,v 83bb45fcf72a 2014/01/18 12:40:59 leoliu $
 
 package main
 
@@ -11,7 +11,7 @@ import (
 type IndexCollator interface {
 	InitGroups(style *OutputStyle) []IndexGroup
 	Group(entry *IndexEntry) int
-	Strcmp(a, b string) int
+	RuneCmp(a, b rune) int
 }
 
 // 排序器
@@ -76,19 +76,39 @@ func (s IndexEntrySlice) Swap(i, j int) {
 	s.entries[i], s.entries[j] = s.entries[j], s.entries[i]
 }
 
+// 比较两个串的大小
+func (s IndexEntrySlice) Strcmp(a, b string) int {
+	a_rune, b_rune := []rune(a), []rune(b)
+	for i := range a_rune {
+		if i >= len(b_rune) {
+			return 1
+		}
+		cmp := s.colattor.RuneCmp(a_rune[i], b_rune[i])
+		if cmp != 0 { // 笔画数不同
+			return cmp
+		} else if a_rune[i] != b_rune[i] { // 笔画数相同、字符不同
+			return int(a_rune[i] - b_rune[i])
+		}
+	}
+	if len(a_rune) < len(b_rune) {
+		return -1
+	}
+	return 0
+}
+
 func (s IndexEntrySlice) Less(i, j int) bool {
 	a, b := s.entries[i], s.entries[j]
 	for i := range a.level {
 		if i >= len(b.level) {
 			return false
 		}
-		keycmp := s.colattor.Strcmp(a.level[i].key, b.level[i].key)
+		keycmp := s.Strcmp(a.level[i].key, b.level[i].key)
 		if keycmp < 0 {
 			return true
 		} else if keycmp > 0 {
 			return false
 		}
-		textcmp := s.colattor.Strcmp(a.level[i].text, b.level[i].text)
+		textcmp := s.Strcmp(a.level[i].text, b.level[i].text)
 		if textcmp < 0 {
 			return true
 		} else if textcmp > 0 {
