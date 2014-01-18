@@ -2,7 +2,8 @@
 // 笔顺来源：sunwb_strokeorder.txt
 // 笔画数来源：Unihan_DictionaryLikeData.txt
 // Unicode 版本：Unicode version: 6.3.0
-var CJKstrokes map[rune] []int8 {
+package main
+var CJKstrokes = [][]int8 {
 	0x3007: {5,}, // 〇
 	0x3400: {2,1,2,1,1,}, // 㐀
 	0x3401: {1,2,5,3,4,1,}, // 㐁

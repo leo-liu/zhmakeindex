@@ -1,1 +1,1 @@
-maketables -d %~d0%~p0..
+go run %~d0%~p0maketables.go -d %~d0%~p0..
