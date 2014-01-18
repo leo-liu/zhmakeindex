@@ -1,4 +1,4 @@
-// $Id: maketables.go,v efb316c5ead9 2014/01/18 19:01:16 leoliu $
+// $Id: maketables.go,v d3c36c5a7972 2014/01/18 20:26:01 leoliu $
 
 package main
 
@@ -179,6 +179,10 @@ func make_reading_table(outdir string) {
 		pinyin := v.regular()
 		numbered := NumberedPinyin(pinyin)
 		out_reading_table[k] = numbered
+	}
+	// 单独增加数字“〇”的读音
+	if out_reading_table['〇'] == "" {
+		out_reading_table['〇'] = "ling2"
 	}
 	// 输出
 	outfile, err := os.Create(path.Join(outdir, "readings.go"))

@@ -3,6 +3,7 @@
 // Unicode version: 6.3.0
 package main
 var CJKreadings = map[rune]string{
+	0x3007: "ling2", // 〇
 	0x3400: "qiu1", // 㐀
 	0x3401: "tian4", // 㐁
 	0x3404: "kua4", // 㐄
