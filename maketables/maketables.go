@@ -1,4 +1,4 @@
-// $Id$
+// $Id: maketables.go,v 5c1288750059 2014/01/18 12:40:15 leoliu $
 
 package main
 
@@ -23,34 +23,61 @@ func main() {
 	flag.Parse()
 	make_stroke_table(*outdir)
 	make_reading_table(*outdir)
-	make_stroke_order_table(*outdir)
 }
 
 func make_stroke_table(outdir string) {
-	reading_file, err := os.Open("Unihan_DictionaryLikeData.txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer reading_file.Close()
-	outfile, err := os.Create(path.Join(outdir, "strokes.go"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer outfile.Close()
-	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
-	fmt.Fprintln(outfile, `// 来源：Unihan_DictionaryLikeData.txt`)
+	const MAX_CODEPOINT = 0x40000 // 覆盖 Unicode 第 0、1、2、3 平面
+	var CJKstrokes [MAX_CODEPOINT][]int8
 	var maxStroke int8 = 0
-	scanner := bufio.NewScanner(reading_file)
+	var unicodeVersion string
+	// 使用海峰五笔码表数据，生成笔顺表
+	sunwb_file, err := os.Open("sunwb_strokeorder.txt")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer sunwb_file.Close()
+	scanner := bufio.NewScanner(sunwb_file)
+	for i := 1; scanner.Scan(); i++ {
+		if scanner.Err() != nil {
+			log.Fatalln(scanner.Err())
+		}
+		line := scanner.Text()
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+		fields := strings.Split(line, "\t")
+		if len(fields) != 2 ||
+			len([]rune(fields[0])) != 1 ||
+			strings.IndexFunc(fields[1], isNotDigit) != -1 {
+			log.Printf("笔顺文件第 %d 行语法错误，忽略。\n", i)
+			continue
+		}
+		var r rune = []rune(fields[0])[0]
+		var order []int8
+		for _, rdigit := range fields[1] {
+			digit, _ := strconv.ParseInt(string(rdigit), 10, 8)
+			order = append(order, int8(digit))
+		}
+		CJKstrokes[r] = order
+		if int8(len(order)) > maxStroke {
+			maxStroke = int8(len(order))
+		}
+	}
+	// 使用 Unihan 数据库，读取笔画数补全其他字符
+	unihan_file, err := os.Open("Unihan_DictionaryLikeData.txt")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer unihan_file.Close()
+	scanner = bufio.NewScanner(unihan_file)
 	for scanner.Scan() {
 		if scanner.Err() != nil {
 			log.Fatalln(scanner.Err())
 		}
 		line := scanner.Text()
 		if strings.Contains(line, "Unicode version:") {
-			version := strings.TrimPrefix(line, "# ")
-			fmt.Fprintln(outfile, `//`, version)
-			fmt.Fprintln(outfile, `package main`)
-			fmt.Fprintln(outfile, `var CJKstrokes = map[rune]int{`)
+			unicodeVersion = strings.TrimPrefix(line, "# ")
 		}
 		if strings.HasPrefix(line, "U+") && strings.Contains(line, "kTotalStrokes") {
 			fields := strings.Split(line, "\t")
@@ -58,14 +85,50 @@ func make_stroke_table(outdir string) {
 			fmt.Sscanf(fields[0], "U+%X", &r)
 			var stroke int8
 			fmt.Sscanf(fields[2], "%d", &stroke)
-			fmt.Fprintf(outfile, "\t%#x: %d, // %c\n", r, stroke, r)
-			if stroke > maxStroke {
-				maxStroke = stroke
+			if CJKstrokes[r] != nil { // 笔顺数据已有，检查一致性
+				if stroke != int8(len(CJKstrokes[r])) {
+					log.Printf("U+%04X (%c) 的笔顺数据（%d 画）与 unihan 笔画数（%d 画）不一致，跳过 unihan 数据\n",
+						r, r, len(CJKstrokes[r]), stroke)
+				}
+			} else { // 无笔顺数据，假定每个笔画都是 6 号（未知）
+				var order = make([]int8, stroke)
+				for i := range order {
+					order[i] = 6
+				}
+				CJKstrokes[r] = order
+				if stroke > maxStroke {
+					maxStroke = stroke
+				}
 			}
 		}
 	}
+	// 输出笔顺表
+	outfile, err := os.Create(path.Join(outdir, "strokes.go"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer outfile.Close()
+	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
+	fmt.Fprintln(outfile, `// 笔顺来源：sunwb_strokeorder.txt`)
+	fmt.Fprintln(outfile, `// 笔画数来源：Unihan_DictionaryLikeData.txt`)
+	fmt.Fprintf(outfile, "// Unicode 版本：%s\n", unicodeVersion)
+	fmt.Fprintf(outfile, "var CJKstrokes map[rune] []int8 {\n")
+	for r, order := range CJKstrokes {
+		if order == nil {
+			continue
+		}
+		fmt.Fprintf(outfile, "\t%#x: {", r)
+		for _, s := range order {
+			fmt.Fprintf(outfile, "%d,", s)
+		}
+		fmt.Fprintf(outfile, "}, // %c\n", r)
+	}
 	fmt.Fprintln(outfile, `}`)
 	fmt.Fprintf(outfile, "\nconst MAX_STROKE = %d\n", maxStroke)
+}
+
+func isNotDigit(r rune) bool {
+	return !unicode.IsDigit(r)
 }
 
 func make_reading_table(outdir string) {
@@ -222,59 +285,4 @@ var Tones = map[rune]int{
 	'ǎ': 3, 'ǒ': 3, 'ě': 3, 'ǐ': 3, 'ǔ': 3, 'ǚ': 3,
 	'à': 4, 'ò': 4, 'è': 4, 'ì': 4, 'ù': 4, 'ǜ': 4,
 	'ü': 5,
-}
-
-// 使用海峰五笔码表数据，生成笔顺表
-func make_stroke_order_table(outdir string) {
-	reading_file, err := os.Open("sunwb_strokeorder.txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer reading_file.Close()
-	outfile, err := os.Create(path.Join(outdir, "stroke_order.go"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer outfile.Close()
-
-	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
-	fmt.Fprintln(outfile, `// 来源：sunwb_strokeorder.txt`)
-	fmt.Fprintln(outfile, `package main`)
-	fmt.Fprintln(outfile, `var CJKstrokeOrder = map[rune] []int8{`)
-
-	scanner := bufio.NewScanner(reading_file)
-	for i := 1; scanner.Scan(); i++ {
-		if scanner.Err() != nil {
-			log.Fatalln(scanner.Err())
-		}
-		line := scanner.Text()
-		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-		fields := strings.Split(line, "\t")
-		if len(fields) != 2 ||
-			len([]rune(fields[0])) != 1 ||
-			strings.IndexFunc(fields[1], isNotDigit) != -1 {
-			log.Printf("第 %d 行语法错误，忽略。\n", i)
-			continue
-		}
-		var r rune = []rune(fields[0])[0]
-		var order []int8
-		for _, rdigit := range fields[1] {
-			digit, _ := strconv.ParseInt(string(rdigit), 10, 8)
-			order = append(order, int8(digit))
-		}
-		fmt.Fprintf(outfile, "\t%#x: {", r)
-		for _, stroke := range order {
-			fmt.Fprintf(outfile, "%d,", stroke)
-		}
-		fmt.Fprintf(outfile, "}, // %c\n", r)
-	}
-
-	fmt.Fprintln(outfile, `}`)
-}
-
-func isNotDigit(r rune) bool {
-	return !unicode.IsDigit(r)
 }
