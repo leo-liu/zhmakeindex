@@ -1,8 +1,9 @@
-// $Id: style.go,v da37196806c9 2013/11/25 07:24:16 leoliu $
+// $Id: style.go,v 425d37ff5247 2014/01/19 16:49:59 leoliu $
 
 package main
 
 import (
+	"./kpathsea"
 	"bufio"
 	"log"
 	"os"
@@ -133,6 +134,10 @@ func NewStyles(stylename string) (*InputStyle, *OutputStyle) {
 		return in, out
 	}
 	// 读取格式文件，处理格式
+	stylename = kpathsea.PathSearch("", stylename, false)
+	if stylename == "" {
+		debug.Fatalln("找不到")
+	}
 	styleFile, err := os.Open(stylename)
 	if err != nil {
 		log.Fatalln(err.Error())
