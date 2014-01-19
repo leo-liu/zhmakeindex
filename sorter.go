@@ -1,4 +1,4 @@
-// $Id: sorter.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
+// $Id: sorter.go,v 34290d80acc1 2014/01/19 20:03:53 leoliu $
 
 package main
 
@@ -30,6 +30,10 @@ func NewIndexSorter(method string) *IndexSorter {
 	case "pinyin", "reading":
 		return &IndexSorter{
 			IndexCollator: ReadingIndexCollator{},
+		}
+	case "bushou", "radical":
+		return &IndexSorter{
+			IndexCollator: RadicalIndexCollator{},
 		}
 	default:
 		log.Fatalln("未知排序方式")
