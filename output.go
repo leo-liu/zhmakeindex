@@ -1,4 +1,4 @@
-// $Id: output.go,v 7e36b80ea5d4 2013/12/06 16:34:29 leoliu $
+// $Id: output.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
 
 package main
 
@@ -134,20 +134,43 @@ type PageRange struct {
 	end   PageInput
 }
 
-func (p *PageRange) Write(out io.Writer, style *OutputStyle) {
-	if p.begin.rangetype == PAGE_NORMAL {
-		fmt.Fprint(out, encapedString(p.begin, style))
-	} else {
-		fmt.Fprintf(out, "%s%s%s", encapedString(p.begin, style),
-			style.delim_r, encapedString(p.end, style))
+func (p *PageRange) diff() int {
+	if p.begin.format == p.end.format {
+		return p.end.page - p.begin.page
+	} else { // 不匹配的区间
+		return -1
 	}
 }
 
-func encapedString(p PageInput, style *OutputStyle) string {
-	if p.encap != "" {
-		return style.encap_prefix + p.encap + style.encap_infix +
-			p.String() + style.encap_suffix
+// 输出页码区间
+func (p *PageRange) Write(out io.Writer, style *OutputStyle) {
+	var rangestr string
+	switch {
+	// 单页
+	case p.diff() == 0:
+		rangestr = p.begin.String()
+	// 由单页合并得到的两页的区间，且未设置 suffix_2p，视为独立的两页
+	case p.begin.rangetype == PAGE_NORMAL && p.end.rangetype == PAGE_NORMAL &&
+		p.diff() == 1 && style.suffix_2p == "":
+		rangestr = p.begin.String() + style.delim_n + p.end.String()
+	// 两页的区间，设置了 suffix_2p
+	case p.diff() == 1 && style.suffix_2p != "":
+		rangestr = p.begin.String() + style.suffix_2p
+	// 三页的区间，设置了 suffix_3p
+	case p.diff() == 2 && style.suffix_3p != "":
+		rangestr = p.begin.String() + style.suffix_3p
+	// 三页或更长的区间，设置了 suffix_mp
+	case p.diff() >= 2 && style.suffix_mp != "":
+		rangestr = p.begin.String() + style.suffix_mp
+	// 普通的区间
+	default:
+		rangestr = p.begin.String() + style.delim_r + p.end.String()
+	}
+	// encap 只看区间头，对不完全区间可能不总正确
+	if p.begin.encap == "" {
+		fmt.Fprint(out, rangestr)
 	} else {
-		return p.String()
+		fmt.Fprint(out, style.encap_prefix, p.begin.encap,
+			style.encap_infix, rangestr, style.encap_suffix)
 	}
 }

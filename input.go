@@ -1,4 +1,4 @@
-// $Id: input.go,v a101eb310522 2013/12/06 17:33:28 leoliu $
+// $Id: input.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
 
 package main
 
@@ -363,7 +363,7 @@ type PageInput struct {
 
 func (p *PageInput) Empty() PageInput {
 	return PageInput{
-		page: 0, format: NUM_UNKNOWN, encap: p.encap, rangetype: 0,
+		page: 0, format: NUM_UNKNOWN, encap: p.encap, rangetype: PAGE_UNKNOWN,
 	}
 }
 
@@ -545,13 +545,16 @@ func romanNumString(num int, upper bool) string {
 type RangeType int
 
 const (
-	PAGE_OPEN RangeType = iota
+	PAGE_UNKNOWN RangeType = iota
+	PAGE_OPEN
 	PAGE_NORMAL
 	PAGE_CLOSE
 )
 
 func (rt RangeType) String() string {
 	switch rt {
+	case PAGE_UNKNOWN:
+		return "?"
 	case PAGE_OPEN:
 		return "("
 	case PAGE_NORMAL:

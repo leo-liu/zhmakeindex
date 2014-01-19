@@ -1,4 +1,4 @@
-// $Id: sorter.go,v d3c36c5a7972 2014/01/18 20:26:01 leoliu $
+// $Id: sorter.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
 
 package main
 
@@ -185,6 +185,7 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 	}
 	//debug.Println(pages)
 	// 使用一个栈来合并页码区间
+	// 这里的合并只将 1( 2 3 3) 合并为 1--3，不处理相邻区间，后者需要再做 Merge 操作
 	var stack []PageInput
 	for i := 0; i < len(pages); i++ {
 		p := pages[i]
@@ -253,7 +254,7 @@ func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
 }
 
 // 合并相邻的页码区间
-// TODO: 目前 1, 2 会被合并为 1--2，但标准 Makeindex 的行为是不合并
+// 输入是 1 2--3 4--6 7，输出 1--7
 func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 	var out []PageRange
 	for i, r := range pages {
@@ -266,10 +267,8 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 		prev := out[len(out)-1]
 		if sorter.disable_range &&
 			(r.begin.rangetype == PAGE_NORMAL || prev.begin.rangetype == PAGE_NORMAL) {
-			// 合并重复页
-			if prev.begin.rangetype == r.begin.rangetype &&
-				r.begin.format == prev.begin.format &&
-				prev.begin.page == r.begin.page {
+			// 合并（跳过）重复页
+			if prev.begin == r.begin {
 				continue
 			} else {
 				out = append(out, r)
@@ -277,24 +276,23 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 		} else if prev.begin.encap == r.begin.encap &&
 			r.begin.format == prev.begin.format &&
 			r.begin.page-prev.end.page <= 1 {
-			// 合并区间
+			// 合并区间，只用后一区间尾替换前一区间尾
 			out[len(out)-1].end = r.end
 		} else {
 			out = append(out, r)
 		}
 	}
-	// 修正区间类型
+	// 修正区间类型（似乎无用）
 	for i := range out {
 		if out[i].begin.encap == out[i].end.encap {
 			if out[i].begin.format == out[i].end.format &&
 				out[i].begin.page == out[i].end.page {
 				out[i].begin.rangetype = PAGE_NORMAL
 				out[i].end.rangetype = PAGE_NORMAL
-			} else {
-				out[i].begin.rangetype = PAGE_OPEN
-				out[i].end.rangetype = PAGE_CLOSE
 			}
+			// 保留首尾区间类型，可以输出时判断是否是合并得到的区间
 		}
+		// encap 不同是不匹配区间或不完全区间，不修正
 	}
 	return out
 }
