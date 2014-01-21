@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 34290d80acc1 2014/01/19 20:03:53 leoliu $
+// $Id: sorter.go,v a46154a87312 2014/01/21 21:27:52 LeoLiu $
 
 package main
 
@@ -23,7 +23,7 @@ type IndexSorter struct {
 
 func NewIndexSorter(method string) *IndexSorter {
 	switch method {
-	case "stroke":
+	case "bihua", "stroke":
 		return &IndexSorter{
 			IndexCollator: StrokeIndexCollator{},
 		}
