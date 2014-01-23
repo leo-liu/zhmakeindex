@@ -1,4 +1,4 @@
-// $Id: stroke_collator.go,v d3c36c5a7972 2014/01/18 20:26:01 leoliu $
+// $Id: stroke_collator.go,v 275968b7271c 2014/01/23 14:06:49 LeoLiu $
 
 package main
 
@@ -29,7 +29,7 @@ func (_ StrokeIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 		}
 	}
 	for stroke, i := 1, 2+26; stroke <= MAX_STROKE; stroke++ {
-		groups[i].name = strconv.Itoa(stroke) + " 划"
+		groups[i].name = style.stroke_prefix + strconv.Itoa(stroke) + style.stroke_suffix
 		i++
 	}
 	return groups

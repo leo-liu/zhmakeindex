@@ -1,5 +1,5 @@
 setlocal
-set FLAGS="-ldflags=-s"
+set FLAGS=-ldflags "-s -w"
 
 set GOOS=windows
 set GOARCH=386

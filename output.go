@@ -1,4 +1,4 @@
-// $Id: output.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
+// $Id: output.go,v 275968b7271c 2014/01/23 14:06:49 LeoLiu $
 
 package main
 
@@ -51,9 +51,7 @@ func (o *OutputIndex) Output() {
 		} else {
 			fmt.Fprint(outfile, o.style.group_skip)
 		}
-		if o.style.headings_flag > 0 {
-			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
-		} else if o.style.headings_flag < 0 {
+		if o.style.headings_flag != 0 {
 			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		}
 		for i, item := range group.items {

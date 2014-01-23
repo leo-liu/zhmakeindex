@@ -1,4 +1,4 @@
-// $Id: radical_collator.go,v 34290d80acc1 2014/01/19 20:03:53 leoliu $
+// $Id: radical_collator.go,v 275968b7271c 2014/01/23 14:06:49 LeoLiu $
 
 // radical_collator.go
 package main
@@ -30,11 +30,14 @@ func (_ RadicalIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 		}
 	}
 	for r, i := 1, 2+26; r < MAX_RADICAL+1; r++ {
-		if CJKRadical[r].simplified != 0 {
-			groups[i].name = fmt.Sprintf("%c（%c）", CJKRadical[r].origin, CJKRadical[r].simplified)
+		var radicalName string
+		if CJKRadical[r].simplified != 0 && style.radical_simplified_flag != 0 {
+			radicalName = fmt.Sprintf("%c%s%c%s",
+				CJKRadical[r].origin, style.radical_simplified_prefix, CJKRadical[r].simplified, style.radical_simplified_suffix)
 		} else {
-			groups[i].name = string(CJKRadical[r].origin)
+			radicalName = string(CJKRadical[r].origin)
 		}
+		groups[i].name = style.radical_prefix + radicalName + style.radical_suffix
 		i++
 	}
 	return groups
