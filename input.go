@@ -1,17 +1,19 @@
-// $Id: input.go,v f44ce2393752 2014/01/19 15:33:26 leoliu $
+// $Id: input.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
 
 package main
 
 import (
 	"errors"
 	"fmt"
-	"github.com/yasushi-saito/rbtree"
 	"io"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"unicode"
+	"code.google.com/p/go.text/transform"
+
+	"github.com/yasushi-saito/rbtree"
 )
 
 type InputIndex []IndexEntry
@@ -20,14 +22,14 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	inset := rbtree.NewTree(CompareIndexEntry)
 
 	if option.stdin {
-		readIdxFile(inset, os.Stdin, style)
+		readIdxFile(inset, os.Stdin, option.decoder, style)
 	} else {
 		for _, idxname := range option.input {
 			idxfile, err := os.Open(idxname)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			readIdxFile(inset, idxfile, style)
+			readIdxFile(inset, idxfile, option.decoder, style)
 			idxfile.Close()
 		}
 	}
@@ -40,10 +42,11 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	return &in
 }
 
-func readIdxFile(inset *rbtree.Tree, idxfile *os.File, style *InputStyle) {
+func readIdxFile(inset *rbtree.Tree, idxfile *os.File, decoder transform.Transformer, style *InputStyle) {
 	log.Printf("读取输入文件 %s ……\n", idxfile.Name())
 	accepted, rejected := 0, 0
-	idxreader := NewNumberdReader(idxfile)
+
+	idxreader := NewNumberdReader(transform.NewReader(idxfile, decoder))
 	for {
 		entry, err := ScanIndexEntry(idxreader, style)
 		if err == io.EOF {

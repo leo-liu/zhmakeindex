@@ -1,4 +1,4 @@
-// $Id: output.go,v 275968b7271c 2014/01/23 14:06:49 LeoLiu $
+// $Id: output.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
 
 package main
 
@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"code.google.com/p/go.text/transform"
 )
 
 // 输出索引
@@ -27,20 +29,21 @@ func NewOutputIndex(input *InputIndex, option *OutputOptions, style *OutputStyle
 // 按格式输出索引项
 // suffix_2p, suffix_3p, suffix_mp 暂未实现
 // line_max, indent_space, indent_length 未实现
-func (o *OutputIndex) Output() {
-	var outfile *os.File
+func (o *OutputIndex) Output(option *OutputOptions) {
+	var writer io.WriteCloser
 	if o.option.output == "" {
-		outfile = os.Stdout
+		writer = os.Stdout
 	} else {
 		var err error
-		outfile, err = os.Create(o.option.output)
+		writer, err = os.Create(o.option.output)
 		if err != nil {
 			log.Fatalln(err)
 		}
-		defer outfile.Close()
+		defer writer.Close()
 	}
+	writer = transform.NewWriter(writer, option.encoder)
 
-	fmt.Fprint(outfile, o.style.preamble)
+	fmt.Fprint(writer, o.style.preamble)
 	first_group := true
 	for _, group := range o.groups {
 		if group.items == nil {
@@ -49,48 +52,48 @@ func (o *OutputIndex) Output() {
 		if first_group {
 			first_group = false
 		} else {
-			fmt.Fprint(outfile, o.style.group_skip)
+			fmt.Fprint(writer, o.style.group_skip)
 		}
 		if o.style.headings_flag != 0 {
-			fmt.Fprintf(outfile, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
+			fmt.Fprintf(writer, "%s%s%s", o.style.heading_prefix, group.name, o.style.heading_suffix)
 		}
 		for i, item := range group.items {
 			// debug.Println(i, item)
 			// 如果修改一下 OutputStyle 的数据结构，容易改成任意层的索引
 			switch item.level {
 			case 0:
-				fmt.Fprintf(outfile, "%s%s", o.style.item_0, item.text)
-				writePage(outfile, 0, item.page, o.style)
+				fmt.Fprintf(writer, "%s%s", o.style.item_0, item.text)
+				writePage(writer, 0, item.page, o.style)
 			case 1:
 				if last := group.items[i-1]; last.level == 0 {
 					if last.page != nil {
-						fmt.Fprint(outfile, o.style.item_01)
+						fmt.Fprint(writer, o.style.item_01)
 					} else {
-						fmt.Fprint(outfile, o.style.item_x1)
+						fmt.Fprint(writer, o.style.item_x1)
 					}
 				} else {
-					fmt.Fprint(outfile, o.style.item_1)
+					fmt.Fprint(writer, o.style.item_1)
 				}
-				fmt.Fprint(outfile, item.text)
-				writePage(outfile, 1, item.page, o.style)
+				fmt.Fprint(writer, item.text)
+				writePage(writer, 1, item.page, o.style)
 			case 2:
 				if last := group.items[i-1]; last.level == 1 {
 					if last.page != nil {
-						fmt.Fprint(outfile, o.style.item_12)
+						fmt.Fprint(writer, o.style.item_12)
 					} else {
-						fmt.Fprint(outfile, o.style.item_x2)
+						fmt.Fprint(writer, o.style.item_x2)
 					}
 				} else {
-					fmt.Fprint(outfile, o.style.item_2)
+					fmt.Fprint(writer, o.style.item_2)
 				}
-				fmt.Fprint(outfile, item.text)
-				writePage(outfile, 2, item.page, o.style)
+				fmt.Fprint(writer, item.text)
+				writePage(writer, 2, item.page, o.style)
 			default:
 				log.Printf("索引项“%s”层次数过深，忽略此项\n", item.text)
 			}
 		}
 	}
-	fmt.Fprint(outfile, o.style.postamble)
+	fmt.Fprint(writer, o.style.postamble)
 }
 
 func writePage(out io.Writer, level int, pageranges []PageRange, style *OutputStyle) {
