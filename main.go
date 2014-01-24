@@ -1,4 +1,4 @@
-// $Id: main.go,v a46154a87312 2014/01/21 21:27:52 LeoLiu $
+// $Id: main.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -11,12 +11,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"code.google.com/p/go.text/encoding"
+	"code.google.com/p/go.text/encoding/simplifiedchinese"
+	"code.google.com/p/go.text/encoding/traditionalchinese"
+	"code.google.com/p/go.text/encoding/unicode"
+	"code.google.com/p/go.text/transform"
 )
 
 var (
 	ProgramAuthor   = "刘海洋"
 	ProgramVersion  = "beta"
-	ProgramRevision = stripDollors("$Revision: a46154a87312 $", "Revision:")
+	ProgramRevision = stripDollors("$Revision: 128ab4e59ab0 $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -46,7 +52,7 @@ func main() {
 	out := NewOutputIndex(in, &option.OutputOptions, outstyle)
 
 	log.Println("正在输出……")
-	out.Output()
+	out.Output(&option.OutputOptions)
 
 	if option.output != "" {
 		log.Printf("输出文件写入 %s\n", option.output)
@@ -59,18 +65,21 @@ func main() {
 type Options struct {
 	InputOptions
 	OutputOptions
-	style string
-	log   string
-	quiet bool
+	encoding string
+	style    string
+	log      string
+	quiet    bool
 }
 
 type InputOptions struct {
 	compress bool
 	stdin    bool
+	decoder  transform.Transformer
 	input    []string
 }
 
 type OutputOptions struct {
+	encoder       transform.Transformer
 	output        string
 	sort          string
 	page          string
@@ -83,7 +92,8 @@ func NewOptions() *Options {
 	// flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格") // 未实现
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
-	flag.StringVar(&o.sort, "x", "pinyin",
+	flag.StringVar(&o.encoding, "enc", "utf-8", "读写索引文件的编码")
+	flag.StringVar(&o.sort, "z", "pinyin",
 		"中文排序方式，可以使用 pinyin (reading)、bihua (stroke) 或 bushou (radical)")
 	// flag.StringVar(&o.page, "p", "", "设置起始页码") // 未实现
 	flag.BoolVar(&o.quiet, "q", false, "静默模式，不输出错误信息")
@@ -119,6 +129,28 @@ func (o *Options) parse() {
 	if o.log == "" && !o.stdin {
 		o.log = stripExt(o.input[0]) + ".ilg"
 	}
+
+	// 检查并设置 IO 编码
+	if encoding, ok := encodingMap[strings.ToLower(o.encoding)]; ok {
+		o.encoder = encoding.NewEncoder()
+		o.decoder = encoding.NewDecoder()
+	} else {
+		log.Printf("编码 '%s' 是无效编码\n", o.encoding)
+		var supported string
+		for enc := range encodingMap {
+			supported += enc + " "
+		}
+		log.Fatalf("支持的编码有（不区分大小写）：%s\n", supported)
+	}
+}
+
+// 汉字编码
+var encodingMap = map[string]encoding.Encoding{
+	"utf-8":   encoding.Nop,
+	"utf-16":  unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM),
+	"gb18030": simplifiedchinese.GB18030,
+	"gbk":     simplifiedchinese.GBK,
+	"big5":    traditionalchinese.Big5,
 }
 
 func setupLog(option *Options) {
