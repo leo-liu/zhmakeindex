@@ -1,4 +1,4 @@
-// $Id: main.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
+// $Id: main.go,v f556a652ef7a 2014/01/24 14:58:07 LeoLiu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -22,7 +22,7 @@ import (
 var (
 	ProgramAuthor   = "刘海洋"
 	ProgramVersion  = "beta"
-	ProgramRevision = stripDollors("$Revision: 128ab4e59ab0 $", "Revision:")
+	ProgramRevision = stripDollors("$Revision: f556a652ef7a $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -43,7 +43,7 @@ func main() {
 	if option.style != "" {
 		log.Println("正在读取格式文件……")
 	}
-	instyle, outstyle := NewStyles(option.style)
+	instyle, outstyle := NewStyles(&option.StyleOptions)
 
 	in := NewInputIndex(&option.InputOptions, instyle)
 	log.Printf("合并后共 %d 项。\n", len(*in))
@@ -65,21 +65,22 @@ func main() {
 type Options struct {
 	InputOptions
 	OutputOptions
-	encoding string
-	style    string
-	log      string
-	quiet    bool
+	StyleOptions
+	encoding       string
+	style_encoding string
+	log            string
+	quiet          bool
 }
 
 type InputOptions struct {
 	compress bool
 	stdin    bool
-	decoder  transform.Transformer
+	decoder  transform.Transformer // 由 encoding 生成
 	input    []string
 }
 
 type OutputOptions struct {
-	encoder       transform.Transformer
+	encoder       transform.Transformer // 由 encoding 生成
 	output        string
 	sort          string
 	page          string
@@ -87,12 +88,16 @@ type OutputOptions struct {
 	disable_range bool
 }
 
+type StyleOptions struct {
+	style         string
+	style_decoder transform.Transformer // 由 style_encoding 生成
+}
+
 func NewOptions() *Options {
 	o := new(Options)
 	// flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格") // 未实现
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
-	flag.StringVar(&o.encoding, "enc", "utf-8", "读写索引文件的编码")
 	flag.StringVar(&o.sort, "z", "pinyin",
 		"中文排序方式，可以使用 pinyin (reading)、bihua (stroke) 或 bushou (radical)")
 	// flag.StringVar(&o.page, "p", "", "设置起始页码") // 未实现
@@ -101,6 +106,8 @@ func NewOptions() *Options {
 	flag.BoolVar(&o.strict, "strict", false, "严格区分不同 encapsulated 命令的页码")
 	flag.StringVar(&o.style, "s", "", "格式文件名")
 	flag.StringVar(&o.log, "t", "", "日志文件名")
+	flag.StringVar(&o.encoding, "enc", "utf-8", "读写索引文件的编码")
+	flag.StringVar(&o.style_encoding, "senc", "utf-8", "格式文件的编码")
 	return o
 }
 
@@ -131,26 +138,34 @@ func (o *Options) parse() {
 	}
 
 	// 检查并设置 IO 编码
-	if encoding, ok := encodingMap[strings.ToLower(o.encoding)]; ok {
-		o.encoder = encoding.NewEncoder()
-		o.decoder = encoding.NewDecoder()
-	} else {
-		log.Printf("编码 '%s' 是无效编码\n", o.encoding)
+	encoding := checkEncoding(o.encoding)
+	o.encoder = encoding.NewEncoder()
+	o.decoder = encoding.NewDecoder()
+
+	// 检查并设置格式文件编码
+	styleEncoding := checkEncoding(o.style_encoding)
+	o.style_decoder = styleEncoding.NewDecoder()
+}
+
+// 检查编码名，返回编码
+func checkEncoding(encodingName string) encoding.Encoding {
+	var encodingMap = map[string]encoding.Encoding{
+		"utf-8":   encoding.Nop,
+		"utf-16":  unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM),
+		"gb18030": simplifiedchinese.GB18030,
+		"gbk":     simplifiedchinese.GBK,
+		"big5":    traditionalchinese.Big5,
+	}
+	encoding, ok := encodingMap[strings.ToLower(encodingName)]
+	if !ok {
+		log.Printf("编码 '%s' 是无效编码\n", encodingName)
 		var supported string
 		for enc := range encodingMap {
 			supported += enc + " "
 		}
 		log.Fatalf("支持的编码有（不区分大小写）：%s\n", supported)
 	}
-}
-
-// 汉字编码
-var encodingMap = map[string]encoding.Encoding{
-	"utf-8":   encoding.Nop,
-	"utf-16":  unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM),
-	"gb18030": simplifiedchinese.GB18030,
-	"gbk":     simplifiedchinese.GBK,
-	"big5":    traditionalchinese.Big5,
+	return encoding
 }
 
 func setupLog(option *Options) {
