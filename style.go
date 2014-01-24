@@ -1,4 +1,4 @@
-// $Id: style.go,v 275968b7271c 2014/01/23 14:06:49 LeoLiu $
+// $Id: style.go,v f556a652ef7a 2014/01/24 14:58:07 LeoLiu $
 
 package main
 
@@ -10,6 +10,7 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+	"code.google.com/p/go.text/transform"
 
 	"./kpathsea"
 )
@@ -141,24 +142,24 @@ func NewOutputStyle() *OutputStyle {
 	return out
 }
 
-func NewStyles(stylename string) (*InputStyle, *OutputStyle) {
+func NewStyles(o *StyleOptions) (*InputStyle, *OutputStyle) {
 	in := NewInputStyle()
 	out := NewOutputStyle()
 
-	if stylename == "" {
+	if o.style == "" {
 		return in, out
 	}
 	// 读取格式文件，处理格式
-	stylename = kpathsea.PathSearch("", stylename, false)
-	if stylename == "" {
+	o.style = kpathsea.PathSearch("", o.style, false)
+	if o.style == "" {
 		log.Fatalln("找不到格式文件。")
 	}
-	styleFile, err := os.Open(stylename)
+	styleFile, err := os.Open(o.style)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	defer styleFile.Close()
-	scanner := bufio.NewScanner(styleFile)
+	scanner := bufio.NewScanner(transform.NewReader(styleFile, o.style_decoder))
 	scanner.Split(ScanStyleTokens)
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
