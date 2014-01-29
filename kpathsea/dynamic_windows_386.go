@@ -74,5 +74,5 @@ func findFile_dynamic(name string, format FileFormatType, mustExist bool) string
 		path_bytes = append(path_bytes, *path_ptr)
 		path_ptr = (*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(path_ptr)) + 1))
 	}
-	return "Dynamic: " + string(path_bytes)
+	return string(path_bytes)
 }
