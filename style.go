@@ -1,4 +1,4 @@
-// $Id: style.go,v f556a652ef7a 2014/01/24 14:58:07 LeoLiu $
+// $Id: style.go,v 698bbf03b97f 2014/01/29 21:30:27 LeoLiu $
 
 package main
 
@@ -150,7 +150,7 @@ func NewStyles(o *StyleOptions) (*InputStyle, *OutputStyle) {
 		return in, out
 	}
 	// 读取格式文件，处理格式
-	o.style = kpathsea.PathSearch("", o.style, false)
+	o.style = kpathsea.FindFile(o.style, kpathsea.IST_FORMAT, false)
 	if o.style == "" {
 		log.Fatalln("找不到格式文件。")
 	}
