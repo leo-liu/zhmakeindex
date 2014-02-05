@@ -1,0 +1,116 @@
+\documentclass[UTF8,hyperref]{ctexart}
+
+\usepackage[a4paper,centering,margin=1.5in]{geometry}
+
+\CTEXsetup[format=\bfseries\Large]{section}
+
+\usepackage{makeidx}
+%\makeindex
+
+\newcommand\pkg{\textsf}
+\newcommand\meta[1]{$\langle\textnormal{\itshape#1}\rangle$}
+\newcommand\email{\nolinkurl}
+
+\title{\pkg{zhmakeindex}\thanks{版本 1.0} 中文索引处理程序}
+\author{刘海洋}
+\date{2014 年 2 月 6 日}
+
+\begin{document}
+
+\maketitle
+
+\section{命令行}
+
+\begin{quote}
+\ttfamily
+\catcode`<\active  \def<#1>{\meta{#1}}
+\halign{#&#\hfil\cr
+zhmakeindex &-enc~<enc> -i -o~<output> -q -r -s~<style>\cr
+            &-senc~<senc> -strict -t~<log> -z~<sort>\cr
+            &<idx1> <idx2> ...\cr}
+\end{quote}
+
+注：除输入文件外，所有选项均可省略。
+
+\section{简介}
+
+\pkg{zhmakeindex} 是一个通用的中文索引处理程序，它从一个或多个输入文件读入索引
+项，将其内容按指定的方式分组、排序，然后输出整理好的索引文件。
+\pkg{zhmakeindex} 主要用于 \LaTeX{} 的索引生成，其功能和用法与 \pkg{makeindex}
+相似，并支持中文的分组与排序。
+
+\section{选项说明}
+
+\begin{description}
+  \item[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。
+  \item[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。
+  \item[-strict] 严格区分不同 encapsulated 命令的页码。
+  \item[-z~\meta{sort}] 设置中文排序分组方式为 \meta{sort}。
+\end{description}
+
+\section{格式文件}
+
+\section{顺序}
+
+\section{特殊效果}
+
+\section{与 \pkg{makeindex} 的比较}
+
+\section{版权与许可}
+
+版权所有：2014 年，刘海洋 \email{leoliu.pku@gmail.com}
+
+本作品可在《the \LaTeX{} Project Public License》1.3 或更高版本的条件下发布与
+修改。最新版本的 LPPL 许可证可以在
+\begin{quote}
+  \url{http://www.latex-project.org/lppl.txt}
+\end{quote}
+下载；该许可证同时也包含在所有最新的 \LaTeX{} 发行版中。
+
+本作品目前处于 LPPL 维护状态“author-maintained”。
+
+当前维护者是刘海洋。
+
+本作品包括 \pkg{zhmakeindex} 的程序及文档，由如下源文件：
+\begin{verbatim}
+dist.cmd
+examples
+input.go
+main.go
+numberedreader.go
+output.go
+radicalstrokes.go
+radical_collator.go
+readings.go
+reading_collator.go
+sorter.go
+strokes.go
+stroke_collator.go
+style.go
+style_test.go
+doc/zhmakeindex.tex
+kpathsea/dynamic_other.go
+kpathsea/dynamic_windows_386.go
+kpathsea/kpathsea.go
+maketables/make-table.cmd
+maketables/maketables.go
+\end{verbatim}
+以及编译源文件得到的二进制文件 \path{zhmakeindex.exe}、PDF 文档
+\path{zhmakeindex.pdf} 组成。
+
+大部分汉字数据来自 Unicode 项目（\url{http://www.unicode.org/}）：
+\begin{verbatim}
+maketables/CJKRadicals.txt
+maketables/Unihan_DictionaryLikeData.txt
+maketables/Unihan_RadicalStrokeCounts.txt
+maketables/Unihan_Readings.txt
+\end{verbatim}
+
+部分字形数据来自海峰五笔项目（\url{http://okuc.net/sunwb/}）：
+\begin{verbatim}
+maketables/sunwb_strokeorder.txt
+\end{verbatim}
+
+\end{document}
+
+vim:tw=78
