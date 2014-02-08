@@ -1,4 +1,4 @@
-// $Id: input.go,v cf6a94d78b2b 2014/02/08 04:50:29 LeoLiu $
+// $Id: input.go,v cd063e5efbf1 2014/02/08 15:13:33 LeoLiu $
 
 package main
 
@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"unicode"
@@ -25,6 +26,10 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 		readIdxFile(inset, os.Stdin, option, style)
 	} else {
 		for _, idxname := range option.input {
+			// 文件不存在且无后缀时，加上默认后缀 .idx 再试
+			if _, err := os.Stat(idxname); os.IsNotExist(err) && filepath.Ext(idxname) == "" {
+				idxname = idxname + ".idx"
+			}
 			idxfile, err := os.Open(idxname)
 			if err != nil {
 				log.Fatalln(err.Error())
