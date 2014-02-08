@@ -1,4 +1,4 @@
-// $Id: input.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
+// $Id: input.go,v cf6a94d78b2b 2014/02/08 04:50:29 LeoLiu $
 
 package main
 
@@ -22,14 +22,14 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	inset := rbtree.NewTree(CompareIndexEntry)
 
 	if option.stdin {
-		readIdxFile(inset, os.Stdin, option.decoder, style)
+		readIdxFile(inset, os.Stdin, option, style)
 	} else {
 		for _, idxname := range option.input {
 			idxfile, err := os.Open(idxname)
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			readIdxFile(inset, idxfile, option.decoder, style)
+			readIdxFile(inset, idxfile, option, style)
 			idxfile.Close()
 		}
 	}
@@ -42,13 +42,13 @@ func NewInputIndex(option *InputOptions, style *InputStyle) *InputIndex {
 	return &in
 }
 
-func readIdxFile(inset *rbtree.Tree, idxfile *os.File, decoder transform.Transformer, style *InputStyle) {
+func readIdxFile(inset *rbtree.Tree, idxfile *os.File, option *InputOptions, style *InputStyle) {
 	log.Printf("读取输入文件 %s ……\n", idxfile.Name())
 	accepted, rejected := 0, 0
 
-	idxreader := NewNumberdReader(transform.NewReader(idxfile, decoder))
+	idxreader := NewNumberdReader(transform.NewReader(idxfile, option.decoder))
 	for {
-		entry, err := ScanIndexEntry(idxreader, style)
+		entry, err := ScanIndexEntry(idxreader, option, style)
 		if err == io.EOF {
 			break
 		} else if err == ScanSyntaxError {
@@ -100,7 +100,7 @@ func skipspaces(reader *NumberdReader) error {
 	return nil
 }
 
-func ScanIndexEntry(reader *NumberdReader, style *InputStyle) (*IndexEntry, error) {
+func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputStyle) (*IndexEntry, error) {
 	var entry IndexEntry
 	entry.pagelist = make([]PageInput, 1)
 	// 跳过空白符
@@ -148,8 +148,11 @@ L_scan_kv:
 				return nil, ScanSyntaxError
 			}
 		case SCAN_KEY:
-			pushtoken := func(next int) {
+			push_keyval := func(next int) {
 				str := string(token)
+				if option.compress {
+					str = strings.TrimSpace(str)
+				}
 				entry.level = append(entry.level, IndexEntryKV{key: str, text: str})
 				token = nil
 				state = next
@@ -163,18 +166,18 @@ L_scan_kv:
 				arg_depth++
 			} else if r == style.arg_close {
 				if arg_depth == 0 {
-					pushtoken(0)
+					push_keyval(0)
 					break L_scan_kv
 				} else {
 					token = append(token, r)
 					arg_depth--
 				}
 			} else if r == style.actual {
-				pushtoken(SCAN_VALUE)
+				push_keyval(SCAN_VALUE)
 			} else if r == style.encap {
-				pushtoken(SCAN_PAGERANGE)
+				push_keyval(SCAN_PAGERANGE)
 			} else if r == style.level {
-				pushtoken(SCAN_KEY)
+				push_keyval(SCAN_KEY)
 			} else if r == style.quote && !escaped {
 				quoted = true
 			} else {
@@ -186,7 +189,7 @@ L_scan_kv:
 				escaped = false
 			}
 		case SCAN_VALUE:
-			pushtoken := func(next int) {
+			set_value := func(next int) {
 				str := string(token)
 				entry.level[len(entry.level)-1].text = str
 				token = nil
@@ -203,16 +206,16 @@ L_scan_kv:
 				arg_depth++
 			} else if r == style.arg_close {
 				if arg_depth == 0 {
-					pushtoken(0)
+					set_value(0)
 					break L_scan_kv
 				} else {
 					token = append(token, r)
 					arg_depth--
 				}
 			} else if r == style.encap {
-				pushtoken(SCAN_PAGERANGE)
+				set_value(SCAN_PAGERANGE)
 			} else if r == style.level {
-				pushtoken(SCAN_KEY)
+				set_value(SCAN_KEY)
 			} else if r == style.quote && !escaped {
 				quoted = true
 			} else {

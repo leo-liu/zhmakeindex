@@ -1,4 +1,4 @@
-// $Id: main.go,v f556a652ef7a 2014/01/24 14:58:07 LeoLiu $
+// $Id: main.go,v cf6a94d78b2b 2014/02/08 04:50:29 LeoLiu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -22,7 +22,7 @@ import (
 var (
 	ProgramAuthor   = "刘海洋"
 	ProgramVersion  = "beta"
-	ProgramRevision = stripDollors("$Revision: f556a652ef7a $", "Revision:")
+	ProgramRevision = stripDollors("$Revision: cf6a94d78b2b $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -95,7 +95,7 @@ type StyleOptions struct {
 
 func NewOptions() *Options {
 	o := new(Options)
-	// flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格") // 未实现
+	flag.BoolVar(&o.compress, "c", false, "忽略条目首尾空格")
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
 	flag.StringVar(&o.sort, "z", "pinyin",
