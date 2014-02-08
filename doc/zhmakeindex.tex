@@ -4,14 +4,29 @@
 
 \CTEXsetup[format=\bfseries\Large]{section}
 
-\usepackage{makeidx}
-%\makeindex
+\bibliographystyle{plain}
 
-\newcommand\pkg{\textsf}
+\usepackage{makeidx}
+\makeindex
+
+\usepackage{shortvrb}
+\MakeShortVerb\"
+
+\usepackage{xspace}
+
+\newcommand\pkg[1]{\textsf{#1}\index{#1@\textsf{#1}}}
+\newcommand\zhm{\pkg{zhmakeindex}\xspace}
 \newcommand\meta[1]{$\langle\textnormal{\itshape#1}\rangle$}
+\newcommand\optional[1]{\textnormal{[}#1\textnormal{]}}
+\def\defchar#1{\begingroup\lccode`~=`#1\lowercase{\endgroup\def~}}
+\newenvironment{syntax}{%
+  \quote\ttfamily
+  \catcode`<\active  \defchar<##1>{\meta{##1}}
+  \catcode`[\active  \defchar[##1]{\optional{##1}}
+}{\endquote}
 \newcommand\email{\nolinkurl}
 
-\title{\pkg{zhmakeindex}\thanks{版本 1.0} 中文索引处理程序}
+\title{\zhm\thanks{版本 1.0} 中文索引处理程序}
 \author{刘海洋}
 \date{2014 年 2 月 6 日}
 
@@ -21,23 +36,32 @@
 
 \section{命令行}
 
-\begin{quote}
-\ttfamily
-\catcode`<\active  \def<#1>{\meta{#1}}
+\begin{syntax}
 \halign{#&#\hfil\cr
-zhmakeindex &-enc~<enc> -i -o~<output> -q -r -s~<style>\cr
-            &-senc~<senc> -strict -t~<log> -z~<sort>\cr
-            &<idx1> <idx2> ...\cr}
-\end{quote}
-
-注：除输入文件外，所有选项均可省略。
+zhmakeindex &[-enc~<enc>] [-i] [-o~<output>] [-q] [-r] [-s~<style>]\cr
+            &[-senc~<senc>] [-strict] [-t~<log>] [-z~<sort>]\cr
+            &[<idx0> <idx1> <idx2> ...]\cr
+}
+\end{syntax}
 
 \section{简介}
 
-\pkg{zhmakeindex} 是一个通用的中文索引处理程序，它从一个或多个输入文件读入索引
-项，将其内容按指定的方式分组、排序，然后输出整理好的索引文件。
-\pkg{zhmakeindex} 主要用于 \LaTeX{} 的索引生成，其功能和用法与 \pkg{makeindex}
-相似，并支持中文的分组与排序。
+\zhm 是一个通用的中文多级索引处理程序，它从一个或多个输入文件读入索引项，将其
+内容按指定的方式分组、排序，然后按格式将整理好的索引输出到文件。索引项可以有 3
+个级别（0, 1, 2）的嵌套。\zhm 主要用于 \LaTeX{} 索引的处理，其功能和用法与
+\pkg{makeindex} 相似，并支持中文的分组与排序。
+
+输入与输出文件的格式由一个格式文件确定。默认的输入/输出是 ".idx"/".ind" 格式
+的，即 \LaTeX{} 格式的索引文件。
+
+如果没有显式指定，第一个输入文件（\meta{idx0}）的主文件名将用于确定输出和日志
+文件的主文件名。对每个输入文件名 \meta{idx0}, \meta{idx1}, \ldots, \zhm 会首先
+查找这个名字的文件；如果找不到且文件名没有后缀，则加上 ".idx" 后缀查找此文件；
+如果还找不到文件，\zhm 则会中止。
+
+如果只有一个输入文件，并且没有显式用 "-s" 选项指定格式文件，\zhm 会使用后缀为
+".mst" 的默认格式文件（如果存在的话）。
+
 
 \section{选项说明}
 
@@ -57,9 +81,11 @@ zhmakeindex &-enc~<enc> -i -o~<output> -q -r -s~<style>\cr
 \section{与 \pkg{makeindex} 的比较}
 
 \section{版权与许可}
+\index{版权}\index{许可}
 
 版权所有：2014 年，刘海洋 \email{leoliu.pku@gmail.com}
 
+\index{LPPL}
 本作品可在《the \LaTeX{} Project Public License》1.3 或更高版本的条件下发布与
 修改。最新版本的 LPPL 许可证可以在
 \begin{quote}
@@ -71,7 +97,8 @@ zhmakeindex &-enc~<enc> -i -o~<output> -q -r -s~<style>\cr
 
 当前维护者是刘海洋。
 
-本作品包括 \pkg{zhmakeindex} 的程序及文档，由如下源文件：
+\index{源文件}
+本作品包括 \zhm 的程序及文档，由如下源文件：
 \begin{verbatim}
 dist.cmd
 examples
@@ -98,6 +125,7 @@ maketables/maketables.go
 以及编译源文件得到的二进制文件 \path{zhmakeindex.exe}、PDF 文档
 \path{zhmakeindex.pdf} 组成。
 
+\index{Unicode}
 大部分汉字数据来自 Unicode 项目（\url{http://www.unicode.org/}）：
 \begin{verbatim}
 maketables/CJKRadicals.txt
@@ -106,10 +134,15 @@ maketables/Unihan_RadicalStrokeCounts.txt
 maketables/Unihan_Readings.txt
 \end{verbatim}
 
+\index{海峰五笔}
 部分字形数据来自海峰五笔项目（\url{http://okuc.net/sunwb/}）：
 \begin{verbatim}
 maketables/sunwb_strokeorder.txt
 \end{verbatim}
+
+\bibliography{zhmakeindex}
+
+\printindex
 
 \end{document}
 

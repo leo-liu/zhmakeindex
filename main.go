@@ -1,4 +1,4 @@
-// $Id: main.go,v cf6a94d78b2b 2014/02/08 04:50:29 LeoLiu $
+// $Id: main.go,v cd063e5efbf1 2014/02/08 15:13:33 LeoLiu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -22,7 +22,7 @@ import (
 var (
 	ProgramAuthor   = "刘海洋"
 	ProgramVersion  = "beta"
-	ProgramRevision = stripDollors("$Revision: cf6a94d78b2b $", "Revision:")
+	ProgramRevision = stripDollors("$Revision: cd063e5efbf1 $", "Revision:")
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -41,7 +41,7 @@ func main() {
 	log.Printf("zhmakeindex 版本：%s (r%s)\t作者：%s\n", ProgramVersion, ProgramRevision, ProgramAuthor)
 
 	if option.style != "" {
-		log.Println("正在读取格式文件……")
+		log.Printf("正在读取格式文件 %s……", option.style)
 	}
 	instyle, outstyle := NewStyles(&option.StyleOptions)
 
@@ -114,14 +114,12 @@ func NewOptions() *Options {
 func (o *Options) parse() {
 	flag.Parse()
 
+	// 整理输入文件
 	o.input = flag.Args()
-	// 整理输入文件，没有后缀时，加上默认后缀 .idx
 	for i := range o.input {
 		o.input[i] = filepath.Clean(o.input[i])
-		if filepath.Ext(o.input[i]) == "" {
-			o.input[i] = o.input[i] + ".idx"
-		}
 	}
+
 	// 错误的参数组合
 	if len(o.input) > 0 && o.stdin {
 		log.Fatalln("不能同时从文件和标准输入流读取输入")
@@ -135,6 +133,14 @@ func (o *Options) parse() {
 	// 不指定输入文件且不使用标准输入时，使用第一个输入文件的主文件名 + ".ilg" 后缀
 	if o.log == "" && !o.stdin {
 		o.log = stripExt(o.input[0]) + ".ilg"
+	}
+	// 不指定格式文件且只有一个输入文件时，尝试使用第一个输入文件的主文件名 + ".mst" 后缀
+	if o.style == "" && len(o.input) == 1 {
+		// 这里只在当前目录下查找 .mst 文件而不调用 kpathsea 搜索，预先判断文件存在
+		mst := stripExt(o.input[0]) + ".mst"
+		if _, err := os.Stat(mst); err == nil {
+			o.style = mst
+		}
 	}
 
 	// 检查并设置 IO 编码
