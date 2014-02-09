@@ -1,4 +1,8 @@
-\documentclass[UTF8,hyperref]{ctexart}
+\documentclass[UTF8,hyperref,nofonts]{ctexart}
+\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao}
+\setCJKmainfont[ItalicFont=FandolKai]{FandolSong}
+\setCJKsansfont{FandolHei}
+\setCJKmonofont{FandolFang}
 
 \usepackage[a4paper,centering,margin=1.5in]{geometry}
 
@@ -11,6 +15,8 @@
 
 \usepackage{shortvrb}
 \MakeShortVerb\"
+
+\usepackage{tabularx}
 
 \usepackage{xspace}
 
@@ -38,8 +44,8 @@
 
 \begin{syntax}
 \halign{#&#\hfil\cr
-zhmakeindex &[-enc~<enc>] [-i] [-o~<output>] [-q] [-r] [-s~<style>]\cr
-            &[-senc~<senc>] [-strict] [-t~<log>] [-z~<sort>]\cr
+zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
+            &[-enc~<enc>] [-senc~<senc>] [-strict] [-z~<sort>]\cr
             &[<idx0> <idx1> <idx2> ...]\cr
 }
 \end{syntax}
@@ -49,7 +55,7 @@ zhmakeindex &[-enc~<enc>] [-i] [-o~<output>] [-q] [-r] [-s~<style>]\cr
 \zhm 是一个通用的中文多级索引处理程序，它从一个或多个输入文件读入索引项，将其
 内容按指定的方式分组、排序，然后按格式将整理好的索引输出到文件。索引项可以有 3
 个级别（0, 1, 2）的嵌套。\zhm 主要用于 \LaTeX{} 索引的处理，其功能和用法与
-\pkg{makeindex} 相似，并支持中文的分组与排序。
+\pkg{makeindex}\cite{Rodgers1991} 相似，并支持中文的分组与排序。
 
 输入与输出文件的格式由一个格式文件确定。默认的输入/输出是 ".idx"/".ind" 格式
 的，即 \LaTeX{} 格式的索引文件。
@@ -65,18 +71,76 @@ zhmakeindex &[-enc~<enc>] [-i] [-o~<output>] [-q] [-r] [-s~<style>]\cr
 
 \section{选项说明}
 
+\subsection{与 \pkg{makeindex} 相同的选项}
+
 \begin{description}
-  \item[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。
-  \item[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。
-  \item[-strict] 严格区分不同 encapsulated 命令的页码。
-  \item[-z~\meta{sort}] 设置中文排序分组方式为 \meta{sort}。
+  \item[-c] 压缩索引项排序键前后的空格。默认情况下，索引键的空格会被保留。
+  \item[-i] 从标准输入流（"stdin"）读入索引项。如果使用了该选项，并且没有使用
+    "-o" 选项，则排序后的索引将输出到标准输出流（"stdout"）。
+  \item[-o~\meta{ind}] 设置输出索引文件为 \meta{ind}。如果没有指定该选项，默认
+    的输出文件名是第一个输入文件 \meta{idx0} 的主文件名加上 ".ind" 的扩展名。
+  \item[-q] 静默模式，不向标准错误流（"stderr"）显示信息。默认情况下处理过程与
+    错误信息会同时在 "stderr" 与日志文件中输出。
+  \item[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
+    第~\ref{sec:sepcialeffects} 节的说明。默认情况下，三个或三个以上连续的页码
+    会自动合并为一个页码区间（如 1--5）。
+  \item[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
+    前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 "kpathsea" 库在 TEXMF
+    树中查找。
+  \item[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
+    入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
 \end{description}
+
+\subsection{\zhm 独有的选项}
+
+\begin{description}
+  \item[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。可选的编码包括
+    "UTF-8", "UTF-16", "GB18030", "GBK" 和 "Big5"，不区分大小写。默认使用
+    UTF-8 编码。
+  \item[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。可选的编码与
+    "-enc" 选项相同。默认使用 UTF-8 编码。
+  \item[-strict] 严格区分不同 encapsulated 命令的页码。默认情况下会将
+  \item[-z~\meta{sort}] 设置中文排序分组方式为 \meta{sort}。可选的中文排序分组
+    方式如表~\ref{tab:sort} 所示。默认按拼音排序分组。
+\begin{table}[htbp]
+\centering
+\begin{tabularx}{\linewidth}{llX}
+\hline
+选项 & 别名 & 意义 \\
+\hline
+"pinyin" & "reading" & 按第一个汉字拼音首字母与西文混合分组，汉字按拼音
+  排序。 \\
+"bihua" & "stroke" & 汉字按笔画数与西文各自分组，按笔画数和笔顺排序。 \\
+"bushou" & "radical" & 汉字按康熙字典部首与西文各自分组，按部首和除部首笔画数
+  排序。 \\
+\hline
+\end{tabularx}
+\caption{\zhm 支持的中文排序分组方式}\label{tab:sort}
+\end{table}
+\end{description}
+
+\subsection{未实现的选项}
+
+\zhm 没有实现 \pkg{makeindex} 的 "-g", "-l", "-p", "-L", "-T" 选项。其中，选项
+"-p" 依赖对 \TeX{} 编译的日志文件的解析，可能在未来版本实现；另外几个语言相关
+的排序选项（"-g" 德文，"-T" 泰文，"-L" 做系统 locale 选择，"-l" 有关西文单词排
+序）对中文索引意义较小，不在 \zhm 中实现。
 
 \section{格式文件}
 
-\section{顺序}
+\zhm 的格式文件与标准 \pkg{makeindex} 基本上完全兼容，同时增加了少量控制中文
+分组输出的格式。可以在 \zhm 中使用标准 \pkg{makeindex} 的格式文件。
+
+\subsection{与 \pkg{makeindex} 兼容的格式}
+
+\subsection{\zhm 特有的格式}
+
+\subsection{未实现的 \pkg{makeindex} 格式}
+
+\section{排序细节}
 
 \section{特殊效果}
+\label{sec:sepcialeffects}
 
 \section{与 \pkg{makeindex} 的比较}
 
