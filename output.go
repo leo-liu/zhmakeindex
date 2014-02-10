@@ -1,4 +1,4 @@
-// $Id: output.go,v 128ab4e59ab0 2014/01/24 05:59:09 LeoLiu $
+// $Id: output.go,v 6fc25bbb9696 2014/02/10 13:10:35 LeoLiu $
 
 package main
 
@@ -114,7 +114,9 @@ func writePage(out io.Writer, level int, pageranges []PageRange, style *OutputSt
 		}
 		p.Write(out, style)
 	}
-	fmt.Fprint(out, style.delim_t)
+	if len(pageranges) != 0 {
+		fmt.Fprint(out, style.delim_t)
+	}
 }
 
 // 一个输出项目组

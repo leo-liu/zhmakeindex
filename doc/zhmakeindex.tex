@@ -4,19 +4,30 @@
 \setCJKsansfont{FandolHei}
 \setCJKmonofont{FandolFang}
 
-\usepackage[a4paper,centering,margin=1.5in]{geometry}
+\usepackage[a4paper,centering,margin=1.2in]{geometry}
 
 \CTEXsetup[format=\bfseries\Large]{section}
 
 \bibliographystyle{plain}
 
+\usepackage{ragged2e}
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabu}
+
+\usepackage{caption}
+\captionsetup[table]{font=small,position=top,skip=1ex}
+
 \usepackage{makeidx}
 \makeindex
 
 \usepackage{shortvrb}
+\MakeShortVerb\|
 \MakeShortVerb\"
 
-\usepackage{tabularx}
+\usepackage{hyperref}
+\def\tableautorefname{表}
 
 \usepackage{xspace}
 
@@ -85,8 +96,8 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
     第~\ref{sec:sepcialeffects} 节的说明。默认情况下，三个或三个以上连续的页码
     会自动合并为一个页码区间（如 1--5）。
   \item[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
-    前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 "kpathsea" 库在 TEXMF
-    树中查找。
+    前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 \pkg{kpathsea} 库在
+    TEXMF 树中查找。
   \item[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
     入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
 \end{description}
@@ -99,23 +110,25 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
     UTF-8 编码。
   \item[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。可选的编码与
     "-enc" 选项相同。默认使用 UTF-8 编码。
-  \item[-strict] 严格区分不同 encapsulated 命令的页码。默认情况下会将
+  \item[-strict] 严格区分不同嵌入命令的页码。默认情况下，在页码区间处理时，会
+    将如果页码左区间的嵌入命令与右区间不匹配，会以左区间为准（部分 \LaTeX{} 文
+    档会生成右区间命令缺失的索引项）；而如果使用 "-strict" 选项，则要求左右区
+    间的命令类型必须严格匹配。
   \item[-z~\meta{sort}] 设置中文排序分组方式为 \meta{sort}。可选的中文排序分组
-    方式如表~\ref{tab:sort} 所示。默认按拼音排序分组。
+    方式如\autoref{tab:sort} 所示。默认按拼音排序分组。
 \begin{table}[htbp]
-\centering
-\begin{tabularx}{\linewidth}{llX}
-\hline
+\caption{\zhm 支持的中文排序分组方式}\label{tab:sort}
+\begin{tabu} to \linewidth{ll>{\RaggedRight}X}
+\toprule
 选项 & 别名 & 意义 \\
-\hline
+\midrule
 "pinyin" & "reading" & 按第一个汉字拼音首字母与西文混合分组，汉字按拼音
   排序。 \\
 "bihua" & "stroke" & 汉字按笔画数与西文各自分组，按笔画数和笔顺排序。 \\
 "bushou" & "radical" & 汉字按康熙字典部首与西文各自分组，按部首和除部首笔画数
   排序。 \\
-\hline
-\end{tabularx}
-\caption{\zhm 支持的中文排序分组方式}\label{tab:sort}
+\bottomrule
+\end{tabu}
 \end{table}
 \end{description}
 
@@ -128,16 +141,157 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 
 \section{格式文件}
 
-\zhm 的格式文件与标准 \pkg{makeindex} 基本上完全兼容，同时增加了少量控制中文
-分组输出的格式。可以在 \zhm 中使用标准 \pkg{makeindex} 的格式文件。
+\zhm 的格式文件与标准 \pkg{makeindex} 语法完全相同，内容也基本上相同，同时增加
+了少量控制中文分组输出的格式。可以在 \zhm 中使用标准 \pkg{makeindex} 的格式文
+件。
+
+格式文件指明了 ".idx" 输入文件和最终输入文件的格式。该文件在当前工作目录或在
+TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关键字} \meta{属
+性} 的列表组成。\meta{关键字} 分为输出和输出两类。\meta{关键字} \meta{属性} 对
+儿不要求以任何顺序出现。以字符 \verb"%" 开头的行是注释。\meta{属性} 可以有不同
+的类型，字符串是以任意双引号 |"| 或反引号 |`| 界定的串，字符是以单引号 |'| 界
+定的单个字符，数字是一个整数。其中，双引号和单引号界定的串和字符，可以使用反斜
+线 "\" 符号作为转义符，以得到特殊字符或引号本身；而反引号界定的串不使用转义
+符。格式文件中没有指定的项目会使用其默认值。
 
 \subsection{与 \pkg{makeindex} 兼容的格式}
 
+\autoref{tab:oldinputstyle} 与\autoref{tab:oldoutputstyle} 的格式是在
+\pkg{makeindex} 中有定义，同时也在 \zhm 中有支持的输入、输出格式。\zhm 的这部
+分格式选项与 \pkg{makeindex} 意义相同，完全兼容。
+
+\begin{longtabu*} to \linewidth{lll>{\RaggedRight}X}
+\caption{与 \pkg{makeindex} 兼容的输入格式}\label{tab:oldinputstyle} \\
+  \toprule
+  关键字 & 类型 & 默认值 & 意义 \\
+  \midrule
+\endfirsthead
+  \toprule
+  关键字 & 类型 & 默认值 & 意义 \\
+  \midrule
+\endhead
+  \bottomrule
+\endfoot
+  |keyword|  & 字符串 & |"\\indexentry"| & 索引命令 \\
+  |arg_open|  & 字符 & |'{'| & 参数的开定界符 \\
+  |arg_close|  & 字符 & |'}'| & 参数的闭定界符 \\
+  |range_open|  & 字符 & |'('| & 页码范围的开定界符 \\
+  |range_close|  & 字符 & |')'| & 页码范围的闭定界符 \\
+  |level|  & 字符 & |'!'| & 索引项层次分隔符 \\
+  |actual|  & 字符 & |'@'| & （用于排序的）实际键标志符 \\
+  |encap|  & 字符 & "'|'" & 页码和特殊命令指示符 \\
+  |quote|  & 字符 & |'"'| & 引号（转义符） \\
+  |escape|  & 字符 & |'\\'| & 转义 |quote| 的符号，在它后面的引号不作转义符
+解释 \\
+\end{longtabu*}
+
+\begin{longtabu*} to \linewidth{lll>{\RaggedRight}X}
+\caption{与 \pkg{makeindex} 兼容的输出格式}\label{tab:oldoutputstyle} \\
+  \toprule
+  关键字 & 类型 & 默认值 & 意义 \\
+  \midrule
+\endfirsthead
+\toprule
+关键字 & 类型 & 默认值 & 意义 \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+|preamble| &  字符串 & |"\\begin{theindex}\n"| & 索引导言代码\\
+|postamble| &  字符串 & |"\n\n\\end{theindex}\n"| & 索引末尾代码\\
+|setpage_prefix| &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
+|setpage_suffix| &  字符串 & |"}\n"| & 页码设置后缀\\
+|group_skip| &  字符串 & |"\n\n  \\indexspace\n"| & 组间垂直间距\\
+|headings_flag| &  数字 & |0| & 标明新字母（分组）的旗标\\
+|heading_prefix| &  字符串 & |""| & 新字母（分组）标题前缀\\
+|heading_suffix| &  字符串 & |""| & 新字母（分组）标题后缀\\
+|symhead_positive| &  字符串 & |"Symbols"| & 当旗标 |headings_flag| 为正数时，符号的标题\\
+|symhead_negative| &  字符串 & |"symbols"| & 当旗标 |headings_flag| 为负数时，符号的标题\\
+|numhead_positive| &  字符串 & |"Numbers"| & 当旗标 |headings_flag| 为正数时，数字的标题\\
+|numhead_negative| &  字符串 & |"numbers"| & 当旗标 |headings_flag| 为负数时，数字的标题\\
+|item_0| &  字符串 & |"\n  \\item "| & 第 0 级条目间分隔\\
+|item_1| &  字符串 & |"\n    \\subitem "| & 第 1 级条目间分隔\\
+|item_2| &  字符串 & |"\n      \\subsubitem "| & 第 2 级条目间分隔\\
+|item_01| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔\\
+|item_x1| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔，其中第 0 级无页码\\
+|item_12| &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔\\
+|item_x2| &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔，其中第 1 级无页码\\
+|delim_0| &  字符串 & |", "| & 第 0 级条目与页码分隔\\
+|delim_1| &  字符串 & |", "| & 第 1 级条目与页码分隔\\
+|delim_2| &  字符串 & |", "| & 第 2 级条目与页码分隔\\
+|delim_n| &  字符串 & |", "| & 多个页码的分隔\\
+|delim_r| &  字符串 & |"--"| & 页码范围符号\\
+|delim_t| &  字符串 & |""| & 将插入到在页码列表末尾。如果页码列表为空，此项无
+效果。 \\
+|encap_prefix| &  字符串 & |"\\"| & 页码特殊指令前缀\\
+|encap_infix| &  字符串 & |"{"| & 页码特殊指令中缀\\
+|encap_suffix| &  字符串 & |"}"| & 页码特殊指令后缀\\
+|page_precedence| &  字符串 & |"rnaRA"| & 不同类型页码的次序，默认值表示小写
+  罗马、阿拉伯数字、小写字母、大写罗马、大写字母\\
+|suffix_2p| & 字符串 & |""| & 在 2 页的页码范围中代替 |delim_r| 和第二个页码\\
+|suffix_3p| & 字符串 & |""| & 在 3 页的页码范围中代替 |delim_r| 和后面的页码\\
+|suffix_mp| & 字符串 & |""| & 在更多页的页码范围中代替 |delim_r| 和后面的页码\\
+\end{longtabu*}
+
 \subsection{\zhm 特有的格式}
+
+\zhm 定义了一些特有的格式（\autoref{tab:newoutputstyle}），用来控制按笔画数或
+部首分组时，分组名的输出格式。
+
+\begin{table}[htbp]
+\caption{\zhm 特有的输出格式}\label{tab:newoutputstyle}
+\begin{tabu*} to \linewidth{lll>{\RaggedRight}X}
+\toprule
+关键字 & 类型 & 默认值 & 意义 \\
+\midrule
+  "stroke_prefix"             & 字符串 & |""| & 笔画数前缀 \\
+  "stroke_suffix"             & 字符串 & |" 画"| & 笔画数后缀 \\
+  "radical_prefix"            & 字符串 & |""| & 部首前缀 \\
+  "radical_suffix"            & 字符串 & |"部"| & 部首后缀 \\
+  "radical_simplified_flag"   & 数字 & 1 & 是否输出简化部首的标志 \\
+  "radical_simplified_prefix" & 字符串 & |"（"| & 简化部首前缀 \\
+  "radical_simplified_suffix" & 字符串 & |"）"| & 简化部首后缀 \\
+\bottomrule
+\end{tabu*}
+\end{table}
 
 \subsection{未实现的 \pkg{makeindex} 格式}
 
+\autoref{tab:unsupportedinputstyle} 和\autoref{tab:unsupportedoutputstyle} 中
+给出的是在标准的 \pkg{makeindex} 中定义，但在 \zhm 中没有实现对应功能的格式。
+格式文件中如果出现这些格式，\zhm 将会忽略它们。
+
+\begin{table}[htbp]
+\caption{未实现的输入格式}\label{tab:unsupportedinputstyle}
+\begin{tabu*} to \linewidth{lll>{\RaggedRight}X}
+\toprule
+关键字 & 类型 & 默认值 & 意义 \\
+\midrule
+  |page_compositor| &  字符串 & |"-"| & 复合页码分隔符 \\
+\bottomrule
+\end{tabu*}
+\end{table}
+
+\begin{table}[htbp]
+\caption{未实现的输出格式}\label{tab:unsupportedoutputstyle}
+\begin{tabu*} to \linewidth{lll>{\RaggedRight}X}
+\toprule
+关键字 & 类型 & 默认值 & 意义 \\
+\midrule
+|line_max| &  数字 & |72| & 最大行长度，超出长度会自动折行\\
+|indent_space| &  字符串 & |"\t\t"| & 自动折行的缩进\\
+|indent_length| &  数字 & |16| & |indent_space| 的长度\\
+\bottomrule
+\end{tabu*}
+\end{table}
+
 \section{排序细节}
+
+\subsection{分组}
+
+\subsection{条目排序}
+
+\subsection{页码排序与合并}
 
 \section{特殊效果}
 \label{sec:sepcialeffects}
@@ -164,8 +318,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \index{源文件}
 本作品包括 \zhm 的程序及文档，由如下源文件：
 \begin{verbatim}
-dist.cmd
-examples
+build-dist.cmd
 input.go
 main.go
 numberedreader.go
@@ -179,6 +332,8 @@ strokes.go
 stroke_collator.go
 style.go
 style_test.go
+doc/zhmakeindex.bib
+doc/zhmakeindex.mst
 doc/zhmakeindex.tex
 kpathsea/dynamic_other.go
 kpathsea/dynamic_windows_386.go
@@ -186,8 +341,8 @@ kpathsea/kpathsea.go
 maketables/make-table.cmd
 maketables/maketables.go
 \end{verbatim}
-以及编译源文件得到的二进制文件 \path{zhmakeindex.exe}、PDF 文档
-\path{zhmakeindex.pdf} 组成。
+以及编译源文件得到的二进制文件 \path{zhmakeindex.exe} 或 \path{zhmakeindex}、
+PDF 文档 \path{zhmakeindex.pdf} 组成。
 
 \index{Unicode}
 大部分汉字数据来自 Unicode 项目（\url{http://www.unicode.org/}）：
