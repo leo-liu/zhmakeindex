@@ -1,5 +1,5 @@
 \documentclass[UTF8,hyperref,nofonts]{ctexart}
-\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao}
+\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao,Verb=true}
 \setCJKmainfont[ItalicFont=FandolKai]{FandolSong}
 \setCJKsansfont{FandolHei}
 \setCJKmonofont{FandolFang}
@@ -22,9 +22,13 @@
 \usepackage{makeidx}
 \makeindex
 
+\usepackage{fancyvrb}
+\fvset{formatcom=\xeCJKVerbAddon}
 \usepackage{shortvrb}
-\MakeShortVerb\|
-\MakeShortVerb\"
+\AtBeginDocument{
+  \MakeShortVerb\|
+  \MakeShortVerb\"
+}
 
 \usepackage{hyperref}
 \def\tableautorefname{表}
@@ -151,8 +155,8 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 儿不要求以任何顺序出现。以字符 \verb"%" 开头的行是注释。\meta{属性} 可以有不同
 的类型，字符串是以任意双引号 |"| 或反引号 |`| 界定的串，字符是以单引号 |'| 界
 定的单个字符，数字是一个整数。其中，双引号和单引号界定的串和字符，可以使用反斜
-线 "\" 符号作为转义符，以得到特殊字符或引号本身；而反引号界定的串不使用转义
-符。格式文件中没有指定的项目会使用其默认值。
+线 "\" 符号作为转义符，以得到特殊字符或引号本身；而反引号界定的串是 \zhm 特有
+的功能，它不使用转义符。格式文件中没有指定的项目会使用其默认值。
 
 \subsection{与 \pkg{makeindex} 兼容的格式}
 
@@ -284,6 +288,15 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \bottomrule
 \end{tabu*}
 \end{table}
+
+\subsection{格式文件示例}
+
+合法的 \pkg{makeindex} 格式文件都是合法的 \zhm 格式文件。\LaTeXe{} 的
+\pkg{doc} 包附带的 \path{gind.ist} 和 \path{gglo.ist} 就是两个实际的例子。此
+外，\pkg{makeindex} 手册页 \cite{Rodgers1991} 也给出了几个有用的例子。
+
+下面是本文档使用的格式文件，注意其中反引号格式的串是 \zhm 特有的：
+\VerbatimInput[numbers=left]{zhmakeindex.mst}
 
 \section{排序细节}
 
