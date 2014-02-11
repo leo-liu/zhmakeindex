@@ -1,14 +1,13 @@
-preamble "
-\\begin{theindex}
+preamble "\\begin{theindex}
   \\def\\seename{见}
   \\def\\alsoname{又见}
-  \\providecommand*\\indexgroup[1]{\\indexspace
-    \\item \\textbf{#1}\\nopagebreak}
-"
+  \\providecommand*\\indexgroup[1]{%
+    \\indexspace
+    \\item \\textbf{#1}\\nopagebreak}\n"
 
 postamble "\n\n\\end{theindex}\n"
 
-group_skip "  %\n  \\indexspace\n  %\n"
+group_skip "\n\n  \\indexspace\n\n"
 
 headings_flag 1
 heading_prefix "  %\n  \\indexgroup{"

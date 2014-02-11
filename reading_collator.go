@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v d3c36c5a7972 2014/01/18 20:26:01 leoliu $
+// $Id: reading_collator.go,v 440c8c98f478 2014/02/11 19:12:02 LeoLiu $
 
 // reading_collator.go
 package main
@@ -36,7 +36,7 @@ func (_ ReadingIndexCollator) Group(entry *IndexEntry) int {
 	first := ([]rune(entry.level[0].key))[0]
 	first = unicode.ToLower(first)
 	switch {
-	case IsNumRune(first):
+	case IsNumString(entry.level[0].key):
 		return 0
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'

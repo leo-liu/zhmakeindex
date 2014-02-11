@@ -1,8 +1,9 @@
-\documentclass[UTF8,hyperref,nofonts]{ctexart}
-\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao,Verb=true}
-\setCJKmainfont[ItalicFont=FandolKai]{FandolSong}
-\setCJKsansfont{FandolHei}
-\setCJKmonofont{FandolFang}
+\documentclass[UTF8,hyperref]{ctexart}
+\setmainfont[Ligatures=TeX]{CMU Serif}
+\setsansfont[Ligatures=TeX]{CMU Sans Serif}
+\setmonofont[Mapping=]{CMU Typewriter Text}
+\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao}
+\setCJKmainfont[BoldFont=FandolSong Bold,ItalicFont=KaiTi]{SimSun}
 
 \usepackage[a4paper,centering,margin=1.2in]{geometry}
 
@@ -31,6 +32,7 @@
 }
 
 \usepackage{hyperref}
+\hypersetup{bookmarksnumbered,pdfstartview=FitH}
 \def\tableautorefname{表}
 
 \usepackage{xspace}
@@ -89,7 +91,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \subsection{与 \pkg{makeindex} 相同的选项}
 
 \begin{description}
-  \item[-c] 压缩索引项排序键前后的空格。默认情况下，索引键的空格会被保留。
+  \item[-c] 压缩索引项排序项前后的空格。默认情况下，排序项中的空格会被保留。
   \item[-i] 从标准输入流（"stdin"）读入索引项。如果使用了该选项，并且没有使用
     "-o" 选项，则排序后的索引将输出到标准输出流（"stdout"）。
   \item[-o~\meta{ind}] 设置输出索引文件为 \meta{ind}。如果没有指定该选项，默认
@@ -97,8 +99,8 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
   \item[-q] 静默模式，不向标准错误流（"stderr"）显示信息。默认情况下处理过程与
     错误信息会同时在 "stderr" 与日志文件中输出。
   \item[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
-    第~\ref{sec:sepcialeffects} 节的说明。默认情况下，三个或三个以上连续的页码
-    会自动合并为一个页码区间（如 1--5）。
+    第~\ref{sec:idxsyntax} 节的说明。默认情况下，三个或三个以上连续的页码会自
+    动合并为一个页码区间（如 1--5）。
   \item[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
     前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 \pkg{kpathsea} 库在
     TEXMF 树中查找。
@@ -107,6 +109,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \end{description}
 
 \subsection{\zhm 独有的选项}
+\label{subsec:newoption}
 
 \begin{description}
   \item[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。可选的编码包括
@@ -118,25 +121,14 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
     将如果页码左区间的嵌入命令与右区间不匹配，会以左区间为准（部分 \LaTeX{} 文
     档会生成右区间命令缺失的索引项）；而如果使用 "-strict" 选项，则要求左右区
     间的命令类型必须严格匹配。
-  \item[-z~\meta{sort}] 设置中文排序分组方式为 \meta{sort}。可选的中文排序分组
-    方式如\autoref{tab:sort} 所示。默认按拼音排序分组。
-\begin{table}[htbp]
-\caption{\zhm 支持的中文排序分组方式}\label{tab:sort}
-\begin{tabu} to \linewidth{ll>{\RaggedRight}X}
-\toprule
-选项 & 别名 & 意义 \\
-\midrule
-"pinyin" & "reading" & 按第一个汉字拼音首字母与西文混合分组，汉字按拼音
-  排序。 \\
-"bihua" & "stroke" & 汉字按笔画数与西文各自分组，按笔画数和笔顺排序。 \\
-"bushou" & "radical" & 汉字按康熙字典部首与西文各自分组，按部首和除部首笔画数
-  排序。 \\
-\bottomrule
-\end{tabu}
-\end{table}
+  \item[-z~\meta{sort}] 设置中文分组与排序方式为 \meta{sort}。可选的中文分组排
+    序方式包括 "pinyin"/"reading", "bihua"/"stroke", "bushou"/"radical"。默认
+    值为 "pinyin"，即中文按拼音分组排序。有关分组与排序的详细说明见
+    第~\ref{sec:sort} 节。
 \end{description}
 
 \subsection{未实现的选项}
+\label{subsec:unsupportedoption}
 
 \zhm 没有实现 \pkg{makeindex} 的 "-g", "-l", "-p", "-L", "-T" 选项。其中，选项
 "-p" 依赖对 \TeX{} 编译的日志文件的解析，可能在未来版本实现；另外几个语言相关
@@ -182,7 +174,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
   |range_open|  & 字符 & |'('| & 页码范围的开定界符 \\
   |range_close|  & 字符 & |')'| & 页码范围的闭定界符 \\
   |level|  & 字符 & |'!'| & 索引项层次分隔符 \\
-  |actual|  & 字符 & |'@'| & （用于排序的）实际键标志符 \\
+  |actual|  & 字符 & |'@'| & （区别于排序项的）实际输出项标志符 \\
   |encap|  & 字符 & "'|'" & 页码和特殊命令指示符 \\
   |quote|  & 字符 & |'"'| & 引号（转义符） \\
   |escape|  & 字符 & |'\\'| & 转义 |quote| 的符号，在它后面的引号不作转义符
@@ -206,16 +198,16 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 |setpage_prefix| &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
 |setpage_suffix| &  字符串 & |"}\n"| & 页码设置后缀\\
 |group_skip| &  字符串 & |"\n\n  \\indexspace\n"| & 组间垂直间距\\
-|headings_flag| &  数字 & |0| & 标明新字母（分组）的旗标\\
-|heading_prefix| &  字符串 & |""| & 新字母（分组）标题前缀\\
-|heading_suffix| &  字符串 & |""| & 新字母（分组）标题后缀\\
+|headings_flag| &  数字 & |0| & 是否显示分组名标题的旗标\\
+|heading_prefix| &  字符串 & |""| & 分组名标题的前缀\\
+|heading_suffix| &  字符串 & |""| & 分组名标题的后缀\\
 |symhead_positive| &  字符串 & |"Symbols"| & 当旗标 |headings_flag| 为正数时，符号的标题\\
 |symhead_negative| &  字符串 & |"symbols"| & 当旗标 |headings_flag| 为负数时，符号的标题\\
 |numhead_positive| &  字符串 & |"Numbers"| & 当旗标 |headings_flag| 为正数时，数字的标题\\
 |numhead_negative| &  字符串 & |"numbers"| & 当旗标 |headings_flag| 为负数时，数字的标题\\
 |item_0| &  字符串 & |"\n  \\item "| & 第 0 级条目间分隔\\
 |item_1| &  字符串 & |"\n    \\subitem "| & 第 1 级条目间分隔\\
-|item_2| &  字符串 & |"\n      \\subsubitem "| & 第 2 级条目间分隔\\
+|item_2|分组 &  字符串 & |"\n      \\subsubitem "| & 第 2 级条目间分隔\\
 |item_01| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔\\
 |item_x1| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔，其中第 0 级无页码\\
 |item_12| &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔\\
@@ -288,7 +280,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \bottomrule
 \end{tabu*}
 \end{table}
-
+分组
 \subsection{格式文件示例}
 
 合法的 \pkg{makeindex} 格式文件都是合法的 \zhm 格式文件。\LaTeXe{} 的
@@ -299,15 +291,103 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \VerbatimInput[numbers=left]{zhmakeindex.mst}
 
 \section{排序细节}
+\label{sec:sort}
 
-\subsection{分组}
+\subsection{索引项分组}
 
-\subsection{条目排序}
+\zhm 与 \pkg{makeindex} 类似，主要是按第一级索引项的排序项的首个字符分组的。对
+最普通的场景，西文是按单词的首字母分组，中文则根据 "-z" 选项
+（\ref{subsec:newoption}~节）的不同，选择对应的分组，数字和其他符号单独分组。
+
+\zhm 的前 28 个分组是固定的，分别是数字、符号，以及 A--Z 的 26 个拉丁字母。按
+笔画排序时，后面是按总笔画数分组的汉字，共 64 组；按部首笔画排序时，后面是按康
+熙字典部首分组的汉字，共 214 组。详细情况见\autoref{tab:group}。
+
+\begin{table}[htbp]
+\caption{\zhm 支持的分组方式}\label{tab:group}
+\begin{tabu} to \linewidth{lll@{\qquad}>{\RaggedRight}X}
+\toprule
+"-z" 选项 & 别名 & 前 28 个分组 & 后面的分组 \\
+\midrule
+"pinyin" & "reading" & 数字、符号、A, \ldots, Z & （无）\\
+"bihua" & "stroke"   & 数字、符号、A, \ldots, Z & 1 画、2 画、……、64 画（共 64 组） \\
+"bushou" & "radical" & 数字、符号、A, \ldots, Z & 一部、丨部、……、龠部（共 214 组） \\
+\bottomrule
+\end{tabu}
+\end{table}
+
+\zhm 主要是面向中文排版的索引处理，因此对于西文条目，只对没有重音等符号的拉丁
+字母能进行正确的分组，对带重音符号的拉丁字母（如 é, ç）、非拉丁字母（如 Σ, Δ,
+Ж, Я 等）等则会一律按符号分组。
+
+如果索引项的第一级排序项全部由数字组成，则该项会被分入数字分组；但如果条目的首
+个字符是数字，后面还有其他字符，则条目会被计入符号分组。除了阿拉伯数字，\zhm
+还将其他 Unicode 数字符号（如罗马数字“Ⅳ”、带圈数字“⑧”）也当作数字处理，但汉字
+数码“〇”被看作汉字处理。
+
+当索引项第一级排序项的首个字符不是拉丁字母或汉字，排序项本身也不是纯数字时，则
+此索引项就会计入符号分组。
+
+当输出格式变量 "headings_flag" 非零时（参见\autoref{tab:oldoutputstyle}），将
+输出分组名称。"headings_flag" 是正数时，以大写字母显示分组名
+称；"headings_flag" 是负数时，以小写字母显示分组名称。
+
+当使用汉字特有的分组时，分组名称可以使用格式文件定制（参见%
+\autoref{tab:newoutputstyle}）。按笔画分组时，分组名为
+\begin{syntax}
+  <stroke\_prefix><笔画数><stroke\_suffix>
+\end{syntax}
+按康熙字典部首分组时，如果变量 "radical_simplified_flag" 非零（默认情况），则
+分组名由原康熙字典部首与简化字部首组合而成：
+\begin{syntax}
+  <radical\_prefix><部首><radical\_suffix>\\
+  \hspace*{2em}<radical\_simplified\_prefix><简化字部首><radical\_simplified\_suffix>
+\end{syntax}
+如果变量 "radical_simplified_flag" 是零，则分组名没有简化字部首：
+\begin{syntax}
+  <radical\_prefix><部首><radical\_suffix>
+\end{syntax}
+
+\subsection{索引项排序}
+
+大体上，\zhm 逐字符按字典序对索引项的排序项进行排序，汉字与其他 Unicode 字符一
+样，按单个字符比较。条目比较有如下特殊规则：
+\begin{itemize}
+  \item 在比较两个排序项时，\zhm 首先忽略字母大小写进行比较，如果此时结果相
+    等，再按区分大小写进行比较，将大写字母排在小写字母之前。
+  \item 如果排序项只包含阿拉伯数字，则首先按数字大小比较，数字相等时再按字典序
+    比较。
+\end{itemize}
+
+\pkg{makeindex} 有一个 "-l" 选项忽略条目中的空格，按所有非空白符比较所有条目
+（\ref{subsec:unsupportedoption}~节）。\zhm 未提供此功能。
+
+按 "-z" 选项（\ref{subsec:newoption}~节）的不同，汉字可以使用不同的排序方式，
+如\autoref{tab:sort} 所示。
+\begin{table}[htbp]
+\caption{\zhm 支持的中文排序方式}\label{tab:sort}
+\begin{tabu} to \linewidth{ll>{\RaggedRight}X}
+\toprule
+"-z" 选项 & 别名 & 意义 \\
+\midrule
+"pinyin" & "reading" & 汉字按常用读音的拼音排序。 \\
+"bihua" & "stroke" & 汉字按笔画数和笔顺排序。 \\
+"bushou" & "radical" & 汉字按康熙字典部首和除部首笔画数排序。 \\
+\bottomrule
+\end{tabu}
+\end{table}
+
+使用读音排序时，没有读音数据的字符（包括生僻字）一律排在有读音的字符之前，汉字
+按其最常用读音比较，读音相同汉字的按 Unicode 编码排序。使用笔画数和笔顺排序
+时，笔画数小的排在前面，笔画数相同的，按横、竖、撇、点（捺）、折的顺序逐笔画比
+较，仍然相同的按 Unicode 编码排序；生僻汉字没有笔顺信息的，排在同笔画数有笔顺
+的字后面。使用部首和除部首笔画数排序时，部首按康熙字典 214 部首顺序排列，部首
+和笔画数相同的按 Unicode 编码排序。
 
 \subsection{页码排序与合并}
 
-\section{特殊效果}
-\label{sec:sepcialeffects}
+\section{索引项输入语法}
+\label{sec:idxsyntax}
 
 \section{与 \pkg{makeindex} 的比较}
 
