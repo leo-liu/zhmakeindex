@@ -2,14 +2,16 @@
 \setmainfont[Ligatures=TeX]{CMU Serif}
 \setsansfont[Ligatures=TeX]{CMU Sans Serif}
 \setmonofont[Mapping=]{CMU Typewriter Text}
-\xeCJKsetup{AutoFakeBold=false,PunctStyle=hangmobanjiao}
 \setCJKmainfont[BoldFont=FandolSong Bold,ItalicFont=KaiTi]{SimSun}
 
 \usepackage[a4paper,centering,margin=1.2in]{geometry}
 
 \CTEXsetup[format=\bfseries\Large]{section}
 
+\renewcommand\refname{参考文档}
 \bibliographystyle{plain}
+
+\usepackage{tocbibind}
 
 \usepackage{ragged2e}
 
@@ -85,10 +87,14 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 如果只有一个输入文件，并且没有显式用 "-s" 选项指定格式文件，\zhm 会使用后缀为
 ".mst" 的默认格式文件（如果存在的话）。
 
+关于如何使用 \pkg{makeindex} 在 \LaTeX{} 文档中处理索引，可以参考陈丕宏较早的
+文档 \cite{Chen:1988:IPP}，或 Lamport 的文档 \cite{Lamport1987}。\zhm 的在
+\LaTeX 中的使用方法与 \pkg{makeindex} 基本一致。
 
 \section{选项说明}
 
 \subsection{与 \pkg{makeindex} 相同的选项}
+\label{subsec:oldoption}
 
 \begin{description}
   \item[-c] 压缩索引项排序项前后的空格。默认情况下，排序项中的空格会被保留。
@@ -385,6 +391,51 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 和笔画数相同的按 Unicode 编码排序。
 
 \subsection{页码排序与合并}
+
+内容完全相同而页码不同的索引项，会在排序时合并为一项。同一索引项的所有页码会按
+前后次序排序、去重，并按要求合并为页码区间。
+
+\zhm 能识别不同类型的页码格式，包括阿拉伯数字（1, 2, 3, \ldots）、大小写罗马数
+字（I, II, III, \ldots）、大小写拉丁字母（a, b, c, \ldots）。不同类型的页码按
+照 "page_precedence" 变量的设置（\autoref{tab:oldoutputstyle}）区分前后次序。
+默认情况下，不同类型的页码次序是 "rnaRA"，即小写罗马数字的页码排在最前，然后依
+次是阿拉伯数字、小写拉丁字母、大写罗马数字、大写拉丁字母的页码。
+
+目前，页码的类型判别比较粗糙，仅以页码的第一个字符判断类型。当页码以字母 "i",
+"v", "x", "l", "c", "d", "m" 起始时，即被识别为罗马数字，其他字母被识别为拉丁
+字母页码。
+
+\zhm 支持页码区间，在索引项中显式指定区间，如对输入
+\begin{verbatim}
+\indexentry{foo|(}{5}
+\indexentry{foo|)}{10}
+\end{verbatim}
+则 "foo" 项会输出页码 5--10。连续的区间、区间内的零散页码会被合并为一个大的区
+间，如对输入
+\begin{verbatim}
+\indexentry{foo|(}{5}
+\indexentry{foo}{6}
+\indexentry{foo|)}{10}
+\indexentry{foo|(}{11}
+\indexentry{foo|)}{13}
+\end{verbatim}
+则 "foo" 项会输出页码 5--13。
+
+如果没有使用 "-r" 选项（\ref{subsec:oldoption}~节），零散的页码也会与区间一起
+合并，3 页或以上连续的页码也会被合并为区间。例如输入
+\begin{verbatim}
+\indexentry{foo}{i}
+\indexentry{foo}{ii}
+\indexentry{foo}{iii}
+\indexentry{foo|(}{5}
+\indexentry{foo|)}{7}
+\indexentry{foo}{8}
+\end{verbatim}
+则 "foo" 项会输出页码 i--iii， 5--8。
+
+在排序合并页码时，\zhm 会区分不同数字类型的页码；如果页码还有特殊命令修饰，则
+还会区分不同的修饰命令。
+
 
 \section{索引项输入语法}
 \label{sec:idxsyntax}
