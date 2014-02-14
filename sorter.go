@@ -1,4 +1,4 @@
-// $Id: sorter.go,v a46154a87312 2014/01/21 21:27:52 LeoLiu $
+// $Id: sorter.go,v 88cf61af5723 2014/02/14 22:14:21 leoliu $
 
 package main
 
@@ -88,8 +88,22 @@ func (s IndexEntrySlice) Strcmp(a, b string) int {
 	if cmp := DecimalStrcmp(a, b); cmp != 0 {
 		return cmp
 	}
-	// 忽略大小写，按字典序比较
 	a_rune, b_rune := []rune(a), []rune(b)
+	// 特例：在符号开头的串 < 数字开头的串，后面是字母汉字开头的串
+	// Unicode 中字母汉字总在数字之后，只特别处理串首是符号或是数字的情形
+//	var a0, b0 rune
+//	if len(a_rune) > 0 {
+//		a0 = a_rune[0]
+//	}
+//	if len(b_rune) > 0 {
+//		b0 = b_rune[0]
+//	}
+//	if !IsNumRune(a0) && !unicode.IsLetter(a0) && IsNumRune(b0) {
+//		return -1
+//	} else if IsNumRune(a0) && !IsNumRune(b0) && !unicode.IsLetter(b0) {
+//		return 1
+//	}
+	// 忽略大小写，按字典序比较
 	for i := range a_rune {
 		if i >= len(b_rune) {
 			return 1
