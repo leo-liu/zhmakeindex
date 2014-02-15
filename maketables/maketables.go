@@ -1,4 +1,4 @@
-// $Id: maketables.go,v 20933710c18b 2014/01/19 19:25:41 leoliu $
+// $Id: maketables.go,v 9a1884915208 2014/02/15 07:02:50 leoliu $
 
 package main
 
@@ -309,6 +309,8 @@ func make_radical_table(outdir string) {
 	CJKRadical := read_radicals()
 	// 读入部首、除部首笔画
 	version, CJKRadicalStrokes := read_radical_strokes()
+	// 单独增加数字“〇”的部首、除部首笔画（乙部 0 画）
+	CJKRadicalStrokes['〇'] = MakeRadicalStroke('〇', 5, 0)
 	// 输出
 	outfile, err := os.Create(path.Join(outdir, "radicalstrokes.go"))
 	if err != nil {

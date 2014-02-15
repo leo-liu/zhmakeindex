@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 88cf61af5723 2014/02/14 22:14:21 leoliu $
+// $Id: sorter.go,v 9a1884915208 2014/02/15 07:02:50 leoliu $
 
 package main
 
@@ -7,13 +7,19 @@ import (
 	"sort"
 	"strconv"
 	"unicode"
+	"unicode/utf8"
 )
 
 // 对应不同的分类排序方式
 type IndexCollator interface {
+	// 初始化分组
 	InitGroups(style *OutputStyle) []IndexGroup
+	// 给索引项分组
 	Group(entry *IndexEntry) int
+	// 单个字符比较
 	RuneCmp(a, b rune) int
+	// 判断是否字母或汉字
+	IsLetter(r rune) bool
 }
 
 // 排序器
@@ -84,26 +90,18 @@ func (s IndexEntrySlice) Swap(i, j int) {
 
 // 比较两个串的大小
 func (s IndexEntrySlice) Strcmp(a, b string) int {
-	// 先尝试按数字比较
+	atype, btype := getStringType(s.colattor, a), getStringType(s.colattor, b)
+	if atype < btype {
+		return -1
+	} else if atype > btype {
+		return 1
+	}
+	// 特例：尝试按纯数字比较
 	if cmp := DecimalStrcmp(a, b); cmp != 0 {
 		return cmp
 	}
-	a_rune, b_rune := []rune(a), []rune(b)
-	// 特例：在符号开头的串 < 数字开头的串，后面是字母汉字开头的串
-	// Unicode 中字母汉字总在数字之后，只特别处理串首是符号或是数字的情形
-//	var a0, b0 rune
-//	if len(a_rune) > 0 {
-//		a0 = a_rune[0]
-//	}
-//	if len(b_rune) > 0 {
-//		b0 = b_rune[0]
-//	}
-//	if !IsNumRune(a0) && !unicode.IsLetter(a0) && IsNumRune(b0) {
-//		return -1
-//	} else if IsNumRune(a0) && !IsNumRune(b0) && !unicode.IsLetter(b0) {
-//		return 1
-//	}
 	// 忽略大小写，按字典序比较
+	a_rune, b_rune := []rune(a), []rune(b)
 	for i := range a_rune {
 		if i >= len(b_rune) {
 			return 1
@@ -116,13 +114,45 @@ func (s IndexEntrySlice) Strcmp(a, b string) int {
 	if len(a_rune) < len(b_rune) {
 		return -1
 	}
-	// 不忽略大小写重新比较串
+	// 不忽略大小写重新比较串，此时不必使用 colattor 特有的比较
 	if a < b {
 		return -1
 	} else if a > b {
 		return 1
 	} else {
 		return 0
+	}
+}
+
+// 串类型
+type stringType int
+
+// 用于比较的串类型，有前后次序
+const (
+	EMPTY_STR      stringType = iota // 空串
+	SYMBOL_STR                       // 符号开头
+	NUM_SYMBOL_STR                   // 数字开头
+	NUM_STR                          // 纯数字
+	LETTER_STR                       // 字母或汉字
+)
+
+// 取得串类型
+func getStringType(collator IndexCollator, s string) stringType {
+	if len(s) == 0 {
+		return EMPTY_STR
+	}
+	r, _ := utf8.DecodeRuneInString(s)
+	switch {
+	case IsNumRune(r):
+		if IsNumString(s) {
+			return NUM_STR
+		} else {
+			return NUM_SYMBOL_STR
+		}
+	case collator.IsLetter(r):
+		return LETTER_STR
+	default:
+		return SYMBOL_STR
 	}
 }
 
