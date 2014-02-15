@@ -1,10 +1,11 @@
-// $Id: stroke_collator.go,v 440c8c98f478 2014/02/11 19:12:02 LeoLiu $
+// $Id: stroke_collator.go,v 9a1884915208 2014/02/15 07:02:50 leoliu $
 
 package main
 
 import (
 	"strconv"
 	"unicode"
+	"unicode/utf8"
 )
 
 // 汉字按笔画排序，汉字按笔画分组排在英文字母组后面
@@ -37,7 +38,7 @@ func (_ StrokeIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 
 // 取得分组
 func (_ StrokeIndexCollator) Group(entry *IndexEntry) int {
-	first := ([]rune(entry.level[0].key))[0]
+	first, _ := utf8.DecodeRuneInString(entry.level[0].key)
 	first = unicode.ToLower(first)
 	switch {
 	case IsNumString(entry.level[0].key):
@@ -71,5 +72,18 @@ func (_ StrokeIndexCollator) RuneCmp(a, b rune) int {
 		return 1
 	default:
 		return int(a - b)
+	}
+}
+
+// 判断是否字母或汉字
+func (_ StrokeIndexCollator) IsLetter(r rune) bool {
+	r = unicode.ToLower(r)
+	switch {
+	case 'a' <= r && r <= 'z':
+		return true
+	case CJKstrokes[r] != "":
+		return true
+	default:
+		return false
 	}
 }

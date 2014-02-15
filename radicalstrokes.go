@@ -243,6 +243,7 @@ func (rs RadicalStroke) Stroke() int {
 }
 
 var CJKRadicalStrokes = map[rune]RadicalStroke{
+	0x3007: "\x05\x00\u3007", // 〇
 	0x3400: "\x01\x04\u3400", // 㐀
 	0x3401: "\x01\x05\u3401", // 㐁
 	0x3402: "\x01\x05\u3402", // 㐂
