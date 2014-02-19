@@ -4,6 +4,10 @@
 \setmonofont[Mapping=]{CMU Typewriter Text}
 \setCJKmainfont[BoldFont=FandolSong Bold,ItalicFont=KaiTi]{SimSun}
 
+\usepackage{pifont}
+\newcommand\gooditem{\item[\ding{51}]}
+\newcommand\baditem{\item[\ding{55}]}
+
 \usepackage[a4paper,centering,margin=1.2in]{geometry}
 
 \CTEXsetup[format=\bfseries\Large]{section}
@@ -142,6 +146,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 序）对中文索引意义较小，不在 \zhm 中实现。
 
 \section{格式文件}
+\label{sec:ist}
 
 \zhm 的格式文件与标准 \pkg{makeindex} 语法完全相同，内容也基本上相同，同时增加
 了少量控制中文分组输出的格式。可以在 \zhm 中使用标准 \pkg{makeindex} 的格式文
@@ -296,6 +301,10 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 下面是本文档使用的格式文件，注意其中反引号格式的串是 \zhm 特有的：
 \VerbatimInput[numbers=left]{zhmakeindex.mst}
 
+
+\section{索引项输入语法}
+\label{sec:idxsyntax}
+
 \section{排序细节}
 \label{sec:sort}
 
@@ -393,6 +402,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 和笔画数相同的按 Unicode 编码排序。
 
 \subsection{页码排序与合并}
+\label{subsec:pagemerge}
 
 内容完全相同而页码不同的索引项，会在排序时合并为一项。同一索引项的所有页码会按
 前后次序排序、去重，并按要求合并为页码区间。
@@ -433,16 +443,69 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \indexentry{foo|)}{7}
 \indexentry{foo}{8}
 \end{verbatim}
-则 "foo" 项会输出页码 i--iii， 5--8。
+则 "foo" 项会输出页码 i--iii， 5--8。使用 "-r" 选项将禁止这种自动合并。
 
 在排序合并页码时，\zhm 会区分不同数字类型的页码；如果页码还有特殊命令修饰，则
-还会区分不同的修饰命令。
+还会区分不同的修饰命令。例如输入
+\begin{verbatim}
+\indexentry{foo}{1}
+\indexentry{foo|textit}{5}
+\indexentry{foo}{3}
+\indexentry{foo|textit}{7}
+\end{verbatim}
+则 "foo" 项会分别以不同格式输出页码 1, 3, \textit{5}, \textit{7}。
 
-
-\section{索引项输入语法}
-\label{sec:idxsyntax}
+在页码区间中如果出现不同类型的特殊命令修饰，则按不同的页码格式分别输出。但是，
+为了适应部分 \LaTeX{} 代码不精确的页码输出，如果页码区间头与页码区间尾使用的特
+殊命令不同，仍把它们看做相同的格式，按页码区间头的格式输出。例如输入
+\begin{verbatim}
+\indexentry{foo|(textit}{1}
+\indexentry{foo|textbf}{5}
+\indexentry{foo|textit}{2}
+\indexentry{foo|)}{4}
+\end{verbatim}
+则 "foo" 项会把页码 1, 2, 4 都归入区间 1--4，输出页码 \textit{1--4},
+\textbf{5}。这也是 \pkg{makeindex} 默认效果。如果使用了 "-strict" 选项
+（\ref{subsec:newoption}~节），则不再允许页码区间有不同的特殊命令修饰，而要求
+格式严格匹配。"-strict" 选项适合用于不同格式页码区间相互交错的复杂的页码格式，
+例如输入
+\begin{verbatim}
+\indexentry{foo|(textit}{1}
+\indexentry{foo|(textbf}{5}
+\indexentry{foo|)textit}{8}
+\indexentry{foo|)textbf}{9}
+\end{verbatim}
+则 "foo" 项会输出页码 \textbf{5--9}, \textit{1--8}。但如果不使用 "-strict" 选
+项，或者使用 \pkg{makeindex}，则无法正确识别这类页码区间。
 
 \section{与 \pkg{makeindex} 的比较}
+
+\begin{itemize}
+  \gooditem \zhm 支持 Unicode，所有字符按 Unicode 字符而非字节流处理。同时支持
+  输入输出文件、格式文件使用不同的中文编码（\ref{subsec:newoption}~节）。
+
+  \gooditem \zhm 支持中文特有的分组与排序方式（第~\ref{sec:sort} 节）。
+
+  \gooditem \zhm 与 \pkg{makeindex} 的页码合并算法不同
+  （\ref{subsec:pagemerge}~节），在页码区间有嵌套和交错，前后分界的格式不统一
+  时，\zhm 与 \pkg{makeindex} 可能会产生不完全相同的效果。如果使用 "-strict"
+  选项，\zhm 会使用更复杂的页码区间合并算法，能正确处理不同格式多层嵌套和互相
+  交错的页码区间，也能识别输入不正确的前后区间分界，而 \pkg{makeindex} 将给出
+  错误的结果。
+
+  \gooditem \zhm 的格式文件支持使用反引号界定的串，在其中禁用转义符
+  （第~\ref{sec:ist} 节）。
+
+  \baditem \zhm 暂不支持 "-p" 选项自动获取 \TeX{} 编译日志文件中的页码，然后输出对
+  应的页码设置语句（\ref{subsec:unsupportedoption}~节）。
+
+  \baditem \zhm 不支持 "-g", "-l", "-L", "-T" 等与中文索引无关的语言选项。
+
+  \baditem \zhm 暂不支持复合页码
+  （\autoref{tab:unsupportedinputstyle}、第~\ref{sec:idxsyntax} 节）。
+
+  \baditem \zhm 不支持输出折行（\autoref{tab:unsupportedoutputstyle}）。
+\end{itemize}
 
 \section{版权与许可}
 \index{版权}\index{许可}
