@@ -145,6 +145,66 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 的排序选项（"-g" 德文，"-T" 泰文，"-L" 做系统 locale 选择，"-l" 有关西文单词排
 序）对中文索引意义较小，不在 \zhm 中实现。
 
+\section{索引项输入语法}
+\label{sec:idxsyntax}
+
+一个典型的索引项输入文件如
+\begin{verbatim}
+\indexentry{简介}{i}
+\indexentry{字体|(}{2}
+\indexentry{font|see{字体}}{2}
+\indexentry{字体!族}{2}
+\indexentry{字体!族!Times}{2}
+\indexentry{字体!族!Computer Modern}{3}
+\indexentry{字体!重量}{4}
+\indexentry{字体|)}{5}
+\indexentry{射线!X 射线}{7}
+\indexentry{射线!$\Gamma$ 射线@Gamma 射线}{8}
+\indexentry{Aha"!}{9}
+\indexentry{G\"odel}{10}
+\end{verbatim}
+
+\zhm 输入索引项的语法与 \pkg{makeindex} 相同。下面以默认的格式输入设置（即在
+\LaTeX{} 中使用）为例对索引项输入语法进行说明。
+
+索引项文件是一个由多条索引项组成的文本文件，每行一条索引项，允许有空行，但索引
+项不得跨行。
+
+一个简单的索引项如
+\begin{verbatim}
+\indexentry{简介}{15}
+\end{verbatim}
+其语法为：
+\begin{syntax}
+"\indexentry{"<条目>"}{"<页码>"}"
+\end{syntax}
+
+"\indexentry" 是在索引输入文件中表示索引项的关键字。可以使用 "keyword" 输入格
+式进行修改（\autoref{tab:oldinputstyle}）。左右花括号是界定 \meta{条目} 与
+\meta{页码} 的标记，可以使用 "arg_open", "arg_close" 输入格式修改
+（\autoref{tab:oldinputstyle}）。
+
+\index{页码}
+\meta{页码} 是一个数字，可以使用阿拉伯数字、大小写罗马数字、大小写拉丁字母共 5
+种格式。标准的 \pkg{makeindex} 还允许多级页码，但 \zhm 暂不支持。
+
+\meta{条目} 是 \zhm 需要处理的正文内容。最简单的条目就是一个普通的词条串，但也
+可以有复杂的格式。
+
+如果对条目排序使用的串与用来输出条目的 \LaTeX{} 代码不一样，则可以把这两部分用
+符号 "@" 分开，前面是排序的键，后面是输出的值。例如：
+\begin{verbatim}
+\indexentry{Gamma 射线@$\Gamma$ 射线}{2}
+\indexentry{粗体@\textbf{粗体}}{3}
+\end{verbatim}
+分隔符 "@" 可通过修改格式文件的 "actual" 项配置
+（\autoref{tab:oldinputstyle}）。
+
+索引项的条目可以分成至多三级，不同级别之间用符号 "!" 分开。例如
+\begin{verbatim}
+\indexentry{方程!解}
+\end{verbatim}
+
 \section{格式文件}
 \label{sec:ist}
 
@@ -179,7 +239,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \endhead
   \bottomrule
 \endfoot
-  |keyword|  & 字符串 & |"\\indexentry"| & 索引命令 \\
+  |keyword|  & 字符串 & |"\\indexentry"| & 索引关键字 \\
   |arg_open|  & 字符 & |'{'| & 参数的开定界符 \\
   |arg_close|  & 字符 & |'}'| & 参数的闭定界符 \\
   |range_open|  & 字符 & |'('| & 页码范围的开定界符 \\
@@ -301,9 +361,6 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 下面是本文档使用的格式文件，注意其中反引号格式的串是 \zhm 特有的：
 \VerbatimInput[numbers=left]{zhmakeindex.mst}
 
-
-\section{索引项输入语法}
-\label{sec:idxsyntax}
 
 \section{排序细节}
 \label{sec:sort}
@@ -506,6 +563,15 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 
   \baditem \zhm 不支持输出折行（\autoref{tab:unsupportedoutputstyle}）。
 \end{itemize}
+
+\section{已知问题}
+
+汉字按拼音分组排序时，多音字可能会被分到错误的分组或排在错误的位置。例如，“长
+度”的“长”有 zhǎng 与 cháng 两个常用读音，由于读音 zhǎng 的使用频率比
+cháng 略高一点，“长”字就会按 zhǎng 的读音分到 Z 组，排序也较为靠后。目前
+\zhm 缺少一种通用的方式控制多音字按拼音分组与排序，只能暂时使用同音字处理此问
+题。另外，部分汉字因为旧字形等问题，笔画数和笔顺也可能有多种选择，造成分组的分
+歧。
 
 \section{版权与许可}
 \index{版权}\index{许可}
