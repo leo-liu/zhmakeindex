@@ -12,8 +12,9 @@
 
 \CTEXsetup[format=\bfseries\Large]{section}
 
+\usepackage[numbers,square,sort&compress]{natbib}
 \renewcommand\refname{参考文档}
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 
 \usepackage{tocbibind}
 
@@ -26,8 +27,25 @@
 \usepackage{caption}
 \captionsetup[table]{font=small,position=top,skip=1ex}
 
+\usepackage{xcolor}
+
 \usepackage{makeidx}
 \makeindex
+
+% 索引项示例
+\newenvironment{idxexample}
+  {\newcommand{\sindex}{%
+     \end{tabular}%
+     &
+     \begin{tabular}[t]{@{}l@{}}}
+   \newcommand{\sitem}{\hspace*{20pt}}
+   \newcommand{\ssitem}{\hspace*{30pt}}
+   \begin{quote}
+   \begin{tabular}{@{}l @{\quad{\color{gray}\vrule width .25em}\quad} l @{}}
+     \begin{tabular}[t]{@{}l@{}}}
+  {  \end{tabular}
+   \end{tabular}
+   \end{quote}}
 
 \usepackage{fancyvrb}
 \fvset{formatcom=\xeCJKVerbAddon}
@@ -54,6 +72,8 @@
   \catcode`[\active  \defchar[##1]{\optional{##1}}
 }{\endquote}
 \newcommand\email{\nolinkurl}
+
+
 
 \title{\zhm\thanks{版本 1.0} 中文索引处理程序}
 \author{刘海洋}
@@ -148,36 +168,27 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \section{索引项输入语法}
 \label{sec:idxsyntax}
 
-一个典型的索引项输入文件如
-\begin{verbatim}
-\indexentry{简介}{i}
-\indexentry{字体|(}{2}
-\indexentry{font|see{字体}}{2}
-\indexentry{字体!族}{2}
-\indexentry{字体!族!Times}{2}
-\indexentry{字体!族!Computer Modern}{3}
-\indexentry{字体!重量}{4}
-\indexentry{字体|)}{5}
-\indexentry{射线!X 射线}{7}
-\indexentry{射线!$\Gamma$ 射线@Gamma 射线}{8}
-\indexentry{Aha"!}{9}
-\indexentry{G\"odel}{10}
-\end{verbatim}
-
 \zhm 输入索引项的语法与 \pkg{makeindex} 相同。下面以默认的格式输入设置（即在
 \LaTeX{} 中使用）为例对索引项输入语法进行说明。
 
 索引项文件是一个由多条索引项组成的文本文件，每行一条索引项，允许有空行，但索引
 项不得跨行。
 
-一个简单的索引项如
-\begin{verbatim}
-\indexentry{简介}{15}
-\end{verbatim}
+一个简单的索引项及其输出如
+\begin{idxexample}
+"\indexentry{简介}{15}" \\
+\sindex
+简介, 15 
+\end{idxexample}
 其语法为：
 \begin{syntax}
 "\indexentry{"<条目>"}{"<页码>"}"
 \end{syntax}
+
+在 \LaTeX{} 中，"\indexentry" 项是在编译过程中自动生成的，实际生成上面例子的
+\LaTeX{} 代码并不包括页码问题，只是在文档 15 页的源文件处输入 "\index{简介}"
+即可得到这样的效果。关于 \pkg{makeindex} 在 \LaTeX{} 中的使用可以参考文档
+\cite{Lamport1987,Chen:1988:IPP}。
 
 "\indexentry" 是在索引输入文件中表示索引项的关键字。可以使用 "keyword" 输入格
 式进行修改（\autoref{tab:oldinputstyle}）。左右花括号是界定 \meta{条目} 与
@@ -186,24 +197,102 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 
 \index{页码}
 \meta{页码} 是一个数字，可以使用阿拉伯数字、大小写罗马数字、大小写拉丁字母共 5
-种格式。标准的 \pkg{makeindex} 还允许多级页码，但 \zhm 暂不支持。
+种格式。标准的 \pkg{makeindex} 还允许多级页码 \cite{Rodgers1991}，但 \zhm 暂不
+支持。
 
 \meta{条目} 是 \zhm 需要处理的正文内容。最简单的条目就是一个普通的词条串，但也
 可以有复杂的格式。
 
 如果对条目排序使用的串与用来输出条目的 \LaTeX{} 代码不一样，则可以把这两部分用
 符号 "@" 分开，前面是排序的键，后面是输出的值。例如：
-\begin{verbatim}
-\indexentry{Gamma 射线@$\Gamma$ 射线}{2}
-\indexentry{粗体@\textbf{粗体}}{3}
-\end{verbatim}
+\begin{idxexample}
+"\indexentry{Gamma 射线@$\Gamma$ 射线}{2}" \\
+"\indexentry{粗体@\textbf{粗体}}{3}"
+\sindex
+\textbf{粗体}, 3 \\
+$\Gamma$ 射线, 2
+\end{idxexample}
 分隔符 "@" 可通过修改格式文件的 "actual" 项配置
 （\autoref{tab:oldinputstyle}）。
 
 索引项的条目可以分成至多三级，不同级别之间用符号 "!" 分开。例如
+\begin{idxexample}
+"\indexentry{方程!解}{1}" \\
+"\indexentry{方程!代数方程!线性方程}{2}" \\
+"\indexentry{方程!代数方程!二次方程}{3}"
+\sindex
+方程 \\
+\sitem 代数方程 \\
+\ssitem 二次方程, 3 \\
+\ssitem 线性方程, 2 \\
+\sitem 解, 1 
+\end{idxexample}
+每一级别内部都可以分别指定排序的键与输出值，例如：
+\begin{idxexample}
+"\indexentry{射线!$\Gamma$ 射线@Gamma 射线}{8}" \\
+"\indexentry{射线!X 射线}{9}"
+\sindex
+射线 \\
+\sitem $\Gamma$ 射线, 8 \\
+\sitem X 射线, 9
+\end{idxexample}
+即分隔符 "!" 的优先级低于 "@"。分隔符 "!" 可通过修改格式文件的 "level" 项配置
+（\autoref{tab:oldinputstyle}）。
+
+索引项条目中也可以在最后指定页码的输出格式，用分隔符 "|" 与前面分开（用
+\autoref{tab:oldinputstyle} 中的 "encap" 项配置）。页码的输出格式由一个带单个
+页码参数的 \TeX{} 命令决定，在输入索引项时这一特殊命令的反斜线 "\" 和左右花括
+号被忽略，输出时会自动加上（用\autoref{tab:oldoutputstyle} 中的
+"encap_prefix", "encap_infix", "encap_suffix" 项配置）。例如：
+\begin{idxexample}
+"\indexentry{字体|emph}{2}" 
+\sindex
+字体, \emph{2}
+\end{idxexample}
+它输出的代码实际上是
 \begin{verbatim}
-\indexentry{方程!解}
+字体, \emph{2}
 \end{verbatim}
+
+除了指定页码输出格式的特殊命令，还可以指定页码范围，在分隔符 "|" 后、特殊命令
+名前（如果有的话），使用开定界符 "(" 和闭定界符 ")"，分别表示页码范围的起始和
+结束。例如：
+\begin{idxexample}
+"\indexentry{方程|(}{5}" \\
+"\indexentry{方程|)}{9}" \\
+"\indexentry{函数!二次函数|(emph}{11}" \\
+"\indexentry{函数!二次函数|)emph}{15}"
+\sindex
+方程, 5--9 \\
+函数 \\
+\sitem 二次函数, \emph{11--15}
+\end{idxexample}
+页码范围的开闭定界符可由\autoref{tab:oldoutputstyle} 中的 "range_open" 与
+"range_close" 项配置。
+
+由于在索引条目中，"{", "}", "(", ")", "!", "@", "|" 等多种符号都有特殊意义，因
+此引入引号 |"| 作为索引条目的转义符，引号及紧跟引号的字符都作为普通的单个后一
+字符看待，不作为索引条目的特殊语法符号。例如：
+\begin{idxexample}
+|\indexentry{Aha"!}{1}| \\
+\verb/\indexentry{绝对值 $"|x"|$}{2}/
+\sindex
+Aha!, 1 \\
+绝对值 $\vert x\vert$, 2
+\end{idxexample}
+引号字符 |"| 可以由\autoref{tab:oldinputstyle} 中的 "quote" 项配置。
+
+使用转义符有一个例外，就是在反斜线后的引号 |\"| 被解释为普通 \TeX{} 命令
+|\"|，这是因为 |\"| 经常被用于输入 G\"odel（|G\"odel|）这样的文字。注意这一例
+外会影响 "\|" 等符号组合的输入。例如：
+\begin{idxexample}
+|\indexentry{G\"odel}{5}| \\
+\verb/\indexentry{命令 \verb+"\"|+}{9}/
+\sindex
+G\"odel, 5 \\
+命令 \verb+\|+, 9
+\end{idxexample}
+转义符 "\" 可以由\autoref{tab:oldinputstyle} 中的 "escape" 项配置。
 
 \section{格式文件}
 \label{sec:ist}
@@ -266,8 +355,6 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \endfoot
 |preamble| &  字符串 & |"\\begin{theindex}\n"| & 索引导言代码\\
 |postamble| &  字符串 & |"\n\n\\end{theindex}\n"| & 索引末尾代码\\
-|setpage_prefix| &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
-|setpage_suffix| &  字符串 & |"}\n"| & 页码设置后缀\\
 |group_skip| &  字符串 & |"\n\n  \\indexspace\n"| & 组间垂直间距\\
 |headings_flag| &  数字 & |0| & 是否显示分组名标题的旗标\\
 |heading_prefix| &  字符串 & |""| & 分组名标题的前缀\\
@@ -345,6 +432,8 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 关键字 & 类型 & 默认值 & 意义 \\
 \midrule
+|setpage_prefix| &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
+|setpage_suffix| &  字符串 & |"}\n"| & 页码设置后缀\\
 |line_max| &  数字 & |72| & 最大行长度，超出长度会自动折行\\
 |indent_space| &  字符串 & |"\t\t"| & 自动折行的缩进\\
 |indent_length| &  数字 & |16| & |indent_space| 的长度\\
@@ -554,7 +643,8 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
   （第~\ref{sec:ist} 节）。
 
   \baditem \zhm 暂不支持 "-p" 选项自动获取 \TeX{} 编译日志文件中的页码，然后输出对
-  应的页码设置语句（\ref{subsec:unsupportedoption}~节）。
+  应的页码设置语句（\ref{subsec:unsupportedoption}~节、
+  \autoref{tab:unsupportedoutputstyle}）。
 
   \baditem \zhm 不支持 "-g", "-l", "-L", "-T" 等与中文索引无关的语言选项。
 
