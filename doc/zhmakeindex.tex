@@ -1,4 +1,7 @@
 \documentclass[UTF8,hyperref]{ctexart}
+
+\usepackage{etoolbox}
+
 \setmainfont[Ligatures=TeX]{CMU Serif}
 \setsansfont[Ligatures=TeX]{CMU Sans Serif}
 \setmonofont[Mapping=]{CMU Typewriter Text}
@@ -13,7 +16,7 @@
 \CTEXsetup[format=\bfseries\Large]{section}
 
 \usepackage[numbers,square,sort&compress]{natbib}
-\renewcommand\refname{参考文档}
+\renewcommand\bibname{参考文档}
 \bibliographystyle{plainnat}
 
 \usepackage{tocbibind}
@@ -55,29 +58,59 @@
   \MakeShortVerb\"
 }
 
+\makeatletter
+\appto\@sanitize{%
+  \@makeother\|%
+  \@makeother\"}
+\def\useangles{%
+  \@makeother\{%
+  \@makeother\}%
+  \catcode`\<=1%
+  \catcode`\>=2}
+\def\restoreangles{%
+  \@makeother\<%
+  \@makeother\>%
+  \catcode`\{=1%
+  \catcode`\}=2}
+\let\org@wrindex\@wrindex
+\let\rawindex\index
+\patchcmd\rawindex{\@wrindex}{\org@wrindex}
+  {}
+  {\GenericWarning
+    {\space\space\space\space}
+    {hyperref index patch failed.}}
+\makeatother
+
 \usepackage{hyperref}
 \hypersetup{bookmarksnumbered,pdfstartview=FitH}
 \def\tableautorefname{表}
 
 \usepackage{xspace}
 
-\newcommand\pkg[1]{\textsf{#1}\index{#1@\textsf{#1}}}
-\newcommand\zhm{\pkg{zhmakeindex}\xspace}
-\newcommand\meta[1]{$\langle\textnormal{\itshape#1}\rangle$}
-\newcommand\optional[1]{\textnormal{[}#1\textnormal{]}}
+\newcommand*\pkg[1]{\textsf{#1}\index{#1@\textsf{#1}}}
+\newcommand*\zhm{\pkg{zhmakeindex}\xspace}
+\newrobustcmd*\meta[1]{$\langle\textnormal{\itshape#1}\rangle$}
+\newcommand*\optional[1]{\textnormal{[}#1\textnormal{]}}
 \def\defchar#1{\begingroup\lccode`~=`#1\lowercase{\endgroup\def~}}
 \newenvironment{syntax}{%
   \quote\ttfamily
   \catcode`<\active  \defchar<##1>{\meta{##1}}
   \catcode`[\active  \defchar[##1]{\optional{##1}}
 }{\endquote}
+\newcommand*\optindex[1]{\index{选项!\texttt{#1}}}
+\newcommand*\optitem[1][]{\optindex{#1}\item[#1]}
+\newrobustcmd*\textkw[1]{\texttt{\scantokens{\catcode`\_=12 #1\endinput}}}
+\newcommand*\kwindex[1]{\index{#1@\textkw{#1}}}
+\newcommand*\kw[1]{\kwindex{#1}\textkw{#1}}
+\newcommand*\sort[1]{%
+  \index{选项!\texttt{-z}!#1@\textkw{#1}}%
+  \textkw{#1}}
 \newcommand\email{\nolinkurl}
-
 
 
 \title{\zhm\thanks{版本 1.0} 中文索引处理程序}
 \author{刘海洋}
-\date{2014 年 2 月 6 日}
+\date{2014 年 2 月 24 日}
 
 \begin{document}
 
@@ -85,6 +118,7 @@
 
 \section{命令行}
 
+\index{命令行}
 \begin{syntax}
 \halign{#&#\hfil\cr
 zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
@@ -100,6 +134,8 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 个级别（0, 1, 2）的嵌套。\zhm 主要用于 \LaTeX{} 索引的处理，其功能和用法与
 \pkg{makeindex}\cite{Rodgers1991} 相似，并支持中文的分组与排序。
 
+\index{.idx@\verb+.idx+}
+\index{.ind@\verb+.ind+}
 输入与输出文件的格式由一个格式文件确定。默认的输入/输出是 ".idx"/".ind" 格式
 的，即 \LaTeX{} 格式的索引文件。
 
@@ -108,6 +144,8 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 查找这个名字的文件；如果找不到且文件名没有后缀，则加上 ".idx" 后缀查找此文件；
 如果还找不到文件，\zhm 则会中止。
 
+\optindex{-s}
+\index{.mst@\verb+.mst+}
 如果只有一个输入文件，并且没有显式用 "-s" 选项指定格式文件，\zhm 会使用后缀为
 ".mst" 的默认格式文件（如果存在的话）。
 
@@ -117,53 +155,70 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 
 \section{选项说明}
 
+\index{选项|(}
+
 \subsection{与 \pkg{makeindex} 相同的选项}
 \label{subsec:oldoption}
 
 \begin{description}
-  \item[-c] 压缩索引项排序项前后的空格。默认情况下，排序项中的空格会被保留。
-  \item[-i] 从标准输入流（"stdin"）读入索引项。如果使用了该选项，并且没有使用
+  \optitem[-c] 压缩索引项排序项前后的空格。默认情况下，排序项中的空格会被保留。
+  \optitem[-i] 从标准输入流（"stdin"）读入索引项。如果使用了该选项，并且没有使用
     "-o" 选项，则排序后的索引将输出到标准输出流（"stdout"）。
-  \item[-o~\meta{ind}] 设置输出索引文件为 \meta{ind}。如果没有指定该选项，默认
+  \optitem[-o~\meta{ind}] 设置输出索引文件为 \meta{ind}。如果没有指定该选项，默认
     的输出文件名是第一个输入文件 \meta{idx0} 的主文件名加上 ".ind" 的扩展名。
-  \item[-q] 静默模式，不向标准错误流（"stderr"）显示信息。默认情况下处理过程与
+    \index{.ind@\verb+.ind+}
+  \optitem[-q] 静默模式，不向标准错误流（"stderr"）显示信息。默认情况下处理过程与
     错误信息会同时在 "stderr" 与日志文件中输出。
-  \item[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
+  \optitem[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
     第~\ref{sec:idxsyntax} 节的说明。默认情况下，三个或三个以上连续的页码会自
     动合并为一个页码区间（如 1--5）。
-  \item[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
+  \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
     前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 \pkg{kpathsea} 库在
     TEXMF 树中查找。
-  \item[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
+  \optitem[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
     入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
+    \index{.ilg@\verb+.ilg+}
 \end{description}
 
 \subsection{\zhm 独有的选项}
 \label{subsec:newoption}
 
 \begin{description}
-  \item[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。可选的编码包括
+  \optitem[-enc~\meta{enc}] 设置输入输出文件的编码为 \meta{enc}。可选的编码包括
     "UTF-8", "UTF-16", "GB18030", "GBK" 和 "Big5"，不区分大小写。默认使用
     UTF-8 编码。
-  \item[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。可选的编码与
+    \index{编码!UTF-8}
+    \index{编码!UTF-16}
+    \index{编码!GB18030}
+    \index{编码!GBK}
+    \index{编码!Big5}
+  \optitem[-senc~\meta{senc}] 设置读入格式文件的编码为 \meta{senc}。可选的编码与
     "-enc" 选项相同。默认使用 UTF-8 编码。
-  \item[-strict] 严格区分不同嵌入命令的页码。默认情况下，在页码区间处理时，会
+  \optitem[-strict] 严格区分不同嵌入命令的页码。默认情况下，在页码区间处理时，会
     将如果页码左区间的嵌入命令与右区间不匹配，会以左区间为准（部分 \LaTeX{} 文
     档会生成右区间命令缺失的索引项）；而如果使用 "-strict" 选项，则要求左右区
     间的命令类型必须严格匹配。
-  \item[-z~\meta{sort}] 设置中文分组与排序方式为 \meta{sort}。可选的中文分组排
-    序方式包括 "pinyin"/"reading", "bihua"/"stroke", "bushou"/"radical"。默认
-    值为 "pinyin"，即中文按拼音分组排序。有关分组与排序的详细说明见
-    第~\ref{sec:sort} 节。
+  \index{分组}\index{排序}
+  \optitem[-z~\meta{sort}] 设置中文分组与排序方式为 \meta{sort}。可选的中文分
+    组排序方式包括 \sort{pinyin}/\sort{reading}, \sort{bihua}/\sort{stroke},
+    \sort{bushou}/\sort{radical}。默认值为 \sort{pinyin}，即中文按拼音分组排
+    序。有关分组与排序的详细说明见第~\ref{sec:sort} 节。
 \end{description}
 
 \subsection{未实现的选项}
 \label{subsec:unsupportedoption}
 
+\optindex{-g}
+\optindex{-l}
+\optindex{-p}
+\optindex{-L}
+\optindex{-T}
 \zhm 没有实现 \pkg{makeindex} 的 "-g", "-l", "-p", "-L", "-T" 选项。其中，选项
 "-p" 依赖对 \TeX{} 编译的日志文件的解析，可能在未来版本实现；另外几个语言相关
 的排序选项（"-g" 德文，"-T" 泰文，"-L" 做系统 locale 选择，"-l" 有关西文单词排
 序）对中文索引意义较小，不在 \zhm 中实现。
+
+\index{选项|)}
 
 \section{索引项输入语法}
 \label{sec:idxsyntax}
@@ -190,9 +245,13 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 即可得到这样的效果。关于 \pkg{makeindex} 在 \LaTeX{} 中的使用可以参考文档
 \cite{Lamport1987,Chen:1988:IPP}。
 
-"\indexentry" 是在索引输入文件中表示索引项的关键字。可以使用 "keyword" 输入格
-式进行修改（\autoref{tab:oldinputstyle}）。左右花括号是界定 \meta{条目} 与
-\meta{页码} 的标记，可以使用 "arg_open", "arg_close" 输入格式修改
+\useangles
+\index<"{@\verb+"{+>
+\index<"}@\verb+"}+>
+\restoreangles
+"\indexentry" 是在索引输入文件中表示索引项的关键字。可以使用 \kw{keyword} 输入
+格式进行修改（\autoref{tab:oldinputstyle}）。左右花括号是界定 \meta{条目} 与
+\meta{页码} 的标记，可以使用 \kw{arg_open}, \kw{arg_close} 输入格式修改
 （\autoref{tab:oldinputstyle}）。
 
 \index{页码}
@@ -203,6 +262,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \meta{条目} 是 \zhm 需要处理的正文内容。最简单的条目就是一个普通的词条串，但也
 可以有复杂的格式。
 
+\index{"@@\verb+"@+}
 如果对条目排序使用的串与用来输出条目的 \LaTeX{} 代码不一样，则可以把这两部分用
 符号 "@" 分开，前面是排序的键，后面是输出的值。例如：
 \begin{idxexample}
@@ -212,9 +272,10 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \textbf{粗体}, 3 \\
 $\Gamma$ 射线, 2
 \end{idxexample}
-分隔符 "@" 可通过修改格式文件的 "actual" 项配置
+分隔符 "@" 可通过修改格式文件的 \kw{actual} 项配置
 （\autoref{tab:oldinputstyle}）。
 
+\index{"!@\verb+"!+}
 索引项的条目可以分成至多三级，不同级别之间用符号 "!" 分开。例如
 \begin{idxexample}
 "\indexentry{方程!解}{1}" \\
@@ -229,21 +290,22 @@ $\Gamma$ 射线, 2
 \end{idxexample}
 每一级别内部都可以分别指定排序的键与输出值，例如：
 \begin{idxexample}
-"\indexentry{射线!$\Gamma$ 射线@Gamma 射线}{8}" \\
+"\indexentry{射线!Gamma 射线@$\Gamma$ 射线}{8}" \\
 "\indexentry{射线!X 射线}{9}"
 \sindex
 射线 \\
 \sitem $\Gamma$ 射线, 8 \\
 \sitem X 射线, 9
 \end{idxexample}
-即分隔符 "!" 的优先级低于 "@"。分隔符 "!" 可通过修改格式文件的 "level" 项配置
-（\autoref{tab:oldinputstyle}）。
+即分隔符 "!" 的优先级低于 "@"。分隔符 "!" 可通过修改格式文件的 \kw{level} 项配
+置（\autoref{tab:oldinputstyle}）。
 
+\rawindex{"|@\verb+"|+|hyperpage}
 索引项条目中也可以在最后指定页码的输出格式，用分隔符 "|" 与前面分开（用
-\autoref{tab:oldinputstyle} 中的 "encap" 项配置）。页码的输出格式由一个带单个
-页码参数的 \TeX{} 命令决定，在输入索引项时这一特殊命令的反斜线 "\" 和左右花括
-号被忽略，输出时会自动加上（用\autoref{tab:oldoutputstyle} 中的
-"encap_prefix", "encap_infix", "encap_suffix" 项配置）。例如：
+\autoref{tab:oldinputstyle} 中的 \kw{encap} 项配置）。页码的输出格式由一个带单
+个页码参数的 \TeX{} 命令决定，在输入索引项时这一特殊命令的反斜线 "\" 和左右花
+括号被忽略，输出时会自动加上（用\autoref{tab:oldoutputstyle} 中的
+\kw{encap_prefix}, \kw{encap_infix}, \kw{encap_suffix} 项配置）。例如：
 \begin{idxexample}
 "\indexentry{字体|emph}{2}" 
 \sindex
@@ -254,6 +316,9 @@ $\Gamma$ 射线, 2
 字体, \emph{2}
 \end{verbatim}
 
+\rawindex{"|@\verb+"|+|hyperpage}
+\index{"(@\verb+"(+}
+\index{")@\verb+")+}
 除了指定页码输出格式的特殊命令，还可以指定页码范围，在分隔符 "|" 后、特殊命令
 名前（如果有的话），使用开定界符 "(" 和闭定界符 ")"，分别表示页码范围的起始和
 结束。例如：
@@ -267,9 +332,11 @@ $\Gamma$ 射线, 2
 函数 \\
 \sitem 二次函数, \emph{11--15}
 \end{idxexample}
-页码范围的开闭定界符可由\autoref{tab:oldoutputstyle} 中的 "range_open" 与
-"range_close" 项配置。
+页码范围的开闭定界符可由\autoref{tab:oldoutputstyle} 中的 \kw{range_open} 与
+\kw{range_close} 项配置。
 
+\index{""@\verb+""+}
+\index{转义符}
 由于在索引条目中，"{", "}", "(", ")", "!", "@", "|" 等多种符号都有特殊意义，因
 此引入引号 |"| 作为索引条目的转义符，引号及紧跟引号的字符都作为普通的单个后一
 字符看待，不作为索引条目的特殊语法符号。例如：
@@ -280,8 +347,10 @@ $\Gamma$ 射线, 2
 Aha!, 1 \\
 绝对值 $\vert x\vert$, 2
 \end{idxexample}
-引号字符 |"| 可以由\autoref{tab:oldinputstyle} 中的 "quote" 项配置。
+引号字符 |"| 可以由\autoref{tab:oldinputstyle} 中的 \kw{quote} 项配置。
 
+\index{"\@\verb+"\+}
+\index{转义符}
 使用转义符有一个例外，就是在反斜线后的引号 |\"| 被解释为普通 \TeX{} 命令
 |\"|，这是因为 |\"| 经常被用于输入 G\"odel（|G\"odel|）这样的文字。注意这一例
 外会影响 "\|" 等符号组合的输入。例如：
@@ -292,7 +361,7 @@ Aha!, 1 \\
 G\"odel, 5 \\
 命令 \verb+\|+, 9
 \end{idxexample}
-转义符 "\" 可以由\autoref{tab:oldinputstyle} 中的 "escape" 项配置。
+转义符 "\" 可以由\autoref{tab:oldinputstyle} 中的 \kw{escape} 项配置。
 
 \section{格式文件}
 \label{sec:ist}
@@ -304,11 +373,22 @@ G\"odel, 5 \\
 格式文件指明了 ".idx" 输入文件和最终输入文件的格式。该文件在当前工作目录或在
 TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关键字} \meta{属
 性} 的列表组成。\meta{关键字} 分为输出和输出两类。\meta{关键字} \meta{属性} 对
-儿不要求以任何顺序出现。以字符 \verb"%" 开头的行是注释。\meta{属性} 可以有不同
-的类型，字符串是以任意双引号 |"| 或反引号 |`| 界定的串，字符是以单引号 |'| 界
-定的单个字符，数字是一个整数。其中，双引号和单引号界定的串和字符，可以使用反斜
-线 "\" 符号作为转义符，以得到特殊字符或引号本身；而反引号界定的串是 \zhm 特有
-的功能，它不使用转义符。格式文件中没有指定的项目会使用其默认值。
+儿不要求以任何顺序出现。
+\index{%@\verb+%+}
+\index{注释}
+以字符 \verb"%" 开头的行是注释。
+\index{字符串}
+\index{""@\verb+""+}
+\index{`@\verb+`+}
+\meta{属性} 可以有不同的类型，字符串是以任意双引号 |"| 或反引号 |`| 界定的串，
+\index{字符}
+\index{'@\verb+'+}
+字符是以单引号 |'| 界定的单个字符，数字是一个整数。
+\index{转义符}
+\index{"\@\verb+"\+}
+其中，双引号和单引号界定的串和字符，可以使用反斜线 "\" 符号作为转义符，以得到
+特殊字符或引号本身；而反引号界定的串是 \zhm 特有的功能，它不使用转义符。格式文
+件中没有指定的项目会使用其默认值。
 
 \subsection{与 \pkg{makeindex} 兼容的格式}
 
@@ -328,18 +408,27 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \endhead
   \bottomrule
 \endfoot
-  |keyword|  & 字符串 & |"\\indexentry"| & 索引关键字 \\
-  |arg_open|  & 字符 & |'{'| & 参数的开定界符 \\
-  |arg_close|  & 字符 & |'}'| & 参数的闭定界符 \\
-  |range_open|  & 字符 & |'('| & 页码范围的开定界符 \\
-  |range_close|  & 字符 & |')'| & 页码范围的闭定界符 \\
-  |level|  & 字符 & |'!'| & 索引项层次分隔符 \\
-  |actual|  & 字符 & |'@'| & （区别于排序项的）实际输出项标志符 \\
-  |encap|  & 字符 & "'|'" & 页码和特殊命令指示符 \\
-  |quote|  & 字符 & |'"'| & 引号（转义符） \\
-  |escape|  & 字符 & |'\\'| & 转义 |quote| 的符号，在它后面的引号不作转义符
+  \kw{keyword}  & 字符串 & |"\\indexentry"| & 索引关键字 \\
+  \kw{arg_open}  & 字符 & |'{'| & 参数的开定界符 \\
+  \kw{arg_close}  & 字符 & |'}'| & 参数的闭定界符 \\
+  \kw{range_open}  & 字符 & |'('| & 页码范围的开定界符 \\
+  \kw{range_close}  & 字符 & |')'| & 页码范围的闭定界符 \\
+  \kw{level}  & 字符 & |'!'| & 索引项层次分隔符 \\
+  \kw{actual}  & 字符 & |'@'| & （区别于排序项的）实际输出项标志符 \\
+  \kw{encap}  & 字符 & "'|'" & 页码和特殊命令指示符 \\
+  \kw{quote}  & 字符 & |'"'| & 引号（转义符） \\
+  \kw{escape}  & 字符 & |'\\'| & 转义 |quote| 的符号，在它后面的引号不作转义符
 解释 \\
 \end{longtabu*}
+\useangles\index<"{@\verb+"{+>\restoreangles
+\useangles\index<"}@\verb+"}+>\restoreangles
+\index{"(@\verb+"(+}
+\index{")@\verb+")+}
+\index{"!@\verb+"!+}
+\index{"@@\verb+"@+}
+\rawindex{"|@\verb+"|+|hyperpage}
+\index{""@\verb+""+}
+\index{"\@\verb+"\+}
 
 \begin{longtabu*} to \linewidth{lll>{\RaggedRight}X}
 \caption{与 \pkg{makeindex} 兼容的输出格式}\label{tab:oldoutputstyle} \\
@@ -353,38 +442,38 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \endhead
 \bottomrule
 \endfoot
-|preamble| &  字符串 & |"\\begin{theindex}\n"| & 索引导言代码\\
-|postamble| &  字符串 & |"\n\n\\end{theindex}\n"| & 索引末尾代码\\
-|group_skip| &  字符串 & |"\n\n  \\indexspace\n"| & 组间垂直间距\\
-|headings_flag| &  数字 & |0| & 是否显示分组名标题的旗标\\
-|heading_prefix| &  字符串 & |""| & 分组名标题的前缀\\
-|heading_suffix| &  字符串 & |""| & 分组名标题的后缀\\
-|symhead_positive| &  字符串 & |"Symbols"| & 当旗标 |headings_flag| 为正数时，符号的标题\\
-|symhead_negative| &  字符串 & |"symbols"| & 当旗标 |headings_flag| 为负数时，符号的标题\\
-|numhead_positive| &  字符串 & |"Numbers"| & 当旗标 |headings_flag| 为正数时，数字的标题\\
-|numhead_negative| &  字符串 & |"numbers"| & 当旗标 |headings_flag| 为负数时，数字的标题\\
-|item_0| &  字符串 & |"\n  \\item "| & 第 0 级条目间分隔\\
-|item_1| &  字符串 & |"\n    \\subitem "| & 第 1 级条目间分隔\\
-|item_2| &  字符串 & |"\n      \\subsubitem "| & 第 2 级条目间分隔\\
-|item_01| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔\\
-|item_x1| &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔，其中第 0 级无页码\\
-|item_12| &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔\\
-|item_x2| &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔，其中第 1 级无页码\\
-|delim_0| &  字符串 & |", "| & 第 0 级条目与页码分隔\\
-|delim_1| &  字符串 & |", "| & 第 1 级条目与页码分隔\\
-|delim_2| &  字符串 & |", "| & 第 2 级条目与页码分隔\\
-|delim_n| &  字符串 & |", "| & 多个页码的分隔\\
-|delim_r| &  字符串 & |"--"| & 页码范围符号\\
-|delim_t| &  字符串 & |""| & 将插入到在页码列表末尾。如果页码列表为空，此项无
+\kw{preamble} &  字符串 & |"\\begin{theindex}\n"| & 索引导言代码\\
+\kw{postamble} &  字符串 & |"\n\n\\end{theindex}\n"| & 索引末尾代码\\
+\kw{group_skip} &  字符串 & |"\n\n  \\indexspace\n"| & 组间垂直间距\\
+\kw{headings_flag} &  数字 & |0| & 是否显示分组名标题的旗标\\
+\kw{heading_prefix} &  字符串 & |""| & 分组名标题的前缀\\
+\kw{heading_suffix} &  字符串 & |""| & 分组名标题的后缀\\
+\kw{symhead_positive} &  字符串 & |"Symbols"| & 当旗标 |headings_flag| 为正数时，符号的标题\\
+\kw{symhead_negative} &  字符串 & |"symbols"| & 当旗标 |headings_flag| 为负数时，符号的标题\\
+\kw{numhead_positive} &  字符串 & |"Numbers"| & 当旗标 |headings_flag| 为正数时，数字的标题\\
+\kw{numhead_negative} &  字符串 & |"numbers"| & 当旗标 |headings_flag| 为负数时，数字的标题\\
+\kw{item_0} &  字符串 & |"\n  \\item "| & 第 0 级条目间分隔\\
+\kw{item_1} &  字符串 & |"\n    \\subitem "| & 第 1 级条目间分隔\\
+\kw{item_2} &  字符串 & |"\n      \\subsubitem "| & 第 2 级条目间分隔\\
+\kw{item_01} &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔\\
+\kw{item_x1} &  字符串 & |"\n    \\subitem "| & 第 0/1 级条目间分隔，其中第 0 级无页码\\
+\kw{item_12} &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔\\
+\kw{item_x2} &  字符串 & |"\n      \\subsubitem "| & 第 1/2 级条目间分隔，其中第 1 级无页码\\
+\kw{delim_0} &  字符串 & |", "| & 第 0 级条目与页码分隔\\
+\kw{delim_1} &  字符串 & |", "| & 第 1 级条目与页码分隔\\
+\kw{delim_2} &  字符串 & |", "| & 第 2 级条目与页码分隔\\
+\kw{delim_n} &  字符串 & |", "| & 多个页码的分隔\\
+\kw{delim_r} &  字符串 & |"--"| & 页码范围符号\\
+\kw{delim_t} &  字符串 & |""| & 将插入到在页码列表末尾。如果页码列表为空，此项无
 效果。 \\
-|encap_prefix| &  字符串 & |"\\"| & 页码特殊指令前缀\\
-|encap_infix| &  字符串 & |"{"| & 页码特殊指令中缀\\
-|encap_suffix| &  字符串 & |"}"| & 页码特殊指令后缀\\
-|page_precedence| &  字符串 & |"rnaRA"| & 不同类型页码的次序，默认值表示小写
+\kw{encap_prefix} &  字符串 & |"\\"| & 页码特殊指令前缀\\
+\kw{encap_infix} &  字符串 & |"{"| & 页码特殊指令中缀\\
+\kw{encap_suffix} &  字符串 & |"}"| & 页码特殊指令后缀\\
+\kw{page_precedence} &  字符串 & |"rnaRA"| & 不同类型页码的次序，默认值表示小写
   罗马、阿拉伯数字、小写字母、大写罗马、大写字母\\
-|suffix_2p| & 字符串 & |""| & 在 2 页的页码范围中代替 |delim_r| 和第二个页码\\
-|suffix_3p| & 字符串 & |""| & 在 3 页的页码范围中代替 |delim_r| 和后面的页码\\
-|suffix_mp| & 字符串 & |""| & 在更多页的页码范围中代替 |delim_r| 和后面的页码\\
+\kw{suffix_2p} & 字符串 & |""| & 在 2 页的页码范围中代替 |delim_r| 和第二个页码\\
+\kw{suffix_3p} & 字符串 & |""| & 在 3 页的页码范围中代替 |delim_r| 和后面的页码\\
+\kw{suffix_mp} & 字符串 & |""| & 在更多页的页码范围中代替 |delim_r| 和后面的页码\\
 \end{longtabu*}
 
 \subsection{\zhm 特有的格式}
@@ -398,13 +487,13 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 关键字 & 类型 & 默认值 & 意义 \\
 \midrule
-  "stroke_prefix"             & 字符串 & |""| & 笔画数前缀 \\
-  "stroke_suffix"             & 字符串 & |" 画"| & 笔画数后缀 \\
-  "radical_prefix"            & 字符串 & |""| & 部首前缀 \\
-  "radical_suffix"            & 字符串 & |"部"| & 部首后缀 \\
-  "radical_simplified_flag"   & 数字 & 1 & 是否输出简化部首的标志 \\
-  "radical_simplified_prefix" & 字符串 & |"（"| & 简化部首前缀 \\
-  "radical_simplified_suffix" & 字符串 & |"）"| & 简化部首后缀 \\
+  \kw{stroke_prefix}             & 字符串 & |""| & 笔画数前缀 \\
+  \kw{stroke_suffix}             & 字符串 & |" 画"| & 笔画数后缀 \\
+  \kw{radical_prefix}            & 字符串 & |""| & 部首前缀 \\
+  \kw{radical_suffix}            & 字符串 & |"部"| & 部首后缀 \\
+  \kw{radical_simplified_flag}   & 数字 & 1 & 是否输出简化部首的标志 \\
+  \kw{radical_simplified_prefix} & 字符串 & |"（"| & 简化部首前缀 \\
+  \kw{radical_simplified_suffix} & 字符串 & |"）"| & 简化部首后缀 \\
 \bottomrule
 \end{tabu*}
 \end{table}
@@ -421,7 +510,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 关键字 & 类型 & 默认值 & 意义 \\
 \midrule
-  |page_compositor| &  字符串 & |"-"| & 复合页码分隔符 \\
+  \kw{page_compositor} &  字符串 & |"-"| & 复合页码分隔符 \\
 \bottomrule
 \end{tabu*}
 \end{table}
@@ -432,11 +521,11 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 关键字 & 类型 & 默认值 & 意义 \\
 \midrule
-|setpage_prefix| &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
-|setpage_suffix| &  字符串 & |"}\n"| & 页码设置后缀\\
-|line_max| &  数字 & |72| & 最大行长度，超出长度会自动折行\\
-|indent_space| &  字符串 & |"\t\t"| & 自动折行的缩进\\
-|indent_length| &  数字 & |16| & |indent_space| 的长度\\
+\kw{setpage_prefix} &  字符串 & |"\n  \\setcounter{page}{"| & 页码设置前缀\\
+\kw{setpage_suffix} &  字符串 & |"}\n"| & 页码设置后缀\\
+\kw{line_max} &  数字 & |72| & 最大行长度，超出长度会自动折行\\
+\kw{indent_space} &  字符串 & |"\t\t"| & 自动折行的缩进\\
+\kw{indent_length} &  数字 & |16| & |indent_space| 的长度\\
 \bottomrule
 \end{tabu*}
 \end{table}
@@ -456,6 +545,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 
 \subsection{索引项分组}
 
+\optindex{-z}
 \zhm 与 \pkg{makeindex} 类似，主要是按第一级索引项的排序项的首个字符分组的。对
 最普通的场景，西文是按单词的首字母分组，中文则根据 "-z" 选项
 （\ref{subsec:newoption}~节）的不同，选择对应的分组，数字和其他符号单独分组。
@@ -470,9 +560,9 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 "-z" 选项 & 别名 & 前 28 个分组 & 后面的分组 \\
 \midrule
-"pinyin" & "reading" & 数字、符号、A, \ldots, Z & （无）\\
-"bihua" & "stroke"   & 数字、符号、A, \ldots, Z & 1 画、2 画、……、64 画（共 64 组） \\
-"bushou" & "radical" & 数字、符号、A, \ldots, Z & 一部、丨部、……、龠部（共 214 组） \\
+\sort{pinyin} & \sort{reading} & 数字、符号、A, \ldots, Z & （无）\\
+\sort{bihua} & \sort{stroke}   & 数字、符号、A, \ldots, Z & 1 画、2 画、……、64 画（共 64 组） \\
+\sort{bushou} & \sort{radical} & 数字、符号、A, \ldots, Z & 一部、丨部、……、龠部（共 214 组） \\
 \bottomrule
 \end{tabu}
 \end{table}
@@ -481,31 +571,41 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 字母能进行正确的分组，对带重音符号的拉丁字母（如 é, ç）、非拉丁字母（如 Σ, Δ,
 Ж, Я 等）等则会一律按符号分组。
 
+\index{数字}
 如果索引项的第一级排序项全部由数字组成，则该项会被分入数字分组；但如果条目的首
 个字符是数字，后面还有其他字符，则条目会被计入符号分组。除了阿拉伯数字，\zhm
 还将其他 Unicode 数字符号（如罗马数字“Ⅳ”、带圈数字“⑧”）也当作数字处理，但汉字
 数码“〇”被看作汉字处理。
+\index{〇}
 
 当索引项第一级排序项的首个字符不是拉丁字母或汉字，排序项本身也不是纯数字时，则
 此索引项就会计入符号分组。
 
-当输出格式变量 "headings_flag" 非零时（参见\autoref{tab:oldoutputstyle}），将
-输出分组名称。"headings_flag" 是正数时，以大写字母显示分组名
-称；"headings_flag" 是负数时，以小写字母显示分组名称。
+当输出格式变量 \kw{headings_flag} 非零时（参见\autoref{tab:oldoutputstyle}），
+将输出分组名称。\kw{headings_flag} 是正数时，以大写字母显示分组名
+称；\kw{headings_flag} 是负数时，以小写字母显示分组名称。
 
 当使用汉字特有的分组时，分组名称可以使用格式文件定制（参见%
 \autoref{tab:newoutputstyle}）。按笔画分组时，分组名为
 \begin{syntax}
+\kwindex{stroke_prefix}
+\kwindex{stroke_suffix}
   <stroke\_prefix><笔画数><stroke\_suffix>
 \end{syntax}
-按康熙字典部首分组时，如果变量 "radical_simplified_flag" 非零（默认情况），则
-分组名由原康熙字典部首与简化字部首组合而成：
+按康熙字典部首分组时，如果变量 \kw{radical_simplified_flag} 非零（默认情况），
+则分组名由原康熙字典部首与简化字部首组合而成：
 \begin{syntax}
+\kwindex{radical_prefix}
+\kwindex{radical_suffix}
+\kwindex{radical_simplified_prefix}
+\kwindex{radical_simplified_suffix}
   <radical\_prefix><部首><radical\_suffix>\\
   \hspace*{2em}<radical\_simplified\_prefix><简化字部首><radical\_simplified\_suffix>
 \end{syntax}
-如果变量 "radical_simplified_flag" 是零，则分组名没有简化字部首：
+如果变量 \kw{radical_simplified_flag} 是零，则分组名没有简化字部首：
 \begin{syntax}
+\kwindex{radical_prefix}
+\kwindex{radical_suffix}
   <radical\_prefix><部首><radical\_suffix>
 \end{syntax}
 
@@ -522,9 +622,11 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
     等，再按区分大小写进行比较，将大写字母排在小写字母之前。
 \end{itemize}
 
+\optindex{-l}
 \pkg{makeindex} 有一个 "-l" 选项忽略条目中的空格，按所有非空白符比较所有条目
 （\ref{subsec:unsupportedoption}~节）。\zhm 未提供此功能。
 
+\optindex{-z}
 按 "-z" 选项（\ref{subsec:newoption}~节）的不同，汉字可以使用不同的排序方式，
 如\autoref{tab:sort} 所示。
 \begin{table}[htbp]
@@ -533,9 +635,9 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 "-z" 选项 & 别名 & 意义 \\
 \midrule
-"pinyin" & "reading" & 汉字按常用读音的拼音排序。 \\
-"bihua" & "stroke" & 汉字按笔画数和笔顺排序。 \\
-"bushou" & "radical" & 汉字按康熙字典部首和除部首笔画数排序。 \\
+\sort{pinyin} & \sort{reading} & 汉字按常用读音的拼音排序。 \\
+\sort{bihua} & \sort{stroke} & 汉字按笔画数和笔顺排序。 \\
+\sort{bushou} & \sort{radical} & 汉字按康熙字典部首和除部首笔画数排序。 \\
 \bottomrule
 \end{tabu}
 \end{table}
@@ -553,9 +655,11 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 内容完全相同而页码不同的索引项，会在排序时合并为一项。同一索引项的所有页码会按
 前后次序排序、去重，并按要求合并为页码区间。
 
+\index{数字}
+\index{页码}
 \zhm 能识别不同类型的页码格式，包括阿拉伯数字（1, 2, 3, \ldots）、大小写罗马数
 字（I, II, III, \ldots）、大小写拉丁字母（a, b, c, \ldots）。不同类型的页码按
-照 "page_precedence" 变量的设置（\autoref{tab:oldoutputstyle}）区分前后次序。
+照 \kw{page_precedence} 变量的设置（\autoref{tab:oldoutputstyle}）区分前后次序。
 默认情况下，不同类型的页码次序是 "rnaRA"，即小写罗马数字的页码排在最前，然后依
 次是阿拉伯数字、小写拉丁字母、大写罗马数字、大写拉丁字母的页码。
 
@@ -579,6 +683,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \end{verbatim}
 则 "foo" 项会输出页码 5--13。
 
+\optindex{-r}
 如果没有使用 "-r" 选项（\ref{subsec:oldoption}~节），零散的页码也会与区间一起
 合并，3 页或以上连续的页码也会被合并为区间。例如输入
 \begin{verbatim}
@@ -656,6 +761,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 
 \section{已知问题}
 
+\index{多音字}
 汉字按拼音分组排序时，多音字可能会被分到错误的分组或排在错误的位置。例如，“长
 度”的“长”有 zhǎng 与 cháng 两个常用读音，由于读音 zhǎng 的使用频率比
 cháng 略高一点，“长”字就会按 zhǎng 的读音分到 Z 组，排序也较为靠后。目前

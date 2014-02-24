@@ -1,10 +1,11 @@
-// $Id: main.go,v cd063e5efbf1 2014/02/08 15:13:33 LeoLiu $
+// $Id: main.go,v 3d2e33dc248c 2014/02/24 12:16:14 leoliu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -20,9 +21,8 @@ import (
 )
 
 var (
-	ProgramAuthor   = "刘海洋"
-	ProgramVersion  = "beta"
-	ProgramRevision = stripDollors("$Revision: cd063e5efbf1 $", "Revision:")
+	ProgramAuthor  = "刘海洋<leoliu.pku@gmail.com>"
+	ProgramVersion = "1.0"
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -38,7 +38,7 @@ func main() {
 
 	setupLog(option)
 
-	log.Printf("zhmakeindex 版本：%s (r%s)\t作者：%s\n", ProgramVersion, ProgramRevision, ProgramAuthor)
+	log.Printf("zhmakeindex 版本：%s\t作者：%s\n", ProgramVersion, ProgramAuthor)
 
 	if option.style != "" {
 		log.Printf("正在读取格式文件 %s……", option.style)
@@ -99,7 +99,7 @@ func NewOptions() *Options {
 	flag.BoolVar(&o.stdin, "i", false, "从标准输入读取")
 	flag.StringVar(&o.output, "o", "", "输出文件")
 	flag.StringVar(&o.sort, "z", "pinyin",
-		"中文排序方式，可以使用 pinyin (reading)、bihua (stroke) 或 bushou (radical)")
+		"中文分组排序方式，可以使用 pinyin (reading)、bihua (stroke) 或 bushou (radical)")
 	// flag.StringVar(&o.page, "p", "", "设置起始页码") // 未实现
 	flag.BoolVar(&o.quiet, "q", false, "静默模式，不输出错误信息")
 	flag.BoolVar(&o.disable_range, "r", false, "禁用自动生成页码区间")
@@ -112,6 +112,9 @@ func NewOptions() *Options {
 }
 
 func (o *Options) parse() {
+	// 设置自定义帮助信息
+	flag.Usage = Usage
+
 	flag.Parse()
 
 	// 整理输入文件
@@ -124,7 +127,9 @@ func (o *Options) parse() {
 	if len(o.input) > 0 && o.stdin {
 		log.Fatalln("不能同时从文件和标准输入流读取输入")
 	} else if len(o.input) == 0 && !o.stdin {
-		log.Fatalln("没有输入文件")
+		// 没有输入文件
+		flag.Usage()
+		os.Exit(0)
 	}
 	// 不指定输出文件且不使用标准输入时，使用第一个输入文件的主文件名 + ".ind" 后缀
 	if o.output == "" && !o.stdin {
@@ -196,11 +201,20 @@ func stripExt(fpath string) string {
 	return fpath[:len(fpath)-len(ext)]
 }
 
-func stripDollors(svnstring, prefix string) string {
-	if prefix == "" {
-		prefix = "$"
-	}
-	begin := strings.Index(svnstring, prefix) + len(prefix)
-	end := strings.LastIndex(svnstring, "$")
-	return strings.TrimSpace(svnstring[begin:end])
+// 帮助信息
+func Usage() {
+	fmt.Fprintln(os.Stderr, `用法：
+zhmakeindex [-c] [-i] [-o <ind>] [-q] [-r] [-s <sty>] [-t <log>]
+            [-enc <enc>] [-senc <senc>] [-strict] [-z <sort>]
+            [<输入文件1> <输入文件2> ...]`)
+	fmt.Fprintln(os.Stderr, "\n中文索引处理程序")
+	fmt.Fprintf(os.Stderr, "\n  %-5s %-5s %s\n", "选项", "默认值", "说明")
+	flag.VisitAll(func(f *flag.Flag) {
+		if f.Value.String() == "" {
+			fmt.Fprintf(os.Stderr, "  -%-6s %-7s %s\n", f.Name, "无", f.Usage)
+		} else {
+			fmt.Fprintf(os.Stderr, "  -%-6s %-8s %s\n", f.Name, f.DefValue, f.Usage)
+		}
+	})
+	fmt.Fprintf(os.Stderr, "\n版本：%s\t作者：%s\n", ProgramVersion, ProgramAuthor)
 }
