@@ -1,4 +1,4 @@
-// $Id: main.go,v 3d2e33dc248c 2014/02/24 12:16:14 leoliu $
+// $Id: main.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
