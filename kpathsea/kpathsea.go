@@ -10,7 +10,7 @@ import (
 // 以 C 中对应于 enum kpse_file_format_type，见源代码 types.h
 type FileFormatType int
 
-// 对应于 TL2013 中的 kpathsea 6.11
+// 对应于 TL2014 中的 kpathsea 6.20
 const (
 	GF_FORMAT FileFormatType = iota
 	PK_FORMAT
@@ -80,7 +80,10 @@ const (
 //    kpse_file_format_type format,  boolean must_exist);
 // 见源代码 tex-file.h
 func FindFile(name string, format FileFormatType, mustExist bool) string {
-	// 动态库调用并不更优，暂不使用 findFile_dynamic(name, format, mustExist)
+	outpath := findFile_dynamic(name, format, mustExist)
+	if outpath != "" {
+		return outpath
+	}
 	return findFile_external(name)
 }
 
