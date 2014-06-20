@@ -14,7 +14,7 @@ strokes.go
 stroke_collator.go
 style.go
 style_test.go
-bin\zhmakeindex
+bin\darwin_x64\zhmakeindex
 bin\darwin_x86\zhmakeindex
 bin\linux_x64\zhmakeindex
 bin\linux_x86\zhmakeindex
