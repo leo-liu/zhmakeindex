@@ -1,7 +1,7 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 部首来源：CJKRadicals.txt
 // 部首笔画数来源：Unihan_RadicalStrokeCounts.txt
-// Unicode version: 6.3.0
+// Unicode version: 7.0.0
 package main
 
 // 康熙字典部首
