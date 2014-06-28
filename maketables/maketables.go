@@ -1,4 +1,4 @@
-// $Id: maketables.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
+// $Id: maketables.go,v 77352a21c850 2014/06/28 07:42:04 LeoLiu $
 
 package main
 
@@ -170,8 +170,6 @@ func make_reading_table(outdir string) {
 				reading_table[r] = &ReadingEntry{}
 			}
 			switch fields[1] {
-			case "kHanyuPinlu":
-				reading_table[r].HanyuPinlu = fields[2]
 			case "kHanyuPinyin":
 				reading_table[r].HanyuPinyin = fields[2]
 			case "kMandarin":
@@ -215,21 +213,14 @@ func make_reading_table(outdir string) {
 }
 
 type ReadingEntry struct {
-	HanyuPinlu  string
 	HanyuPinyin string
 	Mandarin    string
 	XHC1983     string
 }
 
 // 取出最常用的一个拼音
-// 按如下优先次序：HanyuPinlu -> Mandarin -> XHC1983 -> HanyuPinyin
+// 按如下优先次序：Mandarin -> XHC1983 -> HanyuPinyin
 func (entry *ReadingEntry) regular() string {
-	// xHanyuPinlu Syntax: [a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+\([0-9]+\)
-	// 如 cān(525) shēn(25)
-	if entry.HanyuPinlu != "" {
-		// 第一个括号之前的部分即可
-		return strings.Split(entry.HanyuPinlu, "(")[0]
-	}
 	// kMandarin Syntax: [a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+
 	// 如 lüè
 	if entry.Mandarin != "" {
@@ -422,9 +413,9 @@ func MakeRadicalStroke(r rune, radical, stroke int) RadicalStroke {
 	return RadicalStroke(buf) + RadicalStroke(r)
 }
 
-// 读取 Unihan_RadicalStrokeCounts.txt 获取部首笔画数表
+// 读取 Unihan_IRGSources.txt 获取部首笔画数表
 func read_radical_strokes() (version string, CJKRadicalStrokes []RadicalStroke) {
-	radical_file, err := os.Open("Unihan_RadicalStrokeCounts.txt")
+	radical_file, err := os.Open("Unihan_IRGSources.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}

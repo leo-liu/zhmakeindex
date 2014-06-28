@@ -1,6 +1,6 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 来源：Unihan_Readings.txt
-// Unicode version: 6.3.0
+// Unicode version: 7.0.0
 package main
 var CJKreadings = map[rune]string{
 	0x3007: "ling2", // 〇
@@ -26,6 +26,7 @@ var CJKreadings = map[rune]string{
 	0x3432: "dai4", // 㐲
 	0x3433: "wu4", // 㐳
 	0x3434: "pan1", // 㐴
+	0x3435: "ru2", // 㐵
 	0x3437: "ma3", // 㐷
 	0x3438: "qian4", // 㐸
 	0x3439: "yi4", // 㐹
@@ -5842,7 +5843,7 @@ var CJKreadings = map[rune]string{
 	0x4e4b: "zhi1", // 之
 	0x4e4c: "wu1", // 乌
 	0x4e4d: "zha4", // 乍
-	0x4e4e: "hu5", // 乎
+	0x4e4e: "hu1", // 乎
 	0x4e4f: "fa2", // 乏
 	0x4e50: "le4", // 乐
 	0x4e51: "yin2", // 乑
@@ -5981,7 +5982,7 @@ var CJKreadings = map[rune]string{
 	0x4ed6: "ta1", // 他
 	0x4ed7: "zhang4", // 仗
 	0x4ed8: "fu4", // 付
-	0x4ed9: "xian5", // 仙
+	0x4ed9: "xian1", // 仙
 	0x4eda: "xian1", // 仚
 	0x4edb: "tuo1", // 仛
 	0x4edc: "hong2", // 仜
@@ -6033,7 +6034,7 @@ var CJKreadings = map[rune]string{
 	0x4f0a: "yi1", // 伊
 	0x4f0b: "ji2", // 伋
 	0x4f0c: "ai4", // 伌
-	0x4f0d: "wu5", // 伍
+	0x4f0d: "wu3", // 伍
 	0x4f0e: "ji4", // 伎
 	0x4f0f: "fu2", // 伏
 	0x4f10: "fa2", // 伐
@@ -6074,7 +6075,7 @@ var CJKreadings = map[rune]string{
 	0x4f33: "xie4", // 伳
 	0x4f34: "ban4", // 伴
 	0x4f35: "xu4", // 伵
-	0x4f36: "ling5", // 伶
+	0x4f36: "ling2", // 伶
 	0x4f37: "zhou4", // 伷
 	0x4f38: "shen1", // 伸
 	0x4f39: "qu1", // 伹
@@ -6301,7 +6302,7 @@ var CJKreadings = map[rune]string{
 	0x5016: "xing4", // 倖
 	0x5017: "peng2", // 倗
 	0x5018: "tang3", // 倘
-	0x5019: "hou5", // 候
+	0x5019: "hou4", // 候
 	0x501a: "yi3", // 倚
 	0x501b: "qi1", // 倛
 	0x501c: "ti4", // 倜
@@ -6409,7 +6410,7 @@ var CJKreadings = map[rune]string{
 	0x5082: "zhi4", // 傂
 	0x5083: "su4", // 傃
 	0x5084: "xia1", // 傄
-	0x5085: "fu5", // 傅
+	0x5085: "fu4", // 傅
 	0x5086: "yuan4", // 傆
 	0x5087: "rong3", // 傇
 	0x5088: "li4", // 傈
@@ -6595,7 +6596,7 @@ var CJKreadings = map[rune]string{
 	0x513c: "yan3", // 儼
 	0x513d: "lei2", // 儽
 	0x513e: "nang4", // 儾
-	0x513f: "r5", // 儿
+	0x513f: "er2", // 儿
 	0x5140: "wu4", // 兀
 	0x5141: "yun3", // 允
 	0x5142: "zan1", // 兂
@@ -6614,7 +6615,7 @@ var CJKreadings = map[rune]string{
 	0x514f: "chang2", // 兏
 	0x5150: "er2", // 児
 	0x5151: "dui4", // 兑
-	0x5152: "r5", // 兒
+	0x5152: "er2", // 兒
 	0x5153: "jin1", // 兓
 	0x5154: "tu4", // 兔
 	0x5155: "si4", // 兕
@@ -6947,7 +6948,7 @@ var CJKreadings = map[rune]string{
 	0x529e: "ban4", // 办
 	0x529f: "gong1", // 功
 	0x52a0: "jia1", // 加
-	0x52a1: "wu5", // 务
+	0x52a1: "wu4", // 务
 	0x52a2: "mai4", // 劢
 	0x52a3: "lie4", // 劣
 	0x52a4: "jin4", // 劤
@@ -7003,7 +7004,7 @@ var CJKreadings = map[rune]string{
 	0x52d6: "xu4", // 勖
 	0x52d7: "xu4", // 勗
 	0x52d8: "kan1", // 勘
-	0x52d9: "wu5", // 務
+	0x52d9: "wu4", // 務
 	0x52da: "yi4", // 勚
 	0x52db: "xun1", // 勛
 	0x52dc: "weng3", // 勜
@@ -7074,7 +7075,7 @@ var CJKreadings = map[rune]string{
 	0x531d: "za1", // 匝
 	0x531e: "jiang4", // 匞
 	0x531f: "kang4", // 匟
-	0x5320: "jiang5", // 匠
+	0x5320: "jiang4", // 匠
 	0x5321: "kuang1", // 匡
 	0x5322: "hu1", // 匢
 	0x5323: "xia2", // 匣
@@ -7245,7 +7246,7 @@ var CJKreadings = map[rune]string{
 	0x53c8: "you4", // 又
 	0x53c9: "cha1", // 叉
 	0x53ca: "ji2", // 及
-	0x53cb: "you5", // 友
+	0x53cb: "you3", // 友
 	0x53cc: "shuang1", // 双
 	0x53cd: "fan3", // 反
 	0x53ce: "shou1", // 収
@@ -7279,7 +7280,7 @@ var CJKreadings = map[rune]string{
 	0x53ea: "zhi3", // 只
 	0x53eb: "jiao4", // 叫
 	0x53ec: "zhao4", // 召
-	0x53ed: "ba5", // 叭
+	0x53ed: "ba1", // 叭
 	0x53ee: "ding1", // 叮
 	0x53ef: "ke3", // 可
 	0x53f0: "tai2", // 台
@@ -7352,7 +7353,7 @@ var CJKreadings = map[rune]string{
 	0x5433: "wu2", // 吳
 	0x5434: "wu2", // 吴
 	0x5435: "chao3", // 吵
-	0x5436: "ne5", // 吶
+	0x5436: "na4", // 吶
 	0x5437: "xue4", // 吷
 	0x5438: "xi1", // 吸
 	0x5439: "chui1", // 吹
@@ -7378,7 +7379,7 @@ var CJKreadings = map[rune]string{
 	0x544d: "hong1", // 呍
 	0x544e: "chi3", // 呎
 	0x544f: "sheng1", // 呏
-	0x5450: "ne5", // 呐
+	0x5450: "na4", // 呐
 	0x5451: "tun1", // 呑
 	0x5452: "fu3", // 呒
 	0x5453: "yi4", // 呓
@@ -7442,12 +7443,12 @@ var CJKreadings = map[rune]string{
 	0x548d: "hai1", // 咍
 	0x548e: "jiu4", // 咎
 	0x548f: "yong3", // 咏
-	0x5490: "fu5", // 咐
+	0x5490: "fu4", // 咐
 	0x5491: "da1", // 咑
 	0x5492: "zhou4", // 咒
 	0x5493: "wa3", // 咓
 	0x5494: "ka1", // 咔
-	0x5495: "gu5", // 咕
+	0x5495: "gu1", // 咕
 	0x5496: "ka1", // 咖
 	0x5497: "zuo5", // 咗
 	0x5498: "bu4", // 咘
@@ -7465,7 +7466,7 @@ var CJKreadings = map[rune]string{
 	0x54a4: "zha4", // 咤
 	0x54a5: "xi4", // 咥
 	0x54a6: "yi2", // 咦
-	0x54a7: "lie5", // 咧
+	0x54a7: "lie3", // 咧
 	0x54a8: "zi1", // 咨
 	0x54a9: "mie1", // 咩
 	0x54aa: "mi1", // 咪
@@ -7531,7 +7532,7 @@ var CJKreadings = map[rune]string{
 	0x54e6: "o2", // 哦
 	0x54e7: "chi1", // 哧
 	0x54e8: "shao4", // 哨
-	0x54e9: "li5", // 哩
+	0x54e9: "li1", // 哩
 	0x54ea: "na3", // 哪
 	0x54eb: "zu2", // 哫
 	0x54ec: "he2", // 哬
@@ -7598,7 +7599,7 @@ var CJKreadings = map[rune]string{
 	0x5529: "wo1", // 唩
 	0x552a: "feng3", // 唪
 	0x552b: "jin4", // 唫
-	0x552c: "hu5", // 唬
+	0x552c: "hu3", // 唬
 	0x552d: "qi4", // 唭
 	0x552e: "shou4", // 售
 	0x552f: "wei2", // 唯
@@ -7743,7 +7744,7 @@ var CJKreadings = map[rune]string{
 	0x55ba: "xi4", // 喺
 	0x55bb: "yu4", // 喻
 	0x55bc: "jie2", // 喼
-	0x55bd: "lou5", // 喽
+	0x55bd: "lou2", // 喽
 	0x55be: "ku4", // 喾
 	0x55bf: "zao4", // 喿
 	0x55c0: "hu4", // 嗀
@@ -7806,7 +7807,7 @@ var CJKreadings = map[rune]string{
 	0x55fa: "zui1", // 嗺
 	0x55fb: "zhe1", // 嗻
 	0x55fc: "mo4", // 嗼
-	0x55fd: "sou5", // 嗽
+	0x55fd: "sou4", // 嗽
 	0x55fe: "sou3", // 嗾
 	0x55ff: "tan3", // 嗿
 	0x5600: "di2", // 嘀
@@ -7822,7 +7823,7 @@ var CJKreadings = map[rune]string{
 	0x560a: "ai2", // 嘊
 	0x560b: "xiao1", // 嘋
 	0x560c: "piao4", // 嘌
-	0x560d: "lou5", // 嘍
+	0x560d: "lou2", // 嘍
 	0x560e: "ga1", // 嘎
 	0x560f: "gu3", // 嘏
 	0x5610: "xiao1", // 嘐
@@ -8139,7 +8140,7 @@ var CJKreadings = map[rune]string{
 	0x5747: "jun1", // 均
 	0x5748: "rong3", // 坈
 	0x5749: "tun2", // 坉
-	0x574a: "fang5", // 坊
+	0x574a: "fang1", // 坊
 	0x574b: "ben4", // 坋
 	0x574c: "ben4", // 坌
 	0x574d: "tan1", // 坍
@@ -8620,7 +8621,7 @@ var CJKreadings = map[rune]string{
 	0x5928: "ze4", // 夨
 	0x5929: "tian1", // 天
 	0x592a: "tai4", // 太
-	0x592b: "fu5", // 夫
+	0x592b: "fu1", // 夫
 	0x592c: "guai4", // 夬
 	0x592d: "yao1", // 夭
 	0x592e: "yang1", // 央
@@ -8785,7 +8786,7 @@ var CJKreadings = map[rune]string{
 	0x59cd: "shan1", // 姍
 	0x59ce: "yang1", // 姎
 	0x59cf: "man2", // 姏
-	0x59d0: "jie5", // 姐
+	0x59d0: "jie3", // 姐
 	0x59d1: "gu1", // 姑
 	0x59d2: "si4", // 姒
 	0x59d3: "xing4", // 姓
@@ -8857,7 +8858,7 @@ var CJKreadings = map[rune]string{
 	0x5a15: "chuo4", // 娕
 	0x5a16: "chuo4", // 娖
 	0x5a17: "ting3", // 娗
-	0x5a18: "niang5", // 娘
+	0x5a18: "niang2", // 娘
 	0x5a19: "xing2", // 娙
 	0x5a1a: "nan2", // 娚
 	0x5a1b: "yu2", // 娛
@@ -9245,7 +9246,7 @@ var CJKreadings = map[rune]string{
 	0x5b99: "zhou4", // 宙
 	0x5b9a: "ding4", // 定
 	0x5b9b: "wan3", // 宛
-	0x5b9c: "yi5", // 宜
+	0x5b9c: "yi2", // 宜
 	0x5b9d: "bao3", // 宝
 	0x5b9e: "shi2", // 实
 	0x5b9f: "shi2", // 実
@@ -9418,7 +9419,7 @@ var CJKreadings = map[rune]string{
 	0x5c46: "jie4", // 屆
 	0x5c47: "tian2", // 屇
 	0x5c48: "qu1", // 屈
-	0x5c49: "ti5", // 屉
+	0x5c49: "ti4", // 屉
 	0x5c4a: "jie4", // 届
 	0x5c4b: "wu1", // 屋
 	0x5c4c: "diao3", // 屌
@@ -9437,7 +9438,7 @@ var CJKreadings = map[rune]string{
 	0x5c59: "e1", // 屙
 	0x5c5a: "lou4", // 屚
 	0x5c5b: "ping2", // 屛
-	0x5c5c: "ti5", // 屜
+	0x5c5c: "ti4", // 屜
 	0x5c5d: "fei4", // 屝
 	0x5c5e: "shu3", // 属
 	0x5c5f: "xie4", // 屟
@@ -9845,7 +9846,7 @@ var CJKreadings = map[rune]string{
 	0x5df1: "ji3", // 己
 	0x5df2: "yi3", // 已
 	0x5df3: "si4", // 巳
-	0x5df4: "ba5", // 巴
+	0x5df4: "ba1", // 巴
 	0x5df5: "zhi1", // 巵
 	0x5df6: "zhao1", // 巶
 	0x5df7: "xiang4", // 巷
@@ -9883,7 +9884,7 @@ var CJKreadings = map[rune]string{
 	0x5e17: "bo1", // 帗
 	0x5e18: "lian2", // 帘
 	0x5e19: "zhi4", // 帙
-	0x5e1a: "zhou5", // 帚
+	0x5e1a: "zhou3", // 帚
 	0x5e1b: "bo2", // 帛
 	0x5e1c: "zhi4", // 帜
 	0x5e1d: "di4", // 帝
@@ -10252,7 +10253,7 @@ var CJKreadings = map[rune]string{
 	0x5f88: "hen3", // 很
 	0x5f89: "yang2", // 徉
 	0x5f8a: "huai2", // 徊
-	0x5f8b: "l̈u4", // 律
+	0x5f8b: "lv4", // 律
 	0x5f8c: "hou4", // 後
 	0x5f8d: "wang3", // 徍
 	0x5f8e: "cheng3", // 徎
@@ -10264,7 +10265,7 @@ var CJKreadings = map[rune]string{
 	0x5f94: "zhi5", // 徔
 	0x5f95: "lai2", // 徕
 	0x5f96: "cong2", // 徖
-	0x5f97: "de5", // 得
+	0x5f97: "de2", // 得
 	0x5f98: "pai2", // 徘
 	0x5f99: "xi3", // 徙
 	0x5f9a: "dong1", // 徚
@@ -10480,7 +10481,7 @@ var CJKreadings = map[rune]string{
 	0x606c: "tian2", // 恬
 	0x606d: "gong1", // 恭
 	0x606e: "quan1", // 恮
-	0x606f: "xi5", // 息
+	0x606f: "xi1", // 息
 	0x6070: "qia4", // 恰
 	0x6071: "yue4", // 恱
 	0x6072: "peng1", // 恲
@@ -10735,7 +10736,7 @@ var CJKreadings = map[rune]string{
 	0x616b: "song3", // 慫
 	0x616c: "qin2", // 慬
 	0x616d: "yin4", // 慭
-	0x616e: "l̈u4", // 慮
+	0x616e: "lv4", // 慮
 	0x616f: "shang1", // 慯
 	0x6170: "wei4", // 慰
 	0x6171: "tuan2", // 慱
@@ -10907,7 +10908,7 @@ var CJKreadings = map[rune]string{
 	0x6217: "qiang1", // 戗
 	0x6218: "zhan4", // 战
 	0x6219: "dong4", // 戙
-	0x621a: "qi5", // 戚
+	0x621a: "qi1", // 戚
 	0x621b: "jia2", // 戛
 	0x621c: "die2", // 戜
 	0x621d: "zei2", // 戝
@@ -10991,7 +10992,7 @@ var CJKreadings = map[rune]string{
 	0x626b: "sao3", // 扫
 	0x626c: "yang2", // 扬
 	0x626d: "niu3", // 扭
-	0x626e: "ban5", // 扮
+	0x626e: "ban4", // 扮
 	0x626f: "che3", // 扯
 	0x6270: "rao3", // 扰
 	0x6271: "xi1", // 扱
@@ -11080,7 +11081,7 @@ var CJKreadings = map[rune]string{
 	0x62c4: "zhu3", // 拄
 	0x62c5: "dan1", // 担
 	0x62c6: "chai1", // 拆
-	0x62c7: "mu5", // 拇
+	0x62c7: "mu3", // 拇
 	0x62c8: "nian1", // 拈
 	0x62c9: "la1", // 拉
 	0x62ca: "fu3", // 拊
@@ -11135,7 +11136,7 @@ var CJKreadings = map[rune]string{
 	0x62fb: "hui1", // 拻
 	0x62fc: "pin1", // 拼
 	0x62fd: "zhuai1", // 拽
-	0x62fe: "shi5", // 拾
+	0x62fe: "shi2", // 拾
 	0x62ff: "na2", // 拿
 	0x6300: "bai1", // 挀
 	0x6301: "chi2", // 持
@@ -11297,7 +11298,7 @@ var CJKreadings = map[rune]string{
 	0x639d: "huo4", // 掝
 	0x639e: "shan4", // 掞
 	0x639f: "zheng3", // 掟
-	0x63a0: "e4", // 掠
+	0x63a0: "lve4", // 掠
 	0x63a1: "cai3", // 採
 	0x63a2: "tan4", // 探
 	0x63a3: "che4", // 掣
@@ -11743,7 +11744,7 @@ var CJKreadings = map[rune]string{
 	0x655b: "lian3", // 敛
 	0x655c: "nie4", // 敜
 	0x655d: "bi4", // 敝
-	0x655e: "chang5", // 敞
+	0x655e: "chang3", // 敞
 	0x655f: "dian3", // 敟
 	0x6560: "duo1", // 敠
 	0x6561: "yi4", // 敡
@@ -11846,7 +11847,7 @@ var CJKreadings = map[rune]string{
 	0x65c2: "qi2", // 旂
 	0x65c3: "zhan1", // 旃
 	0x65c4: "mao2", // 旄
-	0x65c5: "l̈u3", // 旅
+	0x65c5: "lv3", // 旅
 	0x65c6: "pei4", // 旆
 	0x65c7: "pi1", // 旇
 	0x65c8: "liu2", // 旈
@@ -11972,7 +11973,7 @@ var CJKreadings = map[rune]string{
 	0x6640: "tiao3", // 晀
 	0x6641: "chao2", // 晁
 	0x6642: "shi2", // 時
-	0x6643: "huang5", // 晃
+	0x6643: "huang3", // 晃
 	0x6644: "huang3", // 晄
 	0x6645: "xuan3", // 晅
 	0x6646: "kui2", // 晆
@@ -12009,7 +12010,7 @@ var CJKreadings = map[rune]string{
 	0x6665: "han4", // 晥
 	0x6666: "hui4", // 晦
 	0x6667: "hao4", // 晧
-	0x6668: "chen5", // 晨
+	0x6668: "chen2", // 晨
 	0x6669: "wan3", // 晩
 	0x666a: "tian3", // 晪
 	0x666b: "zhuo2", // 晫
@@ -12214,7 +12215,7 @@ var CJKreadings = map[rune]string{
 	0x6732: "ren2", // 朲
 	0x6733: "ba1", // 朳
 	0x6734: "pu3", // 朴
-	0x6735: "duo5", // 朵
+	0x6735: "duo3", // 朵
 	0x6736: "duo3", // 朶
 	0x6737: "dao1", // 朷
 	0x6738: "li4", // 朸
@@ -12239,7 +12240,7 @@ var CJKreadings = map[rune]string{
 	0x674b: "fan2", // 杋
 	0x674c: "wu4", // 杌
 	0x674d: "zi3", // 杍
-	0x674e: "li5", // 李
+	0x674e: "li3", // 李
 	0x674f: "xing4", // 杏
 	0x6750: "cai2", // 材
 	0x6751: "cun1", // 村
@@ -12298,7 +12299,7 @@ var CJKreadings = map[rune]string{
 	0x6786: "mao2", // 枆
 	0x6787: "pi2", // 枇
 	0x6788: "bi4", // 枈
-	0x6789: "wang5", // 枉
+	0x6789: "wang3", // 枉
 	0x678a: "ang4", // 枊
 	0x678b: "fang1", // 枋
 	0x678c: "fen2", // 枌
@@ -12762,7 +12763,7 @@ var CJKreadings = map[rune]string{
 	0x6957: "jian4", // 楗
 	0x6958: "mu4", // 楘
 	0x6959: "mao4", // 楙
-	0x695a: "chu5", // 楚
+	0x695a: "chu3", // 楚
 	0x695b: "hu4", // 楛
 	0x695c: "hu2", // 楜
 	0x695d: "lian4", // 楝
@@ -13218,7 +13219,7 @@ var CJKreadings = map[rune]string{
 	0x6b1f: "guang5", // 欟
 	0x6b20: "qian4", // 欠
 	0x6b21: "ci4", // 次
-	0x6b22: "huan5", // 欢
+	0x6b22: "huan1", // 欢
 	0x6b23: "xin1", // 欣
 	0x6b24: "yu2", // 欤
 	0x6b25: "yi4", // 欥
@@ -13281,7 +13282,7 @@ var CJKreadings = map[rune]string{
 	0x6b5e: "e4", // 歞
 	0x6b5f: "yu2", // 歟
 	0x6b60: "chuo4", // 歠
-	0x6b61: "huan5", // 歡
+	0x6b61: "huan1", // 歡
 	0x6b62: "zhi3", // 止
 	0x6b63: "zheng4", // 正
 	0x6b64: "ci3", // 此
@@ -13692,7 +13693,7 @@ var CJKreadings = map[rune]string{
 	0x6cf9: "dan4", // 泹
 	0x6cfa: "luo4", // 泺
 	0x6cfb: "xie4", // 泻
-	0x6cfc: "po5", // 泼
+	0x6cfc: "po1", // 泼
 	0x6cfd: "ze2", // 泽
 	0x6cfe: "jing1", // 泾
 	0x6cff: "yin2", // 泿
@@ -13826,7 +13827,7 @@ var CJKreadings = map[rune]string{
 	0x6d7f: "pei4", // 浿
 	0x6d80: "xian4", // 涀
 	0x6d81: "shen4", // 涁
-	0x6d82: "tu5", // 涂
+	0x6d82: "tu2", // 涂
 	0x6d83: "kun4", // 涃
 	0x6d84: "ping1", // 涄
 	0x6d85: "nie4", // 涅
@@ -14289,7 +14290,7 @@ var CJKreadings = map[rune]string{
 	0x6f4e: "pi4", // 潎
 	0x6f4f: "yu4", // 潏
 	0x6f50: "jiao4", // 潐
-	0x6f51: "po5", // 潑
+	0x6f51: "po1", // 潑
 	0x6f52: "dang4", // 潒
 	0x6f53: "hui4", // 潓
 	0x6f54: "jie2", // 潔
@@ -15030,10 +15031,10 @@ var CJKreadings = map[rune]string{
 	0x7234: "jue2", // 爴
 	0x7235: "jue2", // 爵
 	0x7236: "fu4", // 父
-	0x7237: "ye5", // 爷
+	0x7237: "ye2", // 爷
 	0x7238: "ba4", // 爸
 	0x7239: "die1", // 爹
-	0x723a: "ye5", // 爺
+	0x723a: "ye2", // 爺
 	0x723b: "yao2", // 爻
 	0x723c: "zu3", // 爼
 	0x723d: "shuang3", // 爽
@@ -15223,7 +15224,7 @@ var CJKreadings = map[rune]string{
 	0x72f5: "mang2", // 狵
 	0x72f6: "xi1", // 狶
 	0x72f7: "juan4", // 狷
-	0x72f8: "li5", // 狸
+	0x72f8: "li2", // 狸
 	0x72f9: "xia2", // 狹
 	0x72fa: "yin2", // 狺
 	0x72fb: "suan1", // 狻
@@ -15275,7 +15276,7 @@ var CJKreadings = map[rune]string{
 	0x7329: "xing1", // 猩
 	0x732a: "zhu1", // 猪
 	0x732b: "mao1", // 猫
-	0x732c: "wei5", // 猬
+	0x732c: "wei4", // 猬
 	0x732d: "chuan1", // 猭
 	0x732e: "xian4", // 献
 	0x732f: "tuan1", // 猯
@@ -15366,7 +15367,7 @@ var CJKreadings = map[rune]string{
 	0x7384: "xuan2", // 玄
 	0x7385: "miao4", // 玅
 	0x7386: "zi1", // 玆
-	0x7387: "l̈u4", // 率
+	0x7387: "lv4", // 率
 	0x7388: "lu2", // 玈
 	0x7389: "yu4", // 玉
 	0x738a: "su4", // 玊
@@ -15781,7 +15782,7 @@ var CJKreadings = map[rune]string{
 	0x7528: "yong4", // 用
 	0x7529: "shuai3", // 甩
 	0x752a: "lu4", // 甪
-	0x752b: "fu5", // 甫
+	0x752b: "fu3", // 甫
 	0x752c: "yong3", // 甬
 	0x752d: "beng2", // 甭
 	0x752e: "feng4", // 甮
@@ -15839,7 +15840,7 @@ var CJKreadings = map[rune]string{
 	0x7562: "bi4", // 畢
 	0x7563: "da2", // 畣
 	0x7564: "zhi4", // 畤
-	0x7565: "e4", // 略
+	0x7565: "lve4", // 略
 	0x7566: "qi2", // 畦
 	0x7567: "lve4", // 畧
 	0x7568: "pan1", // 畨
@@ -16341,7 +16342,7 @@ var CJKreadings = map[rune]string{
 	0x7758: "qiong2", // 睘
 	0x7759: "lie4", // 睙
 	0x775a: "ya2", // 睚
-	0x775b: "jing5", // 睛
+	0x775b: "jing1", // 睛
 	0x775c: "zheng1", // 睜
 	0x775d: "li2", // 睝
 	0x775e: "lai4", // 睞
@@ -16483,7 +16484,7 @@ var CJKreadings = map[rune]string{
 	0x77e6: "hou2", // 矦
 	0x77e7: "shen3", // 矧
 	0x77e8: "ying3", // 矨
-	0x77e9: "ju5", // 矩
+	0x77e9: "ju3", // 矩
 	0x77ea: "zhou1", // 矪
 	0x77eb: "jiao3", // 矫
 	0x77ec: "cuo2", // 矬
@@ -17078,7 +17079,7 @@ var CJKreadings = map[rune]string{
 	0x7a39: "zhen3", // 稹
 	0x7a3a: "zhi4", // 稺
 	0x7a3b: "dao4", // 稻
-	0x7a3c: "jia5", // 稼
+	0x7a3c: "jia4", // 稼
 	0x7a3d: "ji1", // 稽
 	0x7a3e: "gao3", // 稾
 	0x7a3f: "gao3", // 稿
@@ -17209,7 +17210,7 @@ var CJKreadings = map[rune]string{
 	0x7abc: "zhao1", // 窼
 	0x7abd: "kuan5", // 窽
 	0x7abe: "kuan3", // 窾
-	0x7abf: "long5", // 窿
+	0x7abf: "long2", // 窿
 	0x7ac0: "cheng1", // 竀
 	0x7ac1: "cui4", // 竁
 	0x7ac2: "piao2", // 竂
@@ -17280,7 +17281,7 @@ var CJKreadings = map[rune]string{
 	0x7b03: "du3", // 笃
 	0x7b04: "ji1", // 笄
 	0x7b05: "xiao2", // 笅
-	0x7b06: "ba5", // 笆
+	0x7b06: "ba1", // 笆
 	0x7b07: "suan4", // 笇
 	0x7b08: "ji2", // 笈
 	0x7b09: "qin3", // 笉
@@ -17521,7 +17522,7 @@ var CJKreadings = map[rune]string{
 	0x7bf4: "di2", // 篴
 	0x7bf5: "cong1", // 篵
 	0x7bf6: "yan1", // 篶
-	0x7bf7: "peng5", // 篷
+	0x7bf7: "peng2", // 篷
 	0x7bf8: "can3", // 篸
 	0x7bf9: "zhuan4", // 篹
 	0x7bfa: "pi2", // 篺
@@ -17732,7 +17733,7 @@ var CJKreadings = map[rune]string{
 	0x7cc7: "hou2", // 糇
 	0x7cc8: "xu3", // 糈
 	0x7cc9: "zong4", // 糉
-	0x7cca: "hu5", // 糊
+	0x7cca: "hu2", // 糊
 	0x7ccb: "jian4", // 糋
 	0x7ccc: "zan1", // 糌
 	0x7ccd: "ci2", // 糍
@@ -17946,7 +17947,7 @@ var CJKreadings = map[rune]string{
 	0x7d9d: "chen1", // 綝
 	0x7d9e: "duo3", // 綞
 	0x7d9f: "li4", // 綟
-	0x7da0: "l̈u4", // 綠
+	0x7da0: "lv4", // 綠
 	0x7da1: "liang2", // 綡
 	0x7da2: "chou2", // 綢
 	0x7da3: "quan3", // 綣
@@ -17966,7 +17967,7 @@ var CJKreadings = map[rune]string{
 	0x7db1: "gang1", // 綱
 	0x7db2: "wang3", // 網
 	0x7db3: "beng1", // 綳
-	0x7db4: "zhui5", // 綴
+	0x7db4: "zhui4", // 綴
 	0x7db5: "cai3", // 綵
 	0x7db6: "guo3", // 綶
 	0x7db7: "cui4", // 綷
@@ -18097,7 +18098,7 @@ var CJKreadings = map[rune]string{
 	0x7e34: "qian4", // 縴
 	0x7e35: "man4", // 縵
 	0x7e36: "zhi2", // 縶
-	0x7e37: "l̈u3", // 縷
+	0x7e37: "lv3", // 縷
 	0x7e38: "mu4", // 縸
 	0x7e39: "piao3", // 縹
 	0x7e3a: "lian2", // 縺
@@ -18297,8 +18298,8 @@ var CJKreadings = map[rune]string{
 	0x7efc: "zong1", // 综
 	0x7efd: "zhan4", // 绽
 	0x7efe: "wan3", // 绾
-	0x7eff: "l̈u4", // 绿
-	0x7f00: "zhui5", // 缀
+	0x7eff: "lv4", // 绿
+	0x7f00: "zhui4", // 缀
 	0x7f01: "zi1", // 缁
 	0x7f02: "ke4", // 缂
 	0x7f03: "xiang1", // 缃
@@ -18319,7 +18320,7 @@ var CJKreadings = map[rune]string{
 	0x7f12: "zhui4", // 缒
 	0x7f13: "huan3", // 缓
 	0x7f14: "di4", // 缔
-	0x7f15: "l̈u3", // 缕
+	0x7f15: "lv3", // 缕
 	0x7f16: "bian1", // 编
 	0x7f17: "min2", // 缗
 	0x7f18: "yuan2", // 缘
@@ -18396,7 +18397,7 @@ var CJKreadings = map[rune]string{
 	0x7f5f: "gu3", // 罟
 	0x7f60: "min2", // 罠
 	0x7f61: "gang1", // 罡
-	0x7f62: "ba5", // 罢
+	0x7f62: "ba4", // 罢
 	0x7f63: "gua4", // 罣
 	0x7f64: "ti2", // 罤
 	0x7f65: "juan4", // 罥
@@ -18417,7 +18418,7 @@ var CJKreadings = map[rune]string{
 	0x7f74: "pi2", // 罴
 	0x7f75: "ma4", // 罵
 	0x7f76: "liu3", // 罶
-	0x7f77: "ba5", // 罷
+	0x7f77: "ba4", // 罷
 	0x7f78: "fa2", // 罸
 	0x7f79: "li2", // 罹
 	0x7f7a: "chao2", // 罺
@@ -18948,7 +18949,7 @@ var CJKreadings = map[rune]string{
 	0x8187: "zhui4", // 膇
 	0x8188: "ge2", // 膈
 	0x8189: "yi4", // 膉
-	0x818a: "bo5", // 膊
+	0x818a: "bo2", // 膊
 	0x818b: "liao2", // 膋
 	0x818c: "ji2", // 膌
 	0x818d: "pi2", // 膍
@@ -19521,7 +19522,7 @@ var CJKreadings = map[rune]string{
 	0x83c4: "dong1", // 菄
 	0x83c5: "jian1", // 菅
 	0x83c6: "zou1", // 菆
-	0x83c7: "gu5", // 菇
+	0x83c7: "gu1", // 菇
 	0x83c8: "la1", // 菈
 	0x83c9: "lu4", // 菉
 	0x83ca: "ju2", // 菊
@@ -19857,7 +19858,7 @@ var CJKreadings = map[rune]string{
 	0x8514: "bo2", // 蔔
 	0x8515: "di4", // 蔕
 	0x8516: "cuo2", // 蔖
-	0x8517: "zhe5", // 蔗
+	0x8517: "zhe4", // 蔗
 	0x8518: "shen1", // 蔘
 	0x8519: "xuan4", // 蔙
 	0x851a: "wei4", // 蔚
@@ -20171,7 +20172,7 @@ var CJKreadings = map[rune]string{
 	0x864e: "hu3", // 虎
 	0x864f: "lu3", // 虏
 	0x8650: "nve4", // 虐
-	0x8651: "l̈u4", // 虑
+	0x8651: "lv4", // 虑
 	0x8652: "si1", // 虒
 	0x8653: "xiao1", // 虓
 	0x8654: "qian2", // 虔
@@ -20253,7 +20254,7 @@ var CJKreadings = map[rune]string{
 	0x86a0: "fen2", // 蚠
 	0x86a1: "fen2", // 蚡
 	0x86a2: "hang2", // 蚢
-	0x86a3: "gong5", // 蚣
+	0x86a3: "gong1", // 蚣
 	0x86a4: "zao3", // 蚤
 	0x86a5: "fu4", // 蚥
 	0x86a6: "ran2", // 蚦
@@ -20417,7 +20418,7 @@ var CJKreadings = map[rune]string{
 	0x8744: "wang3", // 蝄
 	0x8745: "can2", // 蝅
 	0x8746: "yang3", // 蝆
-	0x8747: "ying5", // 蝇
+	0x8747: "ying2", // 蝇
 	0x8748: "guo1", // 蝈
 	0x8749: "chan2", // 蝉
 	0x874a: "ding4", // 蝊
@@ -20441,7 +20442,7 @@ var CJKreadings = map[rune]string{
 	0x875c: "fu4", // 蝜
 	0x875d: "yuan2", // 蝝
 	0x875e: "mei4", // 蝞
-	0x875f: "wei5", // 蝟
+	0x875f: "wei4", // 蝟
 	0x8760: "fu2", // 蝠
 	0x8761: "ru2", // 蝡
 	0x8762: "xie2", // 蝢
@@ -20544,7 +20545,7 @@ var CJKreadings = map[rune]string{
 	0x87c3: "wan4", // 蟃
 	0x87c4: "zhe2", // 蟄
 	0x87c5: "zhe4", // 蟅
-	0x87c6: "ma5", // 蟆
+	0x87c6: "ma2", // 蟆
 	0x87c7: "ma2", // 蟇
 	0x87c8: "guo1", // 蟈
 	0x87c9: "liu2", // 蟉
@@ -20607,7 +20608,7 @@ var CJKreadings = map[rune]string{
 	0x8802: "she4", // 蠂
 	0x8803: "luo3", // 蠃
 	0x8804: "qin2", // 蠄
-	0x8805: "ying5", // 蠅
+	0x8805: "ying2", // 蠅
 	0x8806: "chai4", // 蠆
 	0x8807: "li4", // 蠇
 	0x8808: "zei2", // 蠈
@@ -20779,7 +20780,7 @@ var CJKreadings = map[rune]string{
 	0x88ae: "ni5", // 袮
 	0x88af: "bo2", // 袯
 	0x88b0: "bo1", // 袰
-	0x88b1: "fu5", // 袱
+	0x88b1: "fu2", // 袱
 	0x88b2: "chi3", // 袲
 	0x88b3: "chi3", // 袳
 	0x88b4: "ku4", // 袴
@@ -20827,7 +20828,7 @@ var CJKreadings = map[rune]string{
 	0x88de: "shui4", // 裞
 	0x88df: "sha1", // 裟
 	0x88e0: "qun2", // 裠
-	0x88e1: "li5", // 裡
+	0x88e1: "li3", // 裡
 	0x88e2: "lian2", // 裢
 	0x88e3: "lian3", // 裣
 	0x88e4: "ku4", // 裤
@@ -20985,7 +20986,7 @@ var CJKreadings = map[rune]string{
 	0x897c: "yi4", // 襼
 	0x897d: "lan5", // 襽
 	0x897e: "ya4", // 襾
-	0x897f: "xi5", // 西
+	0x897f: "xi1", // 西
 	0x8980: "xi1", // 覀
 	0x8981: "yao4", // 要
 	0x8982: "feng3", // 覂
@@ -21133,7 +21134,7 @@ var CJKreadings = map[rune]string{
 	0x8a10: "jie2", // 訐
 	0x8a11: "yi2", // 訑
 	0x8a12: "ren4", // 訒
-	0x8a13: "xun5", // 訓
+	0x8a13: "xun4", // 訓
 	0x8a14: "yin2", // 訔
 	0x8a15: "shan4", // 訕
 	0x8a16: "qi4", // 訖
@@ -21166,7 +21167,7 @@ var CJKreadings = map[rune]string{
 	0x8a31: "xu3", // 許
 	0x8a32: "yi4", // 訲
 	0x8a33: "yi4", // 訳
-	0x8a34: "su5", // 訴
+	0x8a34: "su4", // 訴
 	0x8a35: "chi1", // 訵
 	0x8a36: "he1", // 訶
 	0x8a37: "shen1", // 訷
@@ -21458,7 +21459,7 @@ var CJKreadings = map[rune]string{
 	0x8b55: "wu2", // 譕
 	0x8b56: "zen4", // 譖
 	0x8b57: "zha2", // 譗
-	0x8b58: "shi5", // 識
+	0x8b58: "shi2", // 識
 	0x8b59: "qiao4", // 譙
 	0x8b5a: "tan2", // 譚
 	0x8b5b: "zen4", // 譛
@@ -21543,7 +21544,7 @@ var CJKreadings = map[rune]string{
 	0x8baa: "shan4", // 讪
 	0x8bab: "qi4", // 讫
 	0x8bac: "tuo1", // 讬
-	0x8bad: "xun5", // 训
+	0x8bad: "xun4", // 训
 	0x8bae: "yi4", // 议
 	0x8baf: "xun4", // 讯
 	0x8bb0: "ji4", // 记
@@ -21568,10 +21569,10 @@ var CJKreadings = map[rune]string{
 	0x8bc3: "he1", // 诃
 	0x8bc4: "ping2", // 评
 	0x8bc5: "zu3", // 诅
-	0x8bc6: "shi5", // 识
+	0x8bc6: "shi2", // 识
 	0x8bc7: "xiong4", // 诇
 	0x8bc8: "zha4", // 诈
-	0x8bc9: "su5", // 诉
+	0x8bc9: "su4", // 诉
 	0x8bca: "zhen3", // 诊
 	0x8bcb: "di3", // 诋
 	0x8bcc: "zhou1", // 诌
@@ -22441,7 +22442,7 @@ var CJKreadings = map[rune]string{
 	0x8f2c: "liang2", // 輬
 	0x8f2d: "ruan3", // 輭
 	0x8f2e: "rou2", // 輮
-	0x8f2f: "ji5", // 輯
+	0x8f2f: "ji2", // 輯
 	0x8f30: "yang2", // 輰
 	0x8f31: "xian2", // 輱
 	0x8f32: "chuan2", // 輲
@@ -22539,7 +22540,7 @@ var CJKreadings = map[rune]string{
 	0x8f8e: "zi1", // 辎
 	0x8f8f: "cou4", // 辏
 	0x8f90: "fu2", // 辐
-	0x8f91: "ji5", // 辑
+	0x8f91: "ji2", // 辑
 	0x8f92: "wen1", // 辒
 	0x8f93: "shu1", // 输
 	0x8f94: "pei4", // 辔
@@ -23014,7 +23015,7 @@ var CJKreadings = map[rune]string{
 	0x9169: "ming3", // 酩
 	0x916a: "lao4", // 酪
 	0x916b: "chuo4", // 酫
-	0x916c: "chou5", // 酬
+	0x916c: "chou2", // 酬
 	0x916d: "you4", // 酭
 	0x916e: "tong2", // 酮
 	0x916f: "zhi3", // 酯
@@ -23355,7 +23356,7 @@ var CJKreadings = map[rune]string{
 	0x92be: "hong4", // 銾
 	0x92bf: "zhong1", // 銿
 	0x92c0: "tou1", // 鋀
-	0x92c1: "l̈u3", // 鋁
+	0x92c1: "lv3", // 鋁
 	0x92c2: "mei2", // 鋂
 	0x92c3: "lang2", // 鋃
 	0x92c4: "wan3", // 鋄
@@ -23732,7 +23733,7 @@ var CJKreadings = map[rune]string{
 	0x9437: "ye4", // 鐷
 	0x9438: "duo2", // 鐸
 	0x9439: "guo3", // 鐹
-	0x943a: "dang5", // 鐺
+	0x943a: "dang1", // 鐺
 	0x943b: "ju4", // 鐻
 	0x943c: "fen2", // 鐼
 	0x943d: "da2", // 鐽
@@ -23893,9 +23894,9 @@ var CJKreadings = map[rune]string{
 	0x94d8: "ye2", // 铘
 	0x94d9: "nao2", // 铙
 	0x94da: "zhi4", // 铚
-	0x94db: "dang5", // 铛
+	0x94db: "dang1", // 铛
 	0x94dc: "tong2", // 铜
-	0x94dd: "l̈u3", // 铝
+	0x94dd: "lv3", // 铝
 	0x94de: "diao4", // 铞
 	0x94df: "yin1", // 铟
 	0x94e0: "kai3", // 铠
@@ -25175,7 +25176,7 @@ var CJKreadings = map[rune]string{
 	0x99da: "yang3", // 駚
 	0x99db: "shi3", // 駛
 	0x99dc: "bi4", // 駜
-	0x99dd: "tuo5", // 駝
+	0x99dd: "tuo2", // 駝
 	0x99de: "tuo2", // 駞
 	0x99df: "si4", // 駟
 	0x99e0: "liu2", // 駠
@@ -25308,7 +25309,7 @@ var CJKreadings = map[rune]string{
 	0x9a5f: "zhou4", // 驟
 	0x9a60: "yan4", // 驠
 	0x9a61: "long2", // 驡
-	0x9a62: "l̈u2", // 驢
+	0x9a62: "lv2", // 驢
 	0x9a63: "teng2", // 驣
 	0x9a64: "xiang1", // 驤
 	0x9a65: "ji4", // 驥
@@ -25326,7 +25327,7 @@ var CJKreadings = map[rune]string{
 	0x9a71: "qu1", // 驱
 	0x9a72: "ri4", // 驲
 	0x9a73: "bo2", // 驳
-	0x9a74: "l̈u2", // 驴
+	0x9a74: "lv2", // 驴
 	0x9a75: "zang3", // 驵
 	0x9a76: "shi3", // 驶
 	0x9a77: "si4", // 驷
@@ -25334,7 +25335,7 @@ var CJKreadings = map[rune]string{
 	0x9a79: "ju1", // 驹
 	0x9a7a: "zou1", // 驺
 	0x9a7b: "zhu4", // 驻
-	0x9a7c: "tuo5", // 驼
+	0x9a7c: "tuo2", // 驼
 	0x9a7d: "nu2", // 驽
 	0x9a7e: "jia4", // 驾
 	0x9a7f: "yi4", // 驿
@@ -26092,7 +26093,7 @@ var CJKreadings = map[rune]string{
 	0x9d6f: "bei1", // 鵯
 	0x9d70: "diao1", // 鵰
 	0x9d71: "lu4", // 鵱
-	0x9d72: "que5", // 鵲
+	0x9d72: "que4", // 鵲
 	0x9d73: "jian1", // 鵳
 	0x9d74: "ju2", // 鵴
 	0x9d75: "tu4", // 鵵
@@ -26115,7 +26116,7 @@ var CJKreadings = map[rune]string{
 	0x9d86: "lai2", // 鶆
 	0x9d87: "dong1", // 鶇
 	0x9d88: "qi1", // 鶈
-	0x9d89: "chun5", // 鶉
+	0x9d89: "chun2", // 鶉
 	0x9d8a: "geng1", // 鶊
 	0x9d8b: "ju1", // 鶋
 	0x9d8c: "jue2", // 鶌
@@ -26308,14 +26309,14 @@ var CJKreadings = map[rune]string{
 	0x9e47: "xian2", // 鹇
 	0x9e48: "ti2", // 鹈
 	0x9e49: "wu3", // 鹉
-	0x9e4a: "que5", // 鹊
+	0x9e4a: "que4", // 鹊
 	0x9e4b: "miao2", // 鹋
 	0x9e4c: "an1", // 鹌
 	0x9e4d: "kun1", // 鹍
 	0x9e4e: "bei1", // 鹎
 	0x9e4f: "peng2", // 鹏
 	0x9e50: "qian1", // 鹐
-	0x9e51: "chun5", // 鹑
+	0x9e51: "chun2", // 鹑
 	0x9e52: "geng1", // 鹒
 	0x9e53: "yuan1", // 鹓
 	0x9e54: "su4", // 鹔
@@ -27309,6 +27310,7 @@ var CJKreadings = map[rune]string{
 	0x20988: "bi4", // 𠦈
 	0x2098a: "han2", // 𠦊
 	0x2098b: "jing4", // 𠦋
+	0x2098c: "xi4", // 𠦌
 	0x2098e: "qin4", // 𠦎
 	0x2098f: "cuo2", // 𠦏
 	0x20990: "ci4", // 𠦐
