@@ -1,4 +1,4 @@
-// $Id: radical_collator.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
+// $Id: radical_collator.go,v bd18129594c4 2014/07/30 08:51:58 leoliu $
 
 // radical_collator.go
 package main
@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"unicode"
 	"unicode/utf8"
+
+	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/CJK"
 )
 
 // 汉字按部首-除部首笔画数排序，汉字按部首分组排在英文字母组后面
@@ -14,7 +16,7 @@ type RadicalIndexCollator struct{}
 
 func (_ RadicalIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 	// 分组：数字、符号、字母 A..Z
-	groups := make([]IndexGroup, 2+26+MAX_RADICAL)
+	groups := make([]IndexGroup, 2+26+CJK.MAX_RADICAL)
 	if style.headings_flag > 0 {
 		groups[0].name = style.numhead_positive
 		groups[1].name = style.symhead_positive
@@ -30,13 +32,13 @@ func (_ RadicalIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
 			i++
 		}
 	}
-	for r, i := 1, 2+26; r < MAX_RADICAL+1; r++ {
+	for r, i := 1, 2+26; r < CJK.MAX_RADICAL+1; r++ {
 		var radicalName string
-		if CJKRadical[r].simplified != 0 && style.radical_simplified_flag != 0 {
+		if CJK.Radicals[r].Simplified != 0 && style.radical_simplified_flag != 0 {
 			radicalName = fmt.Sprintf("%c%s%c%s",
-				CJKRadical[r].origin, style.radical_simplified_prefix, CJKRadical[r].simplified, style.radical_simplified_suffix)
+				CJK.Radicals[r].Origin, style.radical_simplified_prefix, CJK.Radicals[r].Simplified, style.radical_simplified_suffix)
 		} else {
-			radicalName = string(CJKRadical[r].origin)
+			radicalName = string(CJK.Radicals[r].Origin)
 		}
 		groups[i].name = style.radical_prefix + radicalName + style.radical_suffix
 		i++
@@ -53,9 +55,9 @@ func (_ RadicalIndexCollator) Group(entry *IndexEntry) int {
 		return 0
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'
-	case CJKRadicalStrokes[first] != "":
+	case CJK.RadicalStrokes[first] != "":
 		// 首字部首
-		return 2 + 26 + (CJKRadicalStrokes[first].Radical() - 1)
+		return 2 + 26 + (CJK.RadicalStrokes[first].Radical() - 1)
 	default:
 		// 符号组
 		return 1
@@ -64,7 +66,7 @@ func (_ RadicalIndexCollator) Group(entry *IndexEntry) int {
 
 // 按汉字部首、除部首笔画数序比较两个字符大小
 func (_ RadicalIndexCollator) RuneCmp(a, b rune) int {
-	a_rs, b_rs := CJKRadicalStrokes[a], CJKRadicalStrokes[b]
+	a_rs, b_rs := CJK.RadicalStrokes[a], CJK.RadicalStrokes[b]
 	switch {
 	case a_rs == "" && b_rs == "":
 		return RuneCmpIgnoreCases(a, b)
@@ -87,7 +89,7 @@ func (_ RadicalIndexCollator) IsLetter(r rune) bool {
 	switch {
 	case 'a' <= r && r <= 'z':
 		return true
-	case CJKRadicalStrokes[r] != "":
+	case CJK.RadicalStrokes[r] != "":
 		return true
 	default:
 		return false
