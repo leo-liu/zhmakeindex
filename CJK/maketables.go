@@ -1,14 +1,19 @@
-// $Id$
+// $Id: maketables.go,v f9159d45d081 2014/07/30 11:36:00 leoliu $
 
 // +build ignore
 
 package main
 
 import (
+	"archive/zip"
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"strconv"
@@ -26,20 +31,62 @@ func main() {
 	output_reading := flag.Bool("reading", true, "输出读音表")
 	output_radical := flag.Bool("radical", true, "输出部首表")
 	flag.Parse()
+
+	// 数据文件 Unihan.zip
+	var unihan *zip.Reader
+	if *output_stroke || *output_reading || *output_radical {
+		unihan = readUnihan()
+	}
 	if *output_stroke {
-		make_stroke_table(*outdir)
+		make_stroke_table(*outdir, unihan)
 	}
 	if *output_reading {
-		make_reading_table(*outdir)
+		make_reading_table(*outdir, unihan)
 	}
 	if *output_radical {
-		make_radical_table(*outdir)
+		make_radical_table(*outdir, unihan)
 	}
+}
+
+// 读取 Unihan 数据文件
+func readUnihan() *zip.Reader {
+	resp, err := http.Get("http://www.unicode.org/Public/UCD/latest/ucd/Unihan.zip")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("bad GET status for Unihan.zip: %d", resp.Status)
+	}
+	buffer, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	unihan, err := zip.NewReader(bytes.NewReader(buffer), int64(len(buffer)))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return unihan
+}
+
+func getUnihanFile(unihan *zip.Reader, file string) io.ReadCloser {
+	var unihan_file io.ReadCloser
+	var err error
+	for _, f := range unihan.File {
+		if f.Name == file {
+			unihan_file, err = f.Open()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			break
+		}
+	}
+	return unihan_file
 }
 
 const MAX_CODEPOINT = 0x40000 // 覆盖 Unicode 第 0、1、2、3 平面
 
-func make_stroke_table(outdir string) {
+func make_stroke_table(outdir string, unihan *zip.Reader) {
 	var CJKstrokes [MAX_CODEPOINT][]byte
 	var maxStroke int = 0
 	var unicodeVersion string
@@ -78,10 +125,7 @@ func make_stroke_table(outdir string) {
 		}
 	}
 	// 使用 Unihan 数据库，读取笔画数补全其他字符
-	unihan_file, err := os.Open("Unihan_DictionaryLikeData.txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	unihan_file := getUnihanFile(unihan, "Unihan_DictionaryLikeData.txt")
 	defer unihan_file.Close()
 	scanner = bufio.NewScanner(unihan_file)
 	for scanner.Scan() {
@@ -145,13 +189,10 @@ func isNotDigit(r rune) bool {
 	return !unicode.IsDigit(r)
 }
 
-func make_reading_table(outdir string) {
+func make_reading_table(outdir string, unihan *zip.Reader) {
 	// 读取 Unihan 读音表
 	reading_table := make(map[rune]*ReadingEntry)
-	reading_file, err := os.Open("Unihan_Readings.txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
+	reading_file := getUnihanFile(unihan, "Unihan_Readings.txt")
 	defer reading_file.Close()
 	scanner := bufio.NewScanner(reading_file)
 	largest := rune(0)
@@ -297,11 +338,11 @@ var Tones = map[rune]int{
 	'ü': 5,
 }
 
-func make_radical_table(outdir string) {
+func make_radical_table(outdir string, unihan *zip.Reader) {
 	// 读入部首
 	CJKRadical := read_radicals()
 	// 读入部首、除部首笔画
-	version, CJKRadicalStrokes := read_radical_strokes()
+	version, CJKRadicalStrokes := read_radical_strokes(unihan)
 	// 单独增加数字“〇”的部首、除部首笔画（乙部 0 画）
 	CJKRadicalStrokes['〇'] = MakeRadicalStroke('〇', 5, 0)
 	// 输出
@@ -368,13 +409,17 @@ const MAX_RADICAL = 214
 
 // 读取 CJKRadicals.txt 获取康熙字典部首表
 func read_radicals() [MAX_RADICAL + 1]Radical {
-	radical_file, err := os.Open("CJKRadicals.txt")
+	resp, err := http.Get("http://www.unicode.org/Public/UCD/latest/ucd/CJKRadicals.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer radical_file.Close()
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalf("bad GET status for CJKRadicals.txt: %d", resp.Status)
+	}
+	defer resp.Body.Close()
+
 	var CJKRadical [MAX_RADICAL + 1]Radical
-	scanner := bufio.NewScanner(radical_file)
+	scanner := bufio.NewScanner(resp.Body)
 	for scanner.Scan() {
 		if scanner.Err() != nil {
 			log.Fatalln(scanner.Err())
@@ -416,11 +461,8 @@ func MakeRadicalStroke(r rune, radical, stroke int) RadicalStroke {
 }
 
 // 读取 Unihan_IRGSources.txt 获取部首笔画数表
-func read_radical_strokes() (version string, CJKRadicalStrokes []RadicalStroke) {
-	radical_file, err := os.Open("Unihan_IRGSources.txt")
-	if err != nil {
-		log.Fatalln(err)
-	}
+func read_radical_strokes(unihan *zip.Reader) (version string, CJKRadicalStrokes []RadicalStroke) {
+	radical_file := getUnihanFile(unihan, "Unihan_IRGSources.txt")
 	defer radical_file.Close()
 	CJKRadicalStrokes = make([]RadicalStroke, MAX_CODEPOINT)
 	scanner := bufio.NewScanner(radical_file)
