@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
+// $Id: reading_collator.go,v bd18129594c4 2014/07/30 08:51:58 leoliu $
 
 // reading_collator.go
 package main
@@ -6,6 +6,8 @@ package main
 import (
 	"unicode"
 	"unicode/utf8"
+
+	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/CJK"
 )
 
 // 汉字按拼音排序，按拼音首字母与英文一起分组
@@ -41,9 +43,9 @@ func (_ ReadingIndexCollator) Group(entry *IndexEntry) int {
 		return 0
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'
-	case CJKreadings[first] != "":
+	case CJK.Readings[first] != "":
 		// 拼音首字母
-		reading_first := int(CJKreadings[first][0])
+		reading_first := int(CJK.Readings[first][0])
 		return 2 + reading_first - 'a'
 	default:
 		// 符号组
@@ -53,7 +55,7 @@ func (_ ReadingIndexCollator) Group(entry *IndexEntry) int {
 
 // 按汉字读音比较两个字符，读音相同的，内码序
 func (_ ReadingIndexCollator) RuneCmp(a, b rune) int {
-	a_reading, b_reading := CJKreadings[a], CJKreadings[b]
+	a_reading, b_reading := CJK.Readings[a], CJK.Readings[b]
 	switch {
 	case a_reading == "" && b_reading == "":
 		return RuneCmpIgnoreCases(a, b)
@@ -76,7 +78,7 @@ func (_ ReadingIndexCollator) IsLetter(r rune) bool {
 	switch {
 	case 'a' <= r && r <= 'z':
 		return true
-	case CJKreadings[r] != "":
+	case CJK.Readings[r] != "":
 		return true
 	default:
 		return false
