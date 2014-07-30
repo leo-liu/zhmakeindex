@@ -1,4 +1,4 @@
-// $Id: radical_collator.go,v e6234f53fa81 2014/07/30 16:44:48 leoliu $
+// $Id: radical_collator.go,v d89c909a7f3e 2014/07/30 17:05:36 leoliu $
 
 // radical_collator.go
 package main
@@ -8,7 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"code.google.com/p/leoliu-tex-pkg/trunk/zhmakeindex/CJK"
+	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/CJK"
 )
 
 // 汉字按部首-除部首笔画数排序，汉字按部首分组排在英文字母组后面
