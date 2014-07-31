@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v bd18129594c4 2014/07/30 08:51:58 leoliu $
+// $Id: reading_collator.go,v d89c909a7f3e 2014/07/30 17:05:36 leoliu $
 
 // reading_collator.go
 package main
