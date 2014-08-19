@@ -1,4 +1,4 @@
-// $Id: input.go,v cd063e5efbf1 2014/02/08 15:13:33 LeoLiu $
+// $Id: input.go,v d617893d4c54 2014/08/19 13:22:49 leoliu $
 
 package main
 
@@ -493,58 +493,20 @@ func romanNumString(num int, upper bool) string {
 	if num < 1 {
 		return ""
 	}
+	type pair struct {
+		symbol string
+		value  int
+	}
+	var romanTable = []pair{
+		{"m", 1000}, {"cm", 900}, {"d", 500}, {"cd", 400}, {"c", 100}, {"xc", 90},
+		{"l", 50}, {"xl", 40}, {"x", 10}, {"ix", 9}, {"v", 5}, {"iv", 4}, {"i", 1},
+	}
 	var numstr []rune
-	for num > 1000 {
-		numstr = append(numstr, 'm')
-		num -= 1000
-	}
-	if num >= 900 {
-		numstr = append(numstr, 'c', 'm')
-		num -= 900
-	}
-	if num >= 500 {
-		numstr = append(numstr, 'd')
-		num -= 500
-	}
-	if num >= 400 {
-		numstr = append(numstr, 'c', 'd')
-		num -= 400
-	}
-	for num >= 100 {
-		numstr = append(numstr, 'c')
-		num -= 100
-	}
-	if num >= 90 {
-		numstr = append(numstr, 'x', 'c')
-		num -= 90
-	}
-	if num >= 50 {
-		numstr = append(numstr, 'l')
-		num -= 50
-	}
-	if num >= 40 {
-		numstr = append(numstr, 'x', 'l')
-		num -= 40
-	}
-	for num >= 10 {
-		numstr = append(numstr, 'x')
-		num -= 10
-	}
-	if num >= 9 {
-		numstr = append(numstr, 'i', 'x')
-		num -= 9
-	}
-	if num >= 5 {
-		numstr = append(numstr, 'v')
-		num -= 5
-	}
-	if num >= 4 {
-		numstr = append(numstr, 'i', 'v')
-		num -= 4
-	}
-	for num >= 1 {
-		numstr = append(numstr, 'i')
-		num--
+	for _, p := range romanTable {
+		for num > p.value {
+			numstr = append(numstr, []rune(p.symbol)...)
+			num -= p.value
+		}
 	}
 	if upper {
 		return strings.ToUpper(string(numstr))
