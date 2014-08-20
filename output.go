@@ -1,4 +1,4 @@
-// $Id: output.go,v 93f6f442188c 2014/08/20 16:36:15 leoliu $
+// $Id: output.go,v 76b101661244 2014/08/20 16:59:14 leoliu $
 
 package main
 
@@ -132,6 +132,7 @@ type IndexItem struct {
 	page  []PageRange
 }
 
+// 用于输出的页码区间
 type PageRange struct {
 	begin PageNumber
 	end   PageNumber
