@@ -1,4 +1,4 @@
-// $Id: output.go,v 6fc25bbb9696 2014/02/10 13:10:35 LeoLiu $
+// $Id: output.go,v 93f6f442188c 2014/08/20 16:36:15 leoliu $
 
 package main
 
@@ -133,8 +133,8 @@ type IndexItem struct {
 }
 
 type PageRange struct {
-	begin PageInput
-	end   PageInput
+	begin PageNumber
+	end   PageNumber
 }
 
 func (p *PageRange) diff() int {

@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
+// $Id: sorter.go,v 93f6f442188c 2014/08/20 16:36:15 leoliu $
 
 package main
 
@@ -220,21 +220,21 @@ func NewPageSorter(style *OutputStyle, option *OutputOptions) *PageSorter {
 }
 
 // 处理输入的页码，生成页码区间组
-func (sorter *PageSorter) Sort(pages []PageInput) []PageRange {
+func (sorter *PageSorter) Sort(pages []PageNumber) []PageRange {
 	//	debug.Println(pages)
 	var out []PageRange
 	// 合并前排序。传统 Makeindex 按原始输入的次序，在处理多个文件时可能不大好
 	if sorter.strict {
-		sort.Sort(PageInputSliceStrict{
-			PageInputSlice{pages: pages, sorter: sorter}})
+		sort.Sort(PageNumberSliceStrict{
+			PageNumberSlice{pages: pages, sorter: sorter}})
 	} else {
-		sort.Sort(PageInputSliceLoose{
-			PageInputSlice{pages: pages, sorter: sorter}})
+		sort.Sort(PageNumberSliceLoose{
+			PageNumberSlice{pages: pages, sorter: sorter}})
 	}
 	//debug.Println(pages)
 	// 使用一个栈来合并页码区间
 	// 这里的合并只将 1( 2 3 3) 合并为 1--3，不处理相邻区间，后者需要再做 Merge 操作
-	var stack []PageInput
+	var stack []PageNumber
 	for i := 0; i < len(pages); i++ {
 		p := pages[i]
 		//debug.Printf("处理页码 %s{%s} %s\n", p.encap, p.NumString(), p.rangetype)
@@ -345,26 +345,26 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 	return out
 }
 
-type PageInputSlice struct {
-	pages  []PageInput
+type PageNumberSlice struct {
+	pages  []PageNumber
 	sorter *PageSorter
 }
 
-func (p PageInputSlice) Len() int {
+func (p PageNumberSlice) Len() int {
 	return len(p.pages)
 }
 
-func (p PageInputSlice) Swap(i, j int) {
+func (p PageNumberSlice) Swap(i, j int) {
 	p.pages[i], p.pages[j] = p.pages[j], p.pages[i]
 }
 
-type PageInputSliceStrict struct {
-	PageInputSlice
+type PageNumberSliceStrict struct {
+	PageNumberSlice
 }
 
 // 先按 encap 类型比较，然后按页码类型，然后页码数值，最后是 rangetype，方便以后合并
 // 不同 encap 严格分离
-func (p PageInputSliceStrict) Less(i, j int) bool {
+func (p PageNumberSliceStrict) Less(i, j int) bool {
 	a, b := p.pages[i], p.pages[j]
 	if a.encap < b.encap {
 		return true
@@ -388,13 +388,13 @@ func (p PageInputSliceStrict) Less(i, j int) bool {
 	}
 }
 
-type PageInputSliceLoose struct {
-	PageInputSlice
+type PageNumberSliceLoose struct {
+	PageNumberSlice
 }
 
 // 先按页码类型比较，然后按页码数值，然后 rangetype，最后是 encap 类型，方便以后合并
 // 允许不同 encap 合并，接近传统的 Makeindex 行为
-func (p PageInputSliceLoose) Less(i, j int) bool {
+func (p PageNumberSliceLoose) Less(i, j int) bool {
 	a, b := p.pages[i], p.pages[j]
 	if p.sorter.precedence[a.format] < p.sorter.precedence[b.format] {
 		return true
