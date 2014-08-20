@@ -1,4 +1,4 @@
-// $Id: input.go,v d617893d4c54 2014/08/19 13:22:49 leoliu $
+// $Id: input.go,v 93f6f442188c 2014/08/20 16:36:15 leoliu $
 
 package main
 
@@ -107,7 +107,7 @@ func skipspaces(reader *NumberdReader) error {
 
 func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputStyle) (*IndexEntry, error) {
 	var entry IndexEntry
-	entry.pagelist = make([]PageInput, 1)
+	entry.pagelist = make([]PageNumber, 1)
 	// 跳过空白符
 	if err := skipspaces(reader); err != nil {
 		return nil, err
@@ -332,7 +332,7 @@ var ScanSyntaxError = errors.New("索引项语法错误")
 
 type IndexEntry struct {
 	level    []IndexEntryKV
-	pagelist []PageInput
+	pagelist []PageNumber
 }
 
 // 实现 rbtree.CompareFunc
@@ -365,20 +365,20 @@ type IndexEntryKV struct {
 	text string
 }
 
-type PageInput struct {
+type PageNumber struct {
 	page      int
 	format    NumFormat
 	encap     string
 	rangetype RangeType
 }
 
-func (p *PageInput) Empty() PageInput {
-	return PageInput{
+func (p *PageNumber) Empty() PageNumber {
+	return PageNumber{
 		page: 0, format: NUM_UNKNOWN, encap: p.encap, rangetype: PAGE_UNKNOWN,
 	}
 }
 
-func (p PageInput) String() string {
+func (p PageNumber) String() string {
 	return p.format.Format(p.page)
 }
 
