@@ -5,7 +5,8 @@
 \setmainfont[Ligatures=TeX]{CMU Serif}
 \setsansfont[Ligatures=TeX]{CMU Sans Serif}
 \setmonofont[Mapping=]{CMU Typewriter Text}
-\setCJKmainfont[BoldFont=FandolSong Bold,ItalicFont=KaiTi]{SimSun}
+\setCJKmainfont[BoldFont=FandolSong Bold,ItalicFont=FandolKai]{FandolSong}
+\newfontfamily\libertine{Linux Libertine O}
 
 \usepackage{pifont}
 \newcommand\gooditem{\item[\ding{51}]}
@@ -550,7 +551,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 最普通的场景，西文是按单词的首字母分组，中文则根据 "-z" 选项
 （\ref{subsec:newoption}~节）的不同，选择对应的分组，数字和其他符号单独分组。
 
-\zhm 的前 28 个分组是固定的，分别是数字、符号，以及 A--Z 的 26 个拉丁字母。按
+\zhm 的前 28 个分组是固定的，分别是符号、数字，以及 A--Z 的 26 个拉丁字母。按
 笔画排序时，后面是按总笔画数分组的汉字，共 64 组；按部首笔画排序时，后面是按康
 熙字典部首分组的汉字，共 214 组。详细情况见\autoref{tab:group}。
 
@@ -560,9 +561,9 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \toprule
 "-z" 选项 & 别名 & 前 28 个分组 & 后面的分组 \\
 \midrule
-\sort{pinyin} & \sort{reading} & 数字、符号、A, \ldots, Z & （无）\\
-\sort{bihua} & \sort{stroke}   & 数字、符号、A, \ldots, Z & 1 画、2 画、……、64 画（共 64 组） \\
-\sort{bushou} & \sort{radical} & 数字、符号、A, \ldots, Z & 一部、丨部、……、龠部（共 214 组） \\
+\sort{pinyin} & \sort{reading} & 符号、数字、A, \ldots, Z & （无）\\
+\sort{bihua} & \sort{stroke}   & 符号、数字、A, \ldots, Z & 1 画、2 画、……、64 画（共 64 组） \\
+\sort{bushou} & \sort{radical} & 符号、数字、A, \ldots, Z & 一部、丨部、……、龠部（共 214 组） \\
 \bottomrule
 \end{tabu}
 \end{table}
@@ -574,7 +575,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \index{数字}
 如果索引项的第一级排序项全部由数字组成，则该项会被分入数字分组；但如果条目的首
 个字符是数字，后面还有其他字符，则条目会被计入符号分组。除了阿拉伯数字，\zhm
-还将其他 Unicode 数字符号（如罗马数字“Ⅳ”、带圈数字“⑧”）也当作数字处理，但汉字
+还将其他 Unicode 数字符号（如罗马数字“{\libertine Ⅳ}”、带圈数字“{\libertine ⑧}”）也当作数字处理，但汉字
 数码“〇”被看作汉字处理。
 \index{〇}
 

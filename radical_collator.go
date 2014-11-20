@@ -1,4 +1,4 @@
-// $Id: radical_collator.go,v d89c909a7f3e 2014/07/30 17:05:36 leoliu $
+// $Id: radical_collator.go,v 67dbf3e2cf8d 2014/11/20 12:01:06 Liu $
 
 // radical_collator.go
 package main
@@ -15,18 +15,18 @@ import (
 type RadicalIndexCollator struct{}
 
 func (_ RadicalIndexCollator) InitGroups(style *OutputStyle) []IndexGroup {
-	// 分组：数字、符号、字母 A..Z
+	// 分组：符号、数字、字母 A..Z
 	groups := make([]IndexGroup, 2+26+CJK.MAX_RADICAL)
 	if style.headings_flag > 0 {
-		groups[0].name = style.numhead_positive
-		groups[1].name = style.symhead_positive
+		groups[0].name = style.symhead_positive
+		groups[1].name = style.numhead_positive
 		for alph, i := 'A', 2; alph <= 'Z'; alph++ {
 			groups[i].name = string(alph)
 			i++
 		}
 	} else if style.headings_flag < 0 {
-		groups[0].name = style.numhead_negative
-		groups[1].name = style.symhead_negative
+		groups[0].name = style.symhead_negative
+		groups[1].name = style.numhead_negative
 		for alph, i := 'a', 2; alph <= 'z'; alph++ {
 			groups[i].name = string(alph)
 			i++
@@ -52,7 +52,7 @@ func (_ RadicalIndexCollator) Group(entry *IndexEntry) int {
 	first = unicode.ToLower(first)
 	switch {
 	case IsNumString(entry.level[0].key):
-		return 0
+		return 1
 	case 'a' <= first && first <= 'z':
 		return 2 + int(first) - 'a'
 	case CJK.RadicalStrokes[first] != "":
@@ -60,7 +60,7 @@ func (_ RadicalIndexCollator) Group(entry *IndexEntry) int {
 		return 2 + 26 + (CJK.RadicalStrokes[first].Radical() - 1)
 	default:
 		// 符号组
-		return 1
+		return 0
 	}
 }
 
