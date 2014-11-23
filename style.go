@@ -1,16 +1,16 @@
-// $Id: style.go,v d89c909a7f3e 2014/07/30 17:05:36 leoliu $
+// $Id: style.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
 
 package main
 
 import (
 	"bufio"
+	"golang.org/x/text/transform"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
-	"code.google.com/p/go.text/transform"
 
 	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/kpathsea"
 )
