@@ -1,16 +1,16 @@
-// $Id: input.go,v 76b101661244 2014/08/20 16:59:14 leoliu $
+// $Id: input.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
 
 package main
 
 import (
 	"errors"
+	"golang.org/x/text/transform"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
-	"code.google.com/p/go.text/transform"
 
 	"github.com/yasushi-saito/rbtree"
 )

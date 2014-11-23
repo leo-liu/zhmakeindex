@@ -1,4 +1,4 @@
-// $Id: main.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
+// $Id: main.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -13,11 +13,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.google.com/p/go.text/encoding"
-	"code.google.com/p/go.text/encoding/simplifiedchinese"
-	"code.google.com/p/go.text/encoding/traditionalchinese"
-	"code.google.com/p/go.text/encoding/unicode"
-	"code.google.com/p/go.text/transform"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/traditionalchinese"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 var (
