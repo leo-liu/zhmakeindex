@@ -1,4 +1,4 @@
-// $Id: pagenumber.go,v 76b101661244 2014/08/20 16:59:14 leoliu $
+// $Id$
 
 package main
 
@@ -9,21 +9,95 @@ import (
 	"unicode"
 )
 
-type PageNumber struct {
-	page      int
-	format    NumFormat
-	encap     string
-	rangetype RangeType
+// 最大的整数
+const MaxInt = int(^uint(0) >> 1)
+
+type Page struct {
+	numbers    []PageNumber
+	compositor string
+	encap      string
+	rangetype  RangeType
 }
 
-func (p *PageNumber) Empty() PageNumber {
-	return PageNumber{
-		page: 0, format: NUM_UNKNOWN, encap: p.encap, rangetype: PAGE_UNKNOWN,
+// 按 p 生成一个与之输出类型相同的空页码
+func (p *Page) Empty() *Page {
+	return &Page{
+		numbers:    nil,
+		compositor: p.compositor,
+		encap:      p.encap,
+		rangetype:  PAGE_UNKNOWN,
 	}
 }
 
+func (p *Page) String() string {
+	var page_str []string
+	for _, pn := range p.numbers {
+		page_str = append(page_str, pn.String())
+	}
+	return strings.Join(page_str, p.compositor)
+}
+
+// 判断两个页码是否类型一致
+// 两个页码类型一致指它们有相同多个类型相同的数字构成
+func (page *Page) Compatible(other *Page) bool {
+	if len(page.numbers) != len(other.numbers) {
+		return false
+	}
+	for i := 0; i < len(page.numbers); i++ {
+		if page.numbers[i].format != other.numbers[i].format {
+			return false
+		}
+	}
+	return true
+}
+
+// 求两个页码 page 与 other 之差（绝对值）
+// 如果不一致，返回 -1；如果不是最后一段数字不同，返回 MaxInt
+func (page *Page) Diff(other *Page) int {
+	if !page.Compatible(other) {
+		return -1
+	}
+	depth := len(page.numbers)
+	for i := 0; i < depth-1; i++ {
+		if page.numbers[i].num != other.numbers[i].num {
+			return MaxInt
+		}
+	}
+	abs := func(x int) int {
+		if x >= 0 {
+			return x
+		} else {
+			return -x
+		}
+	}
+	return abs(page.numbers[depth-1].num - other.numbers[depth-1].num)
+}
+
+// 按字典序比较两个页码数字串的大小，返回负、零、正值
+// 不同类型的序关系由参数 precedence 给出，不一致的页码仍有大小关系
+// 不比较页码的 encap、rangetype 信息
+func (page *Page) Cmp(other *Page, precedence map[NumFormat]int) int {
+	for i := 0; i < len(page.numbers) && i < len(other.numbers); i++ {
+		a, b := page.numbers[i], other.numbers[i]
+		if precedence[a.format] != precedence[b.format] {
+			return precedence[a.format] - precedence[b.format]
+		} else if a.num != b.num {
+			return a.num - b.num
+		}
+	}
+	if len(page.numbers) != len(other.numbers) {
+		return len(page.numbers) - len(other.numbers)
+	}
+	return 0
+}
+
+type PageNumber struct {
+	format NumFormat
+	num    int
+}
+
 func (p PageNumber) String() string {
-	return p.format.Format(p.page)
+	return p.format.Format(p.num)
 }
 
 type NumFormat int
@@ -37,28 +111,42 @@ const (
 	NUM_ALPH_UPPER
 )
 
+// 将字符串解析为一串页码数字
+func scanPage(token []rune, compositor string) ([]PageNumber, error) {
+	numstr_list := strings.Split(string(token), compositor)
+	var nums []PageNumber
+	for _, numstr := range numstr_list {
+		pn, err := scanNumber([]rune(numstr))
+		if err != nil {
+			return nil, err
+		}
+		nums = append(nums, pn)
+	}
+	return nums, nil
+}
+
 // 读入数字，并粗略判断其格式
-func scanNumber(token []rune) (NumFormat, int, error) {
+func scanNumber(token []rune) (PageNumber, error) {
 	if len(token) == 0 {
-		return 0, 0, ScanSyntaxError
+		return PageNumber{}, ScanSyntaxError
 	}
 	if r := token[0]; unicode.IsDigit(r) {
 		num, err := scanArabic(token)
-		return NUM_ARABIC, num, err
-	} else if RomanLowerValue[r] != 0 {
+		return PageNumber{format: NUM_ARABIC, num: num}, err
+	} else if romanLowerValue[r] != 0 {
 		num, err := scanRomanLower(token)
-		return NUM_ROMAN_LOWER, num, err
-	} else if RomanUpperValue[r] != 0 {
+		return PageNumber{format: NUM_ROMAN_LOWER, num: num}, err
+	} else if romanUpperValue[r] != 0 {
 		num, err := scanRomanUpper(token)
-		return NUM_ROMAN_UPPER, num, err
+		return PageNumber{format: NUM_ROMAN_UPPER, num: num}, err
 	} else if 'a' <= r && r <= 'z' {
 		num, err := scanAlphLower(token)
-		return NUM_ALPH_LOWER, num, err
+		return PageNumber{format: NUM_ALPH_LOWER, num: num}, err
 	} else if 'A' <= r && r <= 'Z' {
 		num, err := scanAlphUpper(token)
-		return NUM_ALPH_UPPER, num, err
+		return PageNumber{format: NUM_ALPH_UPPER, num: num}, err
 	}
-	return 0, 0, ScanSyntaxError
+	return PageNumber{}, ScanSyntaxError
 }
 
 func scanArabic(token []rune) (int, error) {
@@ -70,11 +158,11 @@ func scanArabic(token []rune) (int, error) {
 }
 
 func scanRomanLower(token []rune) (int, error) {
-	return scanRoman(token, RomanLowerValue)
+	return scanRoman(token, romanLowerValue)
 }
 
 func scanRomanUpper(token []rune) (int, error) {
-	return scanRoman(token, RomanUpperValue)
+	return scanRoman(token, romanUpperValue)
 }
 
 func scanRoman(token []rune, romantable map[rune]int) (int, error) {
@@ -92,10 +180,10 @@ func scanRoman(token []rune, romantable map[rune]int) (int, error) {
 	return num, nil
 }
 
-var RomanLowerValue = map[rune]int{
+var romanLowerValue = map[rune]int{
 	'i': 1, 'v': 5, 'x': 10, 'l': 50, 'c': 100, 'd': 500, 'm': 1000,
 }
-var RomanUpperValue = map[rune]int{
+var romanUpperValue = map[rune]int{
 	'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000,
 }
 

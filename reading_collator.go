@@ -1,6 +1,5 @@
 // $Id$
 
-// reading_collator.go
 package main
 
 import (

@@ -1,4 +1,4 @@
-// $Id: output.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
+// $Id$
 
 package main
 
@@ -134,16 +134,12 @@ type IndexItem struct {
 
 // 用于输出的页码区间
 type PageRange struct {
-	begin PageNumber
-	end   PageNumber
+	begin *Page
+	end   *Page
 }
 
-func (p *PageRange) diff() int {
-	if p.begin.format == p.end.format {
-		return p.end.page - p.begin.page
-	} else { // 不匹配的区间
-		return -1
-	}
+func (p *PageRange) Diff() int {
+	return p.end.Diff(p.begin)
 }
 
 // 输出页码区间
@@ -151,20 +147,20 @@ func (p *PageRange) Write(out io.Writer, style *OutputStyle) {
 	var rangestr string
 	switch {
 	// 单页
-	case p.diff() == 0:
+	case p.Diff() == 0:
 		rangestr = p.begin.String()
 	// 由单页合并得到的两页的区间，且未设置 suffix_2p，视为独立的两页
 	case p.begin.rangetype == PAGE_NORMAL && p.end.rangetype == PAGE_NORMAL &&
-		p.diff() == 1 && style.suffix_2p == "":
+		p.Diff() == 1 && style.suffix_2p == "":
 		rangestr = p.begin.String() + style.delim_n + p.end.String()
 	// 两页的区间，设置了 suffix_2p
-	case p.diff() == 1 && style.suffix_2p != "":
+	case p.Diff() == 1 && style.suffix_2p != "":
 		rangestr = p.begin.String() + style.suffix_2p
 	// 三页的区间，设置了 suffix_3p
-	case p.diff() == 2 && style.suffix_3p != "":
+	case p.Diff() == 2 && style.suffix_3p != "":
 		rangestr = p.begin.String() + style.suffix_3p
 	// 三页或更长的区间，设置了 suffix_mp
-	case p.diff() >= 2 && style.suffix_mp != "":
+	case p.Diff() >= 2 && style.suffix_mp != "":
 		rangestr = p.begin.String() + style.suffix_mp
 	// 普通的区间
 	default:
