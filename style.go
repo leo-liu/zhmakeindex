@@ -1,4 +1,4 @@
-// $Id: style.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
+// $Id$
 
 package main
 
@@ -12,7 +12,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/kpathsea"
+	"code.google.com/p/zhmakeindex/kpathsea"
 )
 
 // 输入格式

@@ -1,0 +1,16 @@
+syntax: glob
+**.swp
+**.aux
+**.glo
+**.hd
+**.out
+**.sty
+**.tmp
+**.zip
+**.synctex.gz
+**~
+bin/darwin_x64/zhmakeindex
+bin/darwin_x86/zhmakeindex
+bin/linux_x64/zhmakeindex
+bin/linux_x86/zhmakeindex
+doc/zhmakeindex.pdf

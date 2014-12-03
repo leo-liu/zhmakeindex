@@ -1,4 +1,4 @@
-// $Id: reading_collator.go,v 67dbf3e2cf8d 2014/11/20 12:01:06 Liu $
+// $Id$
 
 // reading_collator.go
 package main
@@ -7,7 +7,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"code.google.com/p/leoliu-tex-pkg/zhmakeindex/CJK"
+	"code.google.com/p/zhmakeindex/CJK"
 )
 
 // 汉字按拼音排序，按拼音首字母与英文一起分组
