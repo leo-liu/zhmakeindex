@@ -1,16 +1,17 @@
-// $Id: input.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
+// $Id$
 
 package main
 
 import (
 	"errors"
-	"golang.org/x/text/transform"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
+
+	"golang.org/x/text/transform"
 
 	"github.com/yasushi-saito/rbtree"
 )
@@ -105,7 +106,7 @@ func skipspaces(reader *NumberdReader) error {
 
 func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputStyle) (*IndexEntry, error) {
 	var entry IndexEntry
-	entry.pagelist = make([]PageNumber, 1)
+	page := new(Page)
 	// 跳过空白符
 	if err := skipspaces(reader); err != nil {
 		return nil, err
@@ -135,7 +136,7 @@ func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputSty
 	escaped := false
 	arg_depth := 0
 	var token []rune
-	entry.pagelist[0].rangetype = PAGE_NORMAL
+	page.rangetype = PAGE_NORMAL
 L_scan_kv:
 	for {
 		r, _, err := reader.ReadRune()
@@ -238,9 +239,9 @@ L_scan_kv:
 				// 注意 encap 符号后不能直接加 arg_open、arg_close 等符号
 				return nil, ScanSyntaxError
 			} else if r == style.range_open {
-				entry.pagelist[0].rangetype = PAGE_OPEN
+				page.rangetype = PAGE_OPEN
 			} else if r == style.range_close {
-				entry.pagelist[0].rangetype = PAGE_CLOSE
+				page.rangetype = PAGE_CLOSE
 			} else if r == style.quote {
 				quoted = true
 			} else {
@@ -264,7 +265,7 @@ L_scan_kv:
 				arg_depth++
 			} else if r == style.arg_close {
 				if arg_depth == 0 {
-					entry.pagelist[0].encap = string(token)
+					page.encap = string(token)
 					break L_scan_kv
 				} else {
 					token = append(token, r)
@@ -307,7 +308,7 @@ L_scan_page:
 			}
 		case SCAN_PAGE:
 			if r == style.arg_close {
-				entry.pagelist[0].format, entry.pagelist[0].page, err = scanNumber(token)
+				page.numbers, err = scanPage(token, page.compositor)
 				if err != nil {
 					return nil, err
 				}
@@ -322,6 +323,7 @@ L_scan_page:
 		}
 		// 未实现对 style.page_compositor 的处理
 	}
+	entry.pagelist = append(entry.pagelist, page)
 	// debug.Println(entry) //// DEBUG only
 	return &entry, nil
 }
@@ -330,7 +332,7 @@ var ScanSyntaxError = errors.New("索引项语法错误")
 
 type IndexEntry struct {
 	level    []IndexEntryKV
-	pagelist []PageNumber
+	pagelist []*Page
 }
 
 // 实现 rbtree.CompareFunc

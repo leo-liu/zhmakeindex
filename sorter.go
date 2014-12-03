@@ -1,4 +1,4 @@
-// $Id: sorter.go,v 93f6f442188c 2014/08/20 16:36:15 leoliu $
+// $Id$
 
 package main
 
@@ -220,21 +220,21 @@ func NewPageSorter(style *OutputStyle, option *OutputOptions) *PageSorter {
 }
 
 // 处理输入的页码，生成页码区间组
-func (sorter *PageSorter) Sort(pages []PageNumber) []PageRange {
+func (sorter *PageSorter) Sort(pages []*Page) []PageRange {
 	//	debug.Println(pages)
 	var out []PageRange
 	// 合并前排序。传统 Makeindex 按原始输入的次序，在处理多个文件时可能不大好
 	if sorter.strict {
-		sort.Sort(PageNumberSliceStrict{
-			PageNumberSlice{pages: pages, sorter: sorter}})
+		sort.Sort(PageSliceStrict{
+			PageSlice{pages: pages, sorter: sorter}})
 	} else {
-		sort.Sort(PageNumberSliceLoose{
-			PageNumberSlice{pages: pages, sorter: sorter}})
+		sort.Sort(PageSliceLoose{
+			PageSlice{pages: pages, sorter: sorter}})
 	}
 	//debug.Println(pages)
 	// 使用一个栈来合并页码区间
 	// 这里的合并只将 1( 2 3 3) 合并为 1--3，不处理相邻区间，后者需要再做 Merge 操作
-	var stack []PageNumber
+	var stack []*Page
 	for i := 0; i < len(pages); i++ {
 		p := pages[i]
 		//debug.Printf("处理页码 %s{%s} %s\n", p.encap, p.NumString(), p.rangetype)
@@ -254,10 +254,6 @@ func (sorter *PageSorter) Sort(pages []PageNumber) []PageRange {
 		} else {
 			front := stack[0]
 			top := stack[len(stack)-1]
-			if p.format != top.format {
-				// 标准 Makeindex 会尝试把区间断开，这里只给出警告
-				log.Printf("页码区间可能有误，页码 %s{%s -- %s} 跨过多种数字格式\n", top.encap, top, p)
-			}
 			if p.encap != front.encap {
 				if sorter.strict {
 					log.Printf("页码区间可能有误，区间头 %s 没有对应的区间尾\n", front)
@@ -276,6 +272,9 @@ func (sorter *PageSorter) Sort(pages []PageNumber) []PageRange {
 							front.encap, front, p.rangetype, p.encap, p)
 					}
 				}
+			} else if !p.Compatible(top) {
+				// 标准 Makeindex 会尝试把区间断开，这里只给出警告
+				log.Printf("页码区间 %s{%s -- %s} 跨过不同的数字格式\n", top.encap, top, p)
 			}
 			switch p.rangetype {
 			case PAGE_NORMAL:
@@ -322,8 +321,8 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 				out = append(out, r)
 			}
 		} else if prev.begin.encap == r.begin.encap &&
-			r.begin.format == prev.begin.format &&
-			r.begin.page-prev.end.page <= 1 {
+			r.begin.Compatible(prev.begin) &&
+			r.begin.Diff(prev.end) <= 1 {
 			// 合并区间，只用后一区间尾替换前一区间尾
 			out[len(out)-1].end = r.end
 		} else {
@@ -333,8 +332,7 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 	// 修正区间类型（似乎无用）
 	for i := range out {
 		if out[i].begin.encap == out[i].end.encap {
-			if out[i].begin.format == out[i].end.format &&
-				out[i].begin.page == out[i].end.page {
+			if out[i].begin.Diff(out[i].end) == 0 {
 				out[i].begin.rangetype = PAGE_NORMAL
 				out[i].end.rangetype = PAGE_NORMAL
 			}
@@ -345,41 +343,34 @@ func (sorter *PageSorter) Merge(pages []PageRange) []PageRange {
 	return out
 }
 
-type PageNumberSlice struct {
-	pages  []PageNumber
+type PageSlice struct {
+	pages  []*Page
 	sorter *PageSorter
 }
 
-func (p PageNumberSlice) Len() int {
+func (p PageSlice) Len() int {
 	return len(p.pages)
 }
 
-func (p PageNumberSlice) Swap(i, j int) {
+func (p PageSlice) Swap(i, j int) {
 	p.pages[i], p.pages[j] = p.pages[j], p.pages[i]
 }
 
-type PageNumberSliceStrict struct {
-	PageNumberSlice
+type PageSliceStrict struct {
+	PageSlice
 }
 
-// 先按 encap 类型比较，然后按页码类型，然后页码数值，最后是 rangetype，方便以后合并
+// 先按 encap 类型比较，然后按页码本身比较，然后是 rangetype，方便以后合并
 // 不同 encap 严格分离
-func (p PageNumberSliceStrict) Less(i, j int) bool {
+func (p PageSliceStrict) Less(i, j int) bool {
 	a, b := p.pages[i], p.pages[j]
 	if a.encap < b.encap {
 		return true
 	} else if a.encap > b.encap {
 		return false
 	}
-	if p.sorter.precedence[a.format] < p.sorter.precedence[b.format] {
-		return true
-	} else if p.sorter.precedence[a.format] > p.sorter.precedence[b.format] {
-		return false
-	}
-	if a.page < b.page {
-		return true
-	} else if a.page > b.page {
-		return false
+	if cmp := a.Cmp(b, p.sorter.precedence); cmp != 0 {
+		return cmp < 0
 	}
 	if a.rangetype < b.rangetype {
 		return true
@@ -388,23 +379,16 @@ func (p PageNumberSliceStrict) Less(i, j int) bool {
 	}
 }
 
-type PageNumberSliceLoose struct {
-	PageNumberSlice
+type PageSliceLoose struct {
+	PageSlice
 }
 
 // 先按页码类型比较，然后按页码数值，然后 rangetype，最后是 encap 类型，方便以后合并
 // 允许不同 encap 合并，接近传统的 Makeindex 行为
-func (p PageNumberSliceLoose) Less(i, j int) bool {
+func (p PageSliceLoose) Less(i, j int) bool {
 	a, b := p.pages[i], p.pages[j]
-	if p.sorter.precedence[a.format] < p.sorter.precedence[b.format] {
-		return true
-	} else if p.sorter.precedence[a.format] > p.sorter.precedence[b.format] {
-		return false
-	}
-	if a.page < b.page {
-		return true
-	} else if a.page > b.page {
-		return false
+	if cmp := a.Cmp(b, p.sorter.precedence); cmp != 0 {
+		return cmp < 0
 	}
 	if a.rangetype < b.rangetype {
 		return true

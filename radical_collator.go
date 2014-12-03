@@ -1,6 +1,5 @@
 // $Id$
 
-// radical_collator.go
 package main
 
 import (
