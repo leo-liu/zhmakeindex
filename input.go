@@ -308,7 +308,7 @@ L_scan_page:
 			}
 		case SCAN_PAGE:
 			if r == style.arg_close {
-				page.numbers, err = scanPage(token, page.compositor)
+				page.numbers, err = scanPage(token, style.page_compositor)
 				if err != nil {
 					return nil, err
 				}
@@ -323,6 +323,7 @@ L_scan_page:
 		}
 		// 未实现对 style.page_compositor 的处理
 	}
+	page.compositor = style.page_compositor
 	entry.pagelist = append(entry.pagelist, page)
 	// debug.Println(entry) //// DEBUG only
 	return &entry, nil
