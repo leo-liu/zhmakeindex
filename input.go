@@ -121,6 +121,10 @@ func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputSty
 			return nil, ScanSyntaxError
 		}
 	}
+	// 跳过空白符
+	if err := skipspaces(reader); err != nil {
+		return nil, err
+	}
 	// 自动机状态
 	const (
 		SCAN_OPEN = iota
@@ -165,10 +169,10 @@ L_scan_kv:
 				token = append(token, r)
 				quoted = false
 				break
-			} else if r == style.arg_open {
+			} else if r == style.arg_open && !escaped {
 				token = append(token, r)
 				arg_depth++
-			} else if r == style.arg_close {
+			} else if r == style.arg_close && !escaped {
 				if arg_depth == 0 {
 					push_keyval(0)
 					break L_scan_kv
@@ -199,16 +203,15 @@ L_scan_kv:
 				token = nil
 				state = next
 			}
+			// 暂不对 actual 特殊处理
 			if quoted {
 				token = append(token, r)
 				quoted = false
 				break
-			} else if r == style.actual {
-				return nil, ScanSyntaxError
-			} else if r == style.arg_open {
+			} else if r == style.arg_open && !escaped {
 				token = append(token, r)
 				arg_depth++
-			} else if r == style.arg_close {
+			} else if r == style.arg_close && !escaped {
 				if arg_depth == 0 {
 					set_value(0)
 					break L_scan_kv
@@ -242,7 +245,7 @@ L_scan_kv:
 				page.rangetype = PAGE_OPEN
 			} else if r == style.range_close {
 				page.rangetype = PAGE_CLOSE
-			} else if r == style.quote {
+			} else if r == style.quote { // 之前是 encap，无须考虑被 escape 转义
 				quoted = true
 			} else {
 				token = append(token, r)
@@ -254,16 +257,15 @@ L_scan_kv:
 				escaped = false
 			}
 		case SCAN_COMMAND:
+			// 不对 encap、actual、level 特殊处理
 			if quoted {
 				token = append(token, r)
 				quoted = false
 				break
-			} else if r == style.actual || r == style.encap || r == style.level {
-				return nil, ScanSyntaxError
-			} else if r == style.arg_open {
+			} else if r == style.arg_open && !escaped {
 				token = append(token, r)
 				arg_depth++
-			} else if r == style.arg_close {
+			} else if r == style.arg_close && !escaped {
 				if arg_depth == 0 {
 					page.encap = string(token)
 					break L_scan_kv
