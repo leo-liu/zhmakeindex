@@ -4,13 +4,14 @@ package main
 
 import (
 	"bufio"
-	"golang.org/x/text/transform"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"golang.org/x/text/transform"
 
 	"code.google.com/p/zhmakeindex/kpathsea"
 )
@@ -349,7 +350,7 @@ func ScanStyleTokens(data []byte, atEOF bool) (advance int, token []byte, err er
 		for width, i := 0, start+firstwidth; i < len(data); i += width {
 			var r rune
 			r, width = utf8.DecodeRune(data[i:])
-			if r == '\\' { // 跳过逃逸符
+			if r == '\\' { // 跳过转义符
 				_, newwidth := utf8.DecodeRune(data[i+width:])
 				width += newwidth
 			} else if r == first { // 找到终点
