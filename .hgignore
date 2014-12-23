@@ -16,3 +16,6 @@ bin/darwin_x86/zhmakeindex
 bin/linux_x64/zhmakeindex
 bin/linux_x86/zhmakeindex
 doc/zhmakeindex.pdf
+**.bbl
+doc/zhmakeindex.idx
+**.blg
