@@ -172,7 +172,9 @@ func make_stroke_table(outdir string, unihan *zip.Reader) {
 	fmt.Fprintf(outfile, "// Unicode 版本：%s\n", unicodeVersion)
 	fmt.Fprintln(outfile, "\n"+`package CJK`)
 	fmt.Fprintln(outfile, "\n"+`// Strokes 从字符取得笔顺信息。
-var Strokes = map[rune]string{`)
+var Strokes map[rune]string = strokes
+
+var strokes = map[rune]string{`)
 	for r, order := range CJKstrokes {
 		if order == nil {
 			continue
@@ -244,12 +246,14 @@ func make_reading_table(outdir string, unihan *zip.Reader) {
 		log.Fatalln(err)
 	}
 	defer outfile.Close()
-	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件`)
-	fmt.Fprintln(outfile, `// 来源：Unihan_Readings.txt`)
+	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件
+// 来源：Unihan_Readings.txt`)
 	fmt.Fprintln(outfile, `//`, version)
 	fmt.Fprintln(outfile, "\n"+`package CJK`)
 	fmt.Fprintln(outfile, "\n"+`// Readings 从字符取得常用读音。
-var Readings = map[rune]string{`)
+var Readings map[rune]string = readings
+
+var readings = map[rune]string{`)
 	for k, v := range out_reading_table {
 		if v != "" {
 			fmt.Fprintf(outfile, "\t%#x: %s, // %c\n", k, strconv.Quote(v), k)
@@ -370,7 +374,9 @@ type Radical struct {
 const MAX_RADICAL = 214
 
 // Radicals 是所有部首。
-var Radicals = [MAX_RADICAL + 1]Radical{`)
+var Radicals [MAX_RADICAL + 1]Radical = radicals
+
+var radicals = [MAX_RADICAL + 1]Radical{`)
 	for i := 1; i < MAX_RADICAL+1; i++ {
 		fmt.Fprintf(outfile, "\t%d: {%#x, %#x}, // %c",
 			i, CJKRadical[i].Origin, CJKRadical[i].Simplified, CJKRadical[i].Origin)
@@ -396,7 +402,9 @@ func (rs RadicalStroke) Stroke() int {
 }
 
 // RadicalStrokes 从字符取得部首与除部首笔画数信息。
-var RadicalStrokes = map[rune]RadicalStroke{`)
+var RadicalStrokes map[rune]RadicalStroke = radicalStrokes
+
+var radicalStrokes = map[rune]RadicalStroke{`)
 	for r, rs := range CJKRadicalStrokes {
 		if rs != "" {
 			fmt.Fprintf(outfile, "\t%#x: %+q, // %c\n", r, rs, r)
