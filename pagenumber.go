@@ -235,7 +235,7 @@ func romanNumString(num int, upper bool) string {
 	}
 	var numstr []rune
 	for _, p := range romanTable {
-		for num > p.value {
+		for num >= p.value {
 			numstr = append(numstr, []rune(p.symbol)...)
 			num -= p.value
 		}
