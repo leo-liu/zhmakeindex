@@ -1,5 +1,6 @@
 setlocal
-set FLAGS=-ldflags "-s -w"
+for /f "delims=" %%i in ('hg parent --template "{rev}({node|short})"') do set Revision=%%i
+set FLAGS=-ldflags "-s -w -X main.Revision %Revision%"
 
 set GOOS=windows
 set GOARCH=386
