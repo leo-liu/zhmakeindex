@@ -479,7 +479,23 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 
 \subsection{\zhm 特有的格式}
 
-\zhm 定义了一些特有的格式（\autoref{tab:newoutputstyle}），用来控制按笔画数或
+\zhm 定义了新的输入格式（\autoref{tab:newinputstyle}），以支持索引输入的行
+注释。
+
+\begin{table}[htbp]
+\caption{\zhm 特有的输入格式}\label{tab:newinputstyle}
+\begin{tabu*} to \linewidth{lll>{\RaggedRight}X}
+\toprule
+关键字 & 类型 & 默认值 & 意义 \\
+\midrule
+  \kw{comment}  & 字符 & \texttt{'\textpercent'} & 行注释的开始符 \\
+\bottomrule
+\end{tabu*}
+\index{%@\verb+%+}
+\index{注释}
+\end{table}
+
+\zhm 定义了一些新的输出格式（\autoref{tab:newoutputstyle}），用来控制按笔画数或
 部首分组时，分组名的输出格式。
 
 \begin{table}[htbp]
