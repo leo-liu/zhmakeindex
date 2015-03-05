@@ -1,4 +1,4 @@
-// $Id: main.go,v 5aa617e1bd06 2014/11/23 10:43:40 Liu $
+// $Id$
 
 // zhmakeindex: 带中文支持的 makeindex 实现
 package main
@@ -23,6 +23,8 @@ import (
 var (
 	ProgramAuthor  = "刘海洋<leoliu.pku@gmail.com>"
 	ProgramVersion = "1.0"
+	// Build with option: -ldflags "-X main.Revision ?"
+	Revision = "???"
 )
 
 var debug = log.New(os.Stderr, "DEBUG: ", log.Lshortfile)
@@ -38,7 +40,7 @@ func main() {
 
 	setupLog(option)
 
-	log.Printf("zhmakeindex 版本：%s\t作者：%s\n", ProgramVersion, ProgramAuthor)
+	log.Printf("zhmakeindex 版本：%s-rev%s\t作者：%s\n", ProgramVersion, Revision, ProgramAuthor)
 
 	if option.style != "" {
 		log.Printf("正在读取格式文件 %s……", option.style)
@@ -216,5 +218,5 @@ zhmakeindex [-c] [-i] [-o <ind>] [-q] [-r] [-s <sty>] [-t <log>]
 			fmt.Fprintf(os.Stderr, "  -%-6s %-8s %s\n", f.Name, f.DefValue, f.Usage)
 		}
 	})
-	fmt.Fprintf(os.Stderr, "\n版本：%s\t作者：%s\n", ProgramVersion, ProgramAuthor)
+	fmt.Fprintf(os.Stderr, "\n版本：%s-rev%s\t作者：%s\n", ProgramVersion, Revision, ProgramAuthor)
 }
