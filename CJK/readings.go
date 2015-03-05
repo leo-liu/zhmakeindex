@@ -1,8 +1,13 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 来源：Unihan_Readings.txt
 // Unicode version: 7.0.0
+
 package CJK
-var Readings = map[rune]string{
+
+// Readings 从字符取得常用读音。
+var Readings map[rune]string = readings
+
+var readings = map[rune]string{
 	0x3007: "ling2", // 〇
 	0x3400: "qiu1", // 㐀
 	0x3401: "tian4", // 㐁
