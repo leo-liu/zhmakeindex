@@ -259,8 +259,19 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 
 \index{页码}
 \meta{页码} 是一个数字，可以使用阿拉伯数字、大小写罗马数字、大小写拉丁字母共 5
-种格式。标准的 \pkg{makeindex} 还允许多级页码 \cite{Rodgers1991}，但 \zhm 暂不
-支持。
+种格式。
+
+\index{-@\verb+-+}
+此外，与 \pkg{makeindex} 类似 \cite{Rodgers1991}，\zhm 还支持多级页码。可以使
+用 "-" 划分不同级别的复合页码。页码分隔符可由 \kw{page_compositor} 输入格式修
+改，见 \autoref{tab:oldinputstyle}。例如：
+\begin{idxexample}
+"\indexentry{方程}{5-ii-2}" \\
+"\indexentry{方程}{5-ii-1}" \\
+"\indexentry{方程}{3-v-9}"
+\sindex
+方程, 3-v-9, 5-ii-1, 5-ii-2
+\end{idxexample}
 
 \meta{条目} 是 \zhm 需要处理的正文内容。最简单的条目就是一个普通的词条串，但也
 可以有复杂的格式。
@@ -422,6 +433,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
   \kw{quote}  & 字符 & |'"'| & 引号（转义符） \\
   \kw{escape}  & 字符 & |'\\'| & 转义 |quote| 的符号，在它后面的引号不作转义符
 解释 \\
+  \kw{page_compositor} &  字符串 & |"-"| & 复合页码分隔符 \\
 \end{longtabu*}
 \useangles\index<"{@\verb+"{+>\restoreangles
 \useangles\index<"}@\verb+"}+>\restoreangles
@@ -432,6 +444,7 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 \rawindex{"|@\verb+"|+|hyperpage}
 \index{""@\verb+""+}
 \index{"\@\verb+"\+}
+\index{-@\verb+-+}
 
 \begin{longtabu*} to \linewidth{lll>{\RaggedRight}X}
 \caption{与 \pkg{makeindex} 兼容的输出格式}\label{tab:oldoutputstyle} \\
@@ -519,20 +532,9 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
 
 \subsection{未实现的 \pkg{makeindex} 格式}
 
-\autoref{tab:unsupportedinputstyle} 和\autoref{tab:unsupportedoutputstyle} 中
-给出的是在标准的 \pkg{makeindex} 中定义，但在 \zhm 中没有实现对应功能的格式。
-格式文件中如果出现这些格式，\zhm 将会忽略它们。
-
-\begin{table}[htbp]
-\caption{未实现的输入格式}\label{tab:unsupportedinputstyle}
-\begin{tabu*} to \linewidth{lll>{\RaggedRight}X}
-\toprule
-关键字 & 类型 & 默认值 & 意义 \\
-\midrule
-  \kw{page_compositor} &  字符串 & |"-"| & 复合页码分隔符 \\
-\bottomrule
-\end{tabu*}
-\end{table}
+\autoref{tab:unsupportedoutputstyle} 中给出的是在标准的 \pkg{makeindex} 中定
+义，但在 \zhm 中没有实现对应功能的格式。格式文件中如果出现这些格式，\zhm 将会
+忽略它们。
 
 \begin{table}[htbp]
 \caption{未实现的输出格式}\label{tab:unsupportedoutputstyle}
@@ -766,14 +768,13 @@ TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关
   \gooditem \zhm 的格式文件支持使用反引号界定的串，在其中禁用转义符
   （第~\ref{sec:ist} 节）。
 
+  \gooditem \zhm 对输入的索引文件支持单个注释符开始的行注释。
+
   \baditem \zhm 暂不支持 "-p" 选项自动获取 \TeX{} 编译日志文件中的页码，然后输出对
   应的页码设置语句（\ref{subsec:unsupportedoption}~节、
   \autoref{tab:unsupportedoutputstyle}）。
 
   \baditem \zhm 不支持 "-g", "-l", "-L", "-T" 等与中文索引无关的语言选项。
-
-  \baditem \zhm 暂不支持复合页码
-  （\autoref{tab:unsupportedinputstyle}、第~\ref{sec:idxsyntax} 节）。
 
   \baditem \zhm 不支持输出折行（\autoref{tab:unsupportedoutputstyle}）。
 \end{itemize}
