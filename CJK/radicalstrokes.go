@@ -2,10 +2,11 @@
 // 部首来源：CJKRadicals.txt
 // 部首笔画数来源：Unihan_RadicalStrokeCounts.txt
 // Unicode version: 7.0.0
+
 package CJK
 
-// 康熙字典部首
-// 未包括 U+2F00 至 U+2FD5 等部首专用符号
+// Radical 是康熙字典部首类型。
+// 此类型未包括 U+2F00 至 U+2FD5 等部首专用符号。
 type Radical struct {
 	Origin     rune // 原部首的对应汉字
 	Simplified rune // 简化部首
@@ -13,7 +14,10 @@ type Radical struct {
 
 const MAX_RADICAL = 214
 
-var Radicals = [MAX_RADICAL + 1]Radical{
+// Radicals 是所有部首。
+var Radicals [MAX_RADICAL + 1]Radical = radicals
+
+var radicals = [MAX_RADICAL + 1]Radical{
 	1: {0x4e00, 0x0}, // 一
 	2: {0x4e28, 0x0}, // 丨
 	3: {0x4e36, 0x0}, // 丶
@@ -230,19 +234,24 @@ var Radicals = [MAX_RADICAL + 1]Radical{
 	214: {0x9fa0, 0x0}, // 龠
 }
 
-// 部首与除部首笔画数
-// 前两个字节分别放部首和除部首笔画数，后面放字符本身的 UTF-8 编码，可直接排序
+// RadicalStroke 为部首与除部首笔画数。
+// 前两个字节分别放部首和除部首笔画数，后面放字符本身的 UTF-8 编码，可直接排序。
 type RadicalStroke string
 
+// Radical 取得部首编号。
 func (rs RadicalStroke) Radical() int {
 	return int(rs[0])
 }
 
+// Stroke 取得除部首笔画数。
 func (rs RadicalStroke) Stroke() int {
 	return int(rs[1])
 }
 
-var RadicalStrokes = map[rune]RadicalStroke{
+// RadicalStrokes 从字符取得部首与除部首笔画数信息。
+var RadicalStrokes map[rune]RadicalStroke = radicalStrokes
+
+var radicalStrokes = map[rune]RadicalStroke{
 	0x3007: "\x05\x00\u3007", // 〇
 	0x3400: "\x01\x04\u3400", // 㐀
 	0x3401: "\x01\x05\u3401", // 㐁
