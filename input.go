@@ -91,11 +91,20 @@ func readIdxFile(inset *rbtree.Tree, idxfile *os.File, option *InputOptions, sty
 	log.Printf("接受 %d 项，拒绝 %d 项。\n", accepted, rejected)
 }
 
-func skipspaces(reader *NumberdReader) error {
+// 跳过空白符和行注释
+func skipspaces(reader *NumberdReader, style *InputStyle) error {
 	for {
 		r, _, err := reader.ReadRune()
 		if err != nil {
 			return err
+		} else if r == style.comment { // 注释以 style.comment 开头，直至行末
+			var rr rune = 0
+			for rr != '\n' {
+				rr, _, err = reader.ReadRune()
+				if err != nil {
+					return err
+				}
+			}
 		} else if !unicode.IsSpace(r) {
 			reader.UnreadRune()
 			break
@@ -108,7 +117,7 @@ func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputSty
 	var entry IndexEntry
 	page := new(Page)
 	// 跳过空白符
-	if err := skipspaces(reader); err != nil {
+	if err := skipspaces(reader, style); err != nil {
 		return nil, err
 	}
 	// 跳过 keyword
@@ -122,7 +131,7 @@ func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputSty
 		}
 	}
 	// 跳过空白符
-	if err := skipspaces(reader); err != nil {
+	if err := skipspaces(reader, style); err != nil {
 		return nil, err
 	}
 	// 自动机状态
@@ -288,7 +297,7 @@ L_scan_kv:
 		}
 	}
 	// 跳过空白符
-	if err := skipspaces(reader); err != nil {
+	if err := skipspaces(reader, style); err != nil {
 		return nil, err
 	}
 	// 从 arg_open 开始扫描到 arg_close，处理页码

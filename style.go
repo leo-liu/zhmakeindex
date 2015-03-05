@@ -31,6 +31,7 @@ type InputStyle struct {
 	page_compositor string
 	range_open      rune
 	range_close     rune
+	comment         rune
 }
 
 func NewInputStyle() *InputStyle {
@@ -46,6 +47,7 @@ func NewInputStyle() *InputStyle {
 		page_compositor: "-",
 		range_open:      '(',
 		range_close:     ')',
+		comment:         '%',
 	}
 	return in
 }
@@ -198,6 +200,8 @@ func NewStyles(o *StyleOptions) (*InputStyle, *OutputStyle) {
 			in.range_open = unquoteChar(value)
 		case "range_close":
 			in.range_close = unquoteChar(value)
+		case "comment":
+			in.comment = unquoteChar(value)
 		// 输出参数
 		case "preamble":
 			out.preamble = unquote(value)
