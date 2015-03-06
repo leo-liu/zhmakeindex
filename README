@@ -1,5 +1,5 @@
-                             zhmakeindex 1.0
-                             ===============
+                             zhmakeindex
+                             ===========
 
 Zhmakeindex is a makeindex replacement for Chinese users, with full Unicode
 and Chinese sorting support.
@@ -20,8 +20,8 @@ To compile zhmakeindex, the latest Go language is needed:
 
 And zhmakeindex is compiled using these Go packages:
 
-  * http://code.google.com/p/go.text
-  * http://github.com/yasushi-saito/rbtree
+  * golang.org/x/text
+  * github.com/yasushi-saito/rbtree
 
 DOCUMENTATION AND SUPPORT
 =========================
@@ -38,7 +38,7 @@ More information, bugfix releases and bug tracker are available at:
 COPYRIGHT AND LICENCE
 =====================
 
-Copyright 2014 Liú Hǎiyáng (Leo Liu) <leoliu.pku@gmail.com>
+Copyright 2014, 2015 Liú Hǎiyáng (Leo Liu) <leoliu.pku@gmail.com>
 
 This work may be distributed and/or modified under the
 conditions of the LaTeX Project Public License, either version 1.3

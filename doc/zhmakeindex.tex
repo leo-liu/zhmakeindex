@@ -1,7 +1,5 @@
 % $Id$
 \documentclass[UTF8,hyperref]{ctexart}
-\usepackage{rcs}
-\RCS $Revision$
 
 \usepackage{etoolbox}
 
@@ -111,9 +109,13 @@
   \textkw{#1}}
 \newcommand\email{\nolinkurl}
 
-\title{\zhm\thanks{版本 1.0-rev\RCSRevision} 中文索引处理程序}
+\InputIfFileExists{zhm-version}{}{%
+  \def\zhmVersion{???}%
+  \def\zhmRevision{???}}
+
+\title{\zhm\thanks{版本 \zhmVersion-rev\zhmRevision} 中文索引处理程序}
 \author{刘海洋}
-\date{2014 年 2 月 24 日}
+\date{2015 年 3 月 6 日}
 
 \begin{document}
 
@@ -792,7 +794,7 @@ cháng 略高一点，“长”字就会按 zhǎng 的读音分到 Z 组，排�
 \section{版权与许可}
 \index{版权}\index{许可}
 
-版权所有：2014 年，刘海洋 \email{leoliu.pku@gmail.com}
+版权所有：2014, 2015 年，刘海洋 \email{leoliu.pku@gmail.com}
 
 \index{LPPL}
 本作品可在《the \LaTeX{} Project Public License》1.3 或更高版本的条件下发布与
