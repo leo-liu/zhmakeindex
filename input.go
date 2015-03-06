@@ -98,13 +98,7 @@ func skipspaces(reader *NumberdReader, style *InputStyle) error {
 		if err != nil {
 			return err
 		} else if r == style.comment { // 注释以 style.comment 开头，直至行末
-			var rr rune = 0
-			for rr != '\n' {
-				rr, _, err = reader.ReadRune()
-				if err != nil {
-					return err
-				}
-			}
+			reader.SkipLine()
 		} else if !unicode.IsSpace(r) {
 			reader.UnreadRune()
 			break
