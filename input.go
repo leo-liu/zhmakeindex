@@ -170,7 +170,7 @@ L_scan_kv:
 				if option.compress {
 					str = strings.TrimSpace(str)
 				}
-				entry.level = append(entry.level, IndexEntryKV{key: str, text: str})
+				entry.level = append(entry.level, IndexEntryLevel{key: str, text: str})
 				token = nil
 				state = next
 			}
@@ -343,7 +343,7 @@ L_scan_page:
 var ScanSyntaxError = errors.New("索引项语法错误")
 
 type IndexEntry struct {
-	level    []IndexEntryKV
+	level    IndexEntryLevelSlice
 	pagelist []*Page
 }
 
@@ -372,9 +372,34 @@ func CompareIndexEntry(a, b rbtree.Item) int {
 	return 0
 }
 
-type IndexEntryKV struct {
+// 一条索引条目中的一级
+type IndexEntryLevel struct {
 	key  string
 	text string
+}
+
+// 大体按输入的方式输出，但没有转义
+func (level *IndexEntryLevel) String() string {
+	if level.key == level.text {
+		return level.key
+	} else {
+		return level.key + "@" + level.text
+	}
+}
+
+// 一条索引条目中的各级
+type IndexEntryLevelSlice []IndexEntryLevel
+
+// 大体按输入的方式输出，但没有转义
+func (levels *IndexEntryLevelSlice) String() string {
+	var str string
+	for i := range *levels {
+		if i > 0 {
+			str += "!"
+		}
+		str += (*levels)[i].String()
+	}
+	return str
 }
 
 type RangeType int
