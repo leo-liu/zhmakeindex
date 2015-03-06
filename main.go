@@ -21,9 +21,9 @@ import (
 )
 
 var (
-	ProgramAuthor  = "刘海洋<leoliu.pku@gmail.com>"
-	ProgramVersion = "1.0"
-	// Build with option: -ldflags "-X main.Revision ?"
+	ProgramAuthor = "刘海洋<leoliu.pku@gmail.com>"
+	// Build with option: -ldflags "-x main.Version ? -X main.Revision ?"
+	Version  = "???"
 	Revision = "???"
 )
 
@@ -40,7 +40,7 @@ func main() {
 
 	setupLog(option)
 
-	log.Printf("zhmakeindex 版本：%s-rev%s\t作者：%s\n", ProgramVersion, Revision, ProgramAuthor)
+	log.Printf("zhmakeindex 版本：%s-rev%s\t作者：%s\n", Version, Revision, ProgramAuthor)
 
 	if option.style != "" {
 		log.Printf("正在读取格式文件 %s……", option.style)
@@ -218,5 +218,5 @@ zhmakeindex [-c] [-i] [-o <ind>] [-q] [-r] [-s <sty>] [-t <log>]
 			fmt.Fprintf(os.Stderr, "  -%-6s %-8s %s\n", f.Name, f.DefValue, f.Usage)
 		}
 	})
-	fmt.Fprintf(os.Stderr, "\n版本：%s-rev%s\t作者：%s\n", ProgramVersion, Revision, ProgramAuthor)
+	fmt.Fprintf(os.Stderr, "\n版本：%s-rev%s\t作者：%s\n", Version, Revision, ProgramAuthor)
 }
