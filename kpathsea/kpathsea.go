@@ -80,10 +80,12 @@ const (
 //    kpse_file_format_type format,  boolean must_exist);
 // 见源代码 tex-file.h
 func FindFile(name string, format FileFormatType, mustExist bool) string {
-	outpath := findFile_dynamic(name, format, mustExist)
-	if outpath != "" {
-		return outpath
-	}
+	/*
+		outpath := findFile_dynamic(name, format, mustExist)
+		if outpath != "" {
+			return outpath
+		}
+	*/
 	return findFile_external(name)
 }
 
