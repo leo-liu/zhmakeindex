@@ -222,7 +222,7 @@ func NewPageSorter(style *OutputStyle, option *OutputOptions) *PageSorter {
 // 处理输入的页码，生成页码区间组
 func (sorter *PageSorter) Sort(entry IndexEntry) []PageRange {
 	pages := entry.pagelist
-	//debug.Println(entry.level.String(), pages)
+	//debug.Println(entry.input, pages)
 	var out []PageRange
 	// 合并前排序。传统 Makeindex 按原始输入的次序，在处理多个文件时可能不大好
 	if sorter.strict {
@@ -248,7 +248,7 @@ func (sorter *PageSorter) Sort(entry IndexEntry) []PageRange {
 				// 压栈
 				stack = append(stack, p)
 			case PAGE_CLOSE:
-				log.Printf("条目【%s】的页码区间有误，区间末尾 %s{%s} 没有匹配的区间头。\n", entry.level.String(), p.encap, p)
+				log.Printf("条目 %s 的页码区间有误，区间末尾 %s{%s} 没有匹配的区间头。\n", entry.input, p.encap, p)
 				// 输出从空白到当前页的伪区间
 				out = append(out, PageRange{begin: p.Empty(), end: p})
 			}
@@ -257,7 +257,7 @@ func (sorter *PageSorter) Sort(entry IndexEntry) []PageRange {
 			top := stack[len(stack)-1]
 			if p.encap != front.encap {
 				if sorter.strict {
-					log.Printf("条目【%s】的页码区间可能有误，区间头 %s 没有对应的区间尾\n", entry.level.String(), front)
+					log.Printf("条目 %s 的页码区间可能有误，区间头 %s 没有对应的区间尾\n", entry.input, front)
 					// 输出从区间头到空白的伪区间，并清空栈
 					out = append(out, PageRange{begin: front, end: front.Empty()})
 					stack = nil
@@ -269,13 +269,13 @@ func (sorter *PageSorter) Sort(entry IndexEntry) []PageRange {
 					if p.rangetype == PAGE_NORMAL {
 						out = append(out, PageRange{begin: p, end: p})
 					} else {
-						log.Printf("条目【%s】的页码区间 %s{%s--} 内 %s%s{%s} 命令格式不同，可能丢失信息",
-							entry.level.String(), front.encap, front, p.rangetype, p.encap, p)
+						log.Printf("条目 %s 的页码区间 %s{%s--} 内 %s%s{%s} 命令格式不同，可能丢失信息",
+							entry.input, front.encap, front, p.rangetype, p.encap, p)
 					}
 				}
 			} else if !p.Compatible(top) {
 				// 标准 Makeindex 会尝试把区间断开，这里只给出警告
-				log.Printf("条目【%s】的页码区间 %s{%s -- %s} 跨过不同的数字格式\n", entry.level.String(), top.encap, top, p)
+				log.Printf("条目 %s 的页码区间 %s{%s -- %s} 跨过不同的数字格式\n", entry.input, top.encap, top, p)
 			}
 			switch p.rangetype {
 			case PAGE_NORMAL:
@@ -293,7 +293,7 @@ func (sorter *PageSorter) Sort(entry IndexEntry) []PageRange {
 		}
 	}
 	if len(stack) > 0 {
-		log.Printf("条目【%s】的页码区间有误，未找到与 %s{%s} 匹配的区间尾。\n", entry.level.String(), stack[0].encap, stack[0])
+		log.Printf("条目 %s 的页码区间有误，未找到与 %s{%s} 匹配的区间尾。\n", entry.input, stack[0].encap, stack[0])
 		// 输出从当前页到空白的伪区间
 		out = append(out, PageRange{begin: stack[0], end: stack[0].Empty()})
 	}
