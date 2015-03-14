@@ -1,5 +1,3 @@
-// $Id: numberedreader.go,v 46e1b534c25a 2014/02/25 18:14:30 leoliu $
-
 package main
 
 import (

@@ -1,5 +1,3 @@
-// $Id$
-
 // +build ignore
 
 // 本程序生成 zhmakeindex/CJK 使用的汉字数据表。
