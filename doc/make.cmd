@@ -12,7 +12,7 @@ if exist ..\VERSION (
 )
 echo }>> zhm-version.tex
 echo \def\zhmRevision{%%>> zhm-version.tex
-hg parent --template "{rev}({node|short})" >> zhm-version.tex
+git rev-parse --short HEAD >> zhm-version.tex
 echo }>> zhm-version.tex
 
 echo ==========^> Compiling document...

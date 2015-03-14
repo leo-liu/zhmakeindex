@@ -7,7 +7,7 @@ if exist VERSION (
 ) else (
   set zhmVersion=devel
 )
-for /f "delims=" %%i in ('hg parent --template "{rev}({node|short})"') do set zhmRevision=%%i
+for /f "delims=" %%i in ('git rev-parse --short HEAD') do set zhmRevision=%%i
 set FLAGS=-ldflags "-X main.Version %zhmVersion% -X main.Revision %zhmRevision%"
 
 set GOOS=windows

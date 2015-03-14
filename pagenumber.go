@@ -1,5 +1,3 @@
-// $Id$
-
 package main
 
 import (

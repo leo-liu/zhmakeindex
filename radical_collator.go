@@ -1,5 +1,3 @@
-// $Id$
-
 package main
 
 import (
@@ -7,7 +5,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"code.google.com/p/zhmakeindex/CJK"
+	"github.com/leo-liu/zhmakeindex/CJK"
 )
 
 // 汉字按部首-除部首笔画数排序，汉字按部首分组排在英文字母组后面

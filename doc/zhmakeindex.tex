@@ -1,4 +1,3 @@
-% $Id$
 \documentclass[UTF8,hyperref]{ctexart}
 
 \usepackage{etoolbox}
@@ -113,7 +112,7 @@
   \def\zhmVersion{???}%
   \def\zhmRevision{???}}
 
-\title{\zhm\thanks{版本 \zhmVersion-rev\zhmRevision} 中文索引处理程序}
+\title{\zhm\thanks{版本 \zhmVersion-\zhmRevision} 中文索引处理程序}
 \author{刘海洋}
 \date{2015 年 3 月 6 日}
 
@@ -238,7 +237,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \begin{idxexample}
 "\indexentry{简介}{15}" \\
 \sindex
-简介, 15 
+简介, 15
 \end{idxexample}
 其语法为：
 \begin{syntax}
@@ -302,7 +301,7 @@ $\Gamma$ 射线, 2
 \sitem 代数方程 \\
 \ssitem 二次方程, 3 \\
 \ssitem 线性方程, 2 \\
-\sitem 解, 1 
+\sitem 解, 1
 \end{idxexample}
 每一级别内部都可以分别指定排序的键与输出值，例如：
 \begin{idxexample}
@@ -323,7 +322,7 @@ $\Gamma$ 射线, 2
 括号被忽略，输出时会自动加上（用\autoref{tab:oldoutputstyle} 中的
 \kw{encap_prefix}, \kw{encap_infix}, \kw{encap_suffix} 项配置）。例如：
 \begin{idxexample}
-"\indexentry{字体|emph}{2}" 
+"\indexentry{字体|emph}{2}"
 \sindex
 字体, \emph{2}
 \end{idxexample}
@@ -813,38 +812,46 @@ cháng 略高一点，“长”字就会按 zhǎng 的读音分到 Z 组，排�
 \begin{verbatim}
 build-dist.cmd
 input.go
+install.cmd
 main.go
+MENIFEST
 numberedreader.go
 output.go
-radicalstrokes.go
+pagenumber.go
 radical_collator.go
-readings.go
 reading_collator.go
+README
 sorter.go
-strokes.go
 stroke_collator.go
 style.go
 style_test.go
+VERSION
+doc/make.cmd
 doc/zhmakeindex.bib
 doc/zhmakeindex.mst
 doc/zhmakeindex.tex
+examples/compositepage.idx
+examples/gb2312.idx
+examples/mixedpage.idx
+examples/numbers.idx
+examples/rangeencap.idx
+examples/suffix.ist
+examples/symorder.idx
+examples/zh.ist
 kpathsea/dynamic_other.go
 kpathsea/dynamic_windows_386.go
 kpathsea/kpathsea.go
-maketables/make-table.cmd
-maketables/maketables.go
+CJK/make-table.cmd
+CJK/maketables.go
+CJK/radicalstrokes.go
+CJK/strokes.go
+CJK/readings.go
 \end{verbatim}
 以及编译源文件得到的二进制文件 \path{zhmakeindex.exe} 或 \path{zhmakeindex}、
 PDF 文档 \path{zhmakeindex.pdf} 组成。
 
 \index{Unicode}
-大部分汉字数据来自 Unicode 项目（\url{http://www.unicode.org/}）：
-\begin{verbatim}
-maketables/CJKRadicals.txt
-maketables/Unihan_DictionaryLikeData.txt
-maketables/Unihan_RadicalStrokeCounts.txt
-maketables/Unihan_Readings.txt
-\end{verbatim}
+大部分汉字数据来自 Unicode 项目（\url{http://www.unicode.org/}）。
 
 \index{海峰五笔}
 部分字形数据来自海峰五笔项目（\url{http://okuc.net/sunwb/}）：
