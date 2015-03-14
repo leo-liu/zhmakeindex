@@ -1,0 +1,12 @@
+*.swp
+*~
+*.ind
+doc/zhmakeindex.idx
+*.bbl
+*.blg
+*.ilg
+*.aux
+*.out
+doc/zhmakeindex.pdf
+doc/zhm-version.tex
+bin/

@@ -13,7 +13,7 @@ import (
 
 	"golang.org/x/text/transform"
 
-	"code.google.com/p/zhmakeindex/kpathsea"
+	"github.com/leo-liu/zhmakeindex/kpathsea"
 )
 
 // 输入格式

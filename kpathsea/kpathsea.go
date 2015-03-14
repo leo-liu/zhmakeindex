@@ -1,5 +1,5 @@
 // 提供 kpathsea 库的基本文件查找功能
-package kpathsea
+package kpathsea // import "github.com/leo-liu/zhmakeindex/kpathsea"
 
 import (
 	"os"

@@ -1,7 +1,7 @@
 // $Id$
 
 // zhmakeindex: 带中文支持的 makeindex 实现
-package main
+package main // import "github.com/leo-liu/zhmakeindex"
 
 import (
 	"flag"
