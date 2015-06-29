@@ -1,6 +1,6 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 来源：Unihan_Readings.txt
-// Unicode version: 7.0.0
+// Unicode version: 8.0.0
 
 package CJK
 
@@ -26663,6 +26663,11 @@ var readings = map[rune]string{
 	0x9fa4: "xie2", // 龤
 	0x9fa5: "yu4", // 龥
 	0x9fc3: "shan3", // 鿃
+	0x9fcd: "gang4", // 鿍
+	0x9fce: "ta3", // 鿎
+	0x9fcf: "mai4", // 鿏
+	0x9fd4: "ge1", // 鿔
+	0x9fd5: "dan1", // 鿕
 	0x20000: "he1", // 𠀀
 	0x20001: "qi1", // 𠀁
 	0x20003: "qie3", // 𠀃
