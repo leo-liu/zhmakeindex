@@ -1,4 +1,4 @@
-\documentclass[UTF8,hyperref]{ctexart}
+\documentclass[UTF8]{ctexart}
 
 \usepackage{etoolbox}
 
@@ -14,7 +14,7 @@
 
 \usepackage[a4paper,centering,margin=1.2in]{geometry}
 
-\CTEXsetup[format=\bfseries\Large]{section}
+\ctexset{section/format=\bfseries\Large}
 
 \usepackage[numbers,square,sort&compress]{natbib}
 \renewcommand\bibname{参考文档}
@@ -114,7 +114,7 @@
 
 \title{\zhm\thanks{版本 \zhmVersion-\zhmRevision} 中文索引处理程序}
 \author{刘海洋}
-\date{2015 年 3 月 6 日}
+\date{2016 年 2 月 28 日}
 
 \begin{document}
 
@@ -176,9 +176,10 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
   \optitem[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
     第~\ref{sec:idxsyntax} 节的说明。默认情况下，三个或三个以上连续的页码会自
     动合并为一个页码区间（如 1--5）。
-  \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
-    前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 \pkg{kpathsea} 库在
-    TEXMF 树中查找。
+  \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。如果没有后
+    缀，会加上 ".ist" 后缀。\zhm 会首先在当前目录查找格式文件，如果找不到则调
+    用 \TeX{} 发行版的 \pkg{kpathsea} 库在 TEXMF 树中查找。
+    \index{.ist@\verb+.ist+}
   \optitem[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
     入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
     \index{.ilg@\verb+.ilg+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"bufio"
 	"log"
 	"os"
@@ -149,6 +150,9 @@ func NewStyles(o *StyleOptions) (*InputStyle, *OutputStyle) {
 
 	if o.style == "" {
 		return in, out
+	}
+	if filepath.Ext(o.style) == "" {
+		o.style += ".ist"
 	}
 	// 读取格式文件，处理格式
 	o.style = kpathsea.FindFile(o.style, kpathsea.IST_FORMAT, false)
