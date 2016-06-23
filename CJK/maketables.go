@@ -358,7 +358,7 @@ func make_radical_table(outdir string, unihan *zip.Reader) {
 	defer outfile.Close()
 	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件
 // 部首来源：CJKRadicals.txt
-// 部首笔画数来源：Unihan_RadicalStrokeCounts.txt`)
+// 部首笔画数来源：Unihan_IRGSources.txt`)
 	fmt.Fprintln(outfile, `//`, version)
 	fmt.Fprintln(outfile, "\n"+`package CJK
 
