@@ -1,7 +1,7 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 部首来源：CJKRadicals.txt
 // 部首笔画数来源：Unihan_RadicalStrokeCounts.txt
-// Unicode version: 8.0.0
+// Unicode version: 9.0.0
 
 package CJK
 
@@ -10895,7 +10895,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x5dd9: ".\x14\u5dd9", // 巙
 	0x5dda: ".\x14\u5dda", // 巚
 	0x5ddb: "/\x00\u5ddb", // 巛
-	0x5ddc: "/\x00\u5ddc", // 巜
+	0x5ddc: "/\xff\u5ddc", // 巜
 	0x5ddd: "/\x00\u5ddd", // 川
 	0x5dde: "/\x03\u5dde", // 州
 	0x5ddf: "/\x03\u5ddf", // 巟
@@ -16446,7 +16446,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x7388: "_\x06\u7388", // 玈
 	0x7389: "`\x00\u7389", // 玉
 	0x738a: "`\x01\u738a", // 玊
-	0x738b: "`\x00\u738b", // 王
+	0x738b: "`\xff\u738b", // 王
 	0x738c: "`\x01\u738c", // 玌
 	0x738d: "`\x01\u738d", // 玍
 	0x738e: "`\x02\u738e", // 玎
@@ -19637,7 +19637,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x7fff: "|\x0e\u7fff", // 翿
 	0x8000: "|\x0e\u8000", // 耀
 	0x8001: "}\x00\u8001", // 老
-	0x8002: "}\x00\u8002", // 耂
+	0x8002: "}\xfe\u8002", // 耂
 	0x8003: "}\x00\u8003", // 考
 	0x8004: "}\x04\u8004", // 耄
 	0x8005: "}\x04\u8005", // 者
@@ -19763,7 +19763,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x807d: "\x80\x10\u807d", // 聽
 	0x807e: "\x80\x10\u807e", // 聾
 	0x807f: "\x81\x00\u807f", // 聿
-	0x8080: "\x81\x00\u8080", // 肀
+	0x8080: "\x81\xfe\u8080", // 肀
 	0x8081: "\x81\x04\u8081", // 肁
 	0x8082: "\x81\x04\u8082", // 肂
 	0x8083: "\x81\x04\u8083", // 肃
@@ -27777,7 +27777,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x9fcb: "\x91\f\u9fcb", // 鿋
 	0x9fcc: "U\t\u9fcc", // 鿌
 	0x9fcd: " \x06\u9fcd", // 鿍
-	0x9fce: "p\a\u9fce", // 鿎
+	0x9fce: "p\x06\u9fce", // 鿎
 	0x9fcf: "\xa7\a\u9fcf", // 鿏
 	0x9fd0: "\xc3\n\u9fd0", // 鿐
 	0x9fd1: "\x0f\x05\u9fd1", // 鿑
@@ -36425,7 +36425,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x21fe5: ".\x1d\U00021fe5", // 𡿥
 	0x21fe6: "/\x00\U00021fe6", // 𡿦
 	0x21fe7: "/\x01\U00021fe7", // 𡿧
-	0x21fe8: "/\x00\U00021fe8", // 𡿨
+	0x21fe8: "/\xfe\U00021fe8", // 𡿨
 	0x21fe9: "/\x03\U00021fe9", // 𡿩
 	0x21fea: "/\x03\U00021fea", // 𡿪
 	0x21feb: "/\x03\U00021feb", // 𡿫
@@ -37898,7 +37898,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x225a6: "<\x14\U000225a6", // 𢖦
 	0x225a7: "<\x16\U000225a7", // 𢖧
 	0x225a8: "<\x18\U000225a8", // 𢖨
-	0x225a9: "=\x00\U000225a9", // 𢖩
+	0x225a9: "=\xff\U000225a9", // 𢖩
 	0x225aa: "=\x01\U000225aa", // 𢖪
 	0x225ab: "=\x02\U000225ab", // 𢖫
 	0x225ac: "=\x02\U000225ac", // 𢖬
@@ -42703,7 +42703,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2386b: "K\x16\U0002386b", // 𣡫
 	0x2386c: "K\x16\U0002386c", // 𣡬
 	0x2386d: "K\x16\U0002386d", // 𣡭
-	0x2386e: "K\x16\U0002386e", // 𣡮
+	0x2386e: "K\x15\U0002386e", // 𣡮
 	0x2386f: "K\x16\U0002386f", // 𣡯
 	0x23870: "K\x16\U00023870", // 𣡰
 	0x23871: "K\x16\U00023871", // 𣡱
@@ -46918,7 +46918,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x248e2: "^\x15\U000248e2", // 𤣢
 	0x248e3: "^\x16\U000248e3", // 𤣣
 	0x248e4: "^\x18\U000248e4", // 𤣤
-	0x248e5: "_\x00\U000248e5", // 𤣥
+	0x248e5: "_\xff\U000248e5", // 𤣥
 	0x248e6: "_\x04\U000248e6", // 𤣦
 	0x248e7: "_\a\U000248e7", // 𤣧
 	0x248e8: "_\t\U000248e8", // 𤣨
@@ -53678,7 +53678,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2634a: "z\x17\U0002634a", // 𦍊
 	0x2634b: "{\x00\U0002634b", // 𦍋
 	0x2634c: "{\x00\U0002634c", // 𦍌
-	0x2634d: "{\x00\U0002634d", // 𦍍
+	0x2634d: "{\xff\U0002634d", // 𦍍
 	0x2634e: "{\x02\U0002634e", // 𦍎
 	0x2634f: "{\x02\U0002634f", // 𦍏
 	0x26350: "{\x02\U00026350", // 𦍐
@@ -54065,7 +54065,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x264cd: "}\x15\U000264cd", // 𦓍
 	0x264ce: "~\x02\U000264ce", // 𦓎
 	0x264cf: "~\x02\U000264cf", // 𦓏
-	0x264d0: "~\x00\U000264d0", // 𦓐
+	0x264d0: "~\xff\U000264d0", // 𦓐
 	0x264d1: "~\x02\U000264d1", // 𦓑
 	0x264d2: "~\x04\U000264d2", // 𦓒
 	0x264d3: "~\x05\U000264d3", // 𦓓
@@ -54387,7 +54387,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2660f: "\x80\x12\U0002660f", // 𦘏
 	0x26610: "\x80\x13\U00026610", // 𦘐
 	0x26611: "\x80\x14\U00026611", // 𦘑
-	0x26612: "\x81\x00\U00026612", // 𦘒
+	0x26612: "\x81\xff\U00026612", // 𦘒
 	0x26613: "\x81\x02\U00026613", // 𦘓
 	0x26614: "\x81\x03\U00026614", // 𦘔
 	0x26615: "\x81\x05\U00026615", // 𦘕
@@ -58472,7 +58472,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x27604: "\x90\r\U00027604", // 𧘄
 	0x27605: "\x90\x0f\U00027605", // 𧘅
 	0x27606: "\x90\x10\U00027606", // 𧘆
-	0x27607: "\x91\x00\U00027607", // 𧘇
+	0x27607: "\x91\xfe\U00027607", // 𧘇
 	0x27608: "\x91\x02\U00027608", // 𧘈
 	0x27609: "\x91\x02\U00027609", // 𧘉
 	0x2760a: "\x91\x02\U0002760a", // 𧘊
@@ -59324,8 +59324,8 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x27958: "\x94\x15\U00027958", // 𧥘
 	0x27959: "\x94\x16\U00027959", // 𧥙
 	0x2795a: "\x94\x16\U0002795a", // 𧥚
-	0x2795b: "\x95\x00\U0002795b", // 𧥛
-	0x2795c: "\x95\x00\U0002795c", // 𧥜
+	0x2795b: "\x95\xff\U0002795b", // 𧥛
+	0x2795c: "\x95\xff\U0002795c", // 𧥜
 	0x2795d: "\x95\x01\U0002795d", // 𧥝
 	0x2795e: "\x95\x01\U0002795e", // 𧥞
 	0x2795f: "\x95\x01\U0002795f", // 𧥟
@@ -60040,8 +60040,8 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x27c24: "\x97\x14\U00027c24", // 𧰤
 	0x27c25: "\x97\x16\U00027c25", // 𧰥
 	0x27c26: "\x98\x01\U00027c26", // 𧰦
-	0x27c27: "\x98\x00\U00027c27", // 𧰧
-	0x27c28: "\x98\x00\U00027c28", // 𧰨
+	0x27c27: "\x98\xff\U00027c27", // 𧰧
+	0x27c28: "\x98\xff\U00027c28", // 𧰨
 	0x27c29: "\x98\x02\U00027c29", // 𧰩
 	0x27c2a: "\x98\x03\U00027c2a", // 𧰪
 	0x27c2b: "\x98\x03\U00027c2b", // 𧰫
@@ -61553,8 +61553,8 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2820d: "\x9d\x18\U0002820d", // 𨈍
 	0x2820e: "\x9d\x1e\U0002820e", // 𨈎
 	0x2820f: "\x9e\x00\U0002820f", // 𨈏
-	0x28210: "\x9e\x00\U00028210", // 𨈐
-	0x28211: "\x9e\x00\U00028211", // 𨈑
+	0x28210: "\x9e\xfe\U00028210", // 𨈐
+	0x28211: "\x9e\xff\U00028211", // 𨈑
 	0x28212: "\x9e\x02\U00028212", // 𨈒
 	0x28213: "\x9e\x03\U00028213", // 𨈓
 	0x28214: "\x9e\x03\U00028214", // 𨈔
@@ -68203,8 +68203,8 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x29c07: "\xbe\x12\U00029c07", // 𩰇
 	0x29c08: "\xbe\x15\U00029c08", // 𩰈
 	0x29c09: "\xbe\x16\U00029c09", // 𩰉
-	0x29c0a: "\xbf\x00\U00029c0a", // 𩰊
-	0x29c0b: "\xbf\x00\U00029c0b", // 𩰋
+	0x29c0a: "\xbf\xfb\U00029c0a", // 𩰊
+	0x29c0b: "\xbf\xfb\U00029c0b", // 𩰋
 	0x29c0c: "\xbf\x03\U00029c0c", // 𩰌
 	0x29c0d: "\xbf\x04\U00029c0d", // 𩰍
 	0x29c0e: "\xbf\x04\U00029c0e", // 𩰎
@@ -75773,14 +75773,14 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2b9cf: "\x16\x04\U0002b9cf", // 𫧏
 	0x2b9d0: "\x16\x05\U0002b9d0", // 𫧐
 	0x2b9d1: "\x16\x06\U0002b9d1", // 𫧑
-	0x2b9d2: "\x16\x06\U0002b9d2", // 𫧒
+	0x2b9d2: "\x16\x05\U0002b9d2", // 𫧒
 	0x2b9d3: "\x16\a\U0002b9d3", // 𫧓
 	0x2b9d4: "\x16\b\U0002b9d4", // 𫧔
 	0x2b9d5: "\x16\n\U0002b9d5", // 𫧕
 	0x2b9d6: "\x16\v\U0002b9d6", // 𫧖
-	0x2b9d7: "\x16\v\U0002b9d7", // 𫧗
+	0x2b9d7: "\x16\f\U0002b9d7", // 𫧗
 	0x2b9d8: "\x16\r\U0002b9d8", // 𫧘
-	0x2b9d9: "\x16\x0e\U0002b9d9", // 𫧙
+	0x2b9d9: "\x16\r\U0002b9d9", // 𫧙
 	0x2b9da: "\x16\x0e\U0002b9da", // 𫧚
 	0x2b9db: "\x16\x0f\U0002b9db", // 𫧛
 	0x2b9dc: "\x16\x0f\U0002b9dc", // 𫧜
@@ -77510,7 +77510,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2c098: "J\x0f\U0002c098", // 𬂘
 	0x2c099: "J\x11\U0002c099", // 𬂙
 	0x2c09a: "J\x1a\U0002c09a", // 𬂚
-	0x2c09b: "K\x00\U0002c09b", // 𬂛
+	0x2c09b: "K\xfe\U0002c09b", // 𬂛
 	0x2c09c: "K\x01\U0002c09c", // 𬂜
 	0x2c09d: "K\x03\U0002c09d", // 𬂝
 	0x2c09e: "K\x03\U0002c09e", // 𬂞
@@ -79544,7 +79544,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2c88a: "\x93\x05\U0002c88a", // 𬢊
 	0x2c88b: "\x93\x06\U0002c88b", // 𬢋
 	0x2c88c: "\x93\a\U0002c88c", // 𬢌
-	0x2c88d: "\x93\a\U0002c88d", // 𬢍
+	0x2c88d: "\x93\x06\U0002c88d", // 𬢍
 	0x2c88e: "\x93\b\U0002c88e", // 𬢎
 	0x2c88f: "\x93\t\U0002c88f", // 𬢏
 	0x2c890: "\x93\t\U0002c890", // 𬢐
@@ -79936,7 +79936,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2ca12: "\x9f\v\U0002ca12", // 𬨒
 	0x2ca13: "\x9f\v\U0002ca13", // 𬨓
 	0x2ca14: "\x9f\r\U0002ca14", // 𬨔
-	0x2ca15: "\x9f\x0f\U0002ca15", // 𬨕
+	0x2ca15: "\x9f\x0e\U0002ca15", // 𬨕
 	0x2ca16: "\xa0\x01\U0002ca16", // 𬨖
 	0x2ca17: "\xa0\x05\U0002ca17", // 𬨗
 	0x2ca18: "\xa0\x05\U0002ca18", // 𬨘
@@ -80835,7 +80835,7 @@ var radicalStrokes = map[rune]RadicalStroke{
 	0x2cd95: "\xc3\a\U0002cd95", // 𬶕
 	0x2cd96: "\xc3\b\U0002cd96", // 𬶖
 	0x2cd97: "\xc3\b\U0002cd97", // 𬶗
-	0x2cd98: "\xc3\b\U0002cd98", // 𬶘
+	0x2cd98: "\xc3\t\U0002cd98", // 𬶘
 	0x2cd99: "\xc3\b\U0002cd99", // 𬶙
 	0x2cd9a: "\xc3\b\U0002cd9a", // 𬶚
 	0x2cd9b: "\xc3\b\U0002cd9b", // 𬶛
