@@ -219,8 +219,6 @@ func make_reading_table(outdir string, unihan *zip.Reader) {
 				reading_table[r].HanyuPinyin = fields[2]
 			case "kMandarin":
 				reading_table[r].Mandarin = fields[2]
-			case "kXHC1983":
-				reading_table[r].XHC1983 = fields[2]
 			}
 			if r > largest {
 				largest = r
@@ -263,29 +261,16 @@ var readings = map[rune]string{`)
 type ReadingEntry struct {
 	HanyuPinyin string
 	Mandarin    string
-	XHC1983     string
 }
 
 // 取出最常用的一个拼音
-// 按如下优先次序：Mandarin -> XHC1983 -> HanyuPinyin
+// 以 Mandarin 为主，不足的以 HanyuPinyin 补全
 func (entry *ReadingEntry) regular() string {
 	// kMandarin Syntax: [a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+
 	// 如 lüè
 	if entry.Mandarin != "" {
 		// 目前文件中没有多值情况，不过按 UAX #38 允许多值
 		return strings.Split(entry.Mandarin, " ")[0]
-	}
-	// kXHC1983 Syntax: [0-9]{4}\.[0-9]{3}\*?(,[0-9]{4}\.[0-9]{3}\*?)*:[a-z\x{300}\x{301}\x{304}\x{308}\x{30C}]+
-	// 如 1327.041:yán 1333.051:yàn
-	if entry.XHC1983 != "" {
-		// 第一项中第一个引号后的部分
-		b := strings.Index(entry.XHC1983, ":")
-		e := strings.Index(entry.XHC1983, " ")
-		if e > 0 {
-			return entry.XHC1983[b+1 : e]
-		} else {
-			return entry.XHC1983[b+1:]
-		}
 	}
 	// kHanyuPinyin Syntax: (\d{5}\.\d{2}0,)*\d{5}\.\d{2}0:([a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+,)*[a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+
 	// 如 10093.130:xī,lǔ 74609.020:lǔ,xī
