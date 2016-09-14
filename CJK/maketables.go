@@ -474,6 +474,9 @@ func read_radical_strokes(unihan *zip.Reader) (version string, CJKRadicalStrokes
 		}
 		if strings.HasPrefix(line, "U+") {
 			fields := strings.Split(line, "\t")
+			// kRSUnicode 语法：[1-9][0-9]{0,2}\'?\.-?[0-9]{1,2}
+			// 点前面是部首编号，加撇表示简化字部首；
+			// 点后面是除部首笔画数，可能为负数表示是部首简化的部分，但这里将负笔画计为 0
 			if fields[1] == "kRSUnicode" {
 				var r rune
 				fmt.Sscanf(fields[0], "U+%X", &r)
@@ -482,6 +485,9 @@ func read_radical_strokes(unihan *zip.Reader) (version string, CJKRadicalStrokes
 					fmt.Sscanf(fields[2], "%d'.%d", &radical, &stroke)
 				} else {
 					fmt.Sscanf(fields[2], "%d.%d", &radical, &stroke)
+				}
+				if stroke < 0 {
+					stroke = 0
 				}
 				CJKRadicalStrokes[r] = MakeRadicalStroke(r, radical, stroke)
 			}
