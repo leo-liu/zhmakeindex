@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"strings"
 
 	"golang.org/x/text/encoding"
@@ -40,6 +41,17 @@ func main() {
 
 	log.Printf("zhmakeindex 版本：%s-%s\t作者：%s\n", Version, Revision, ProgramAuthor)
 
+	if option.cpuprofile != "" {
+		f, err := os.Create(option.cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("无法启动 CPU 性能调试：", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	if option.style != "" {
 		log.Printf("正在读取格式文件 %s……", option.style)
 	}
@@ -70,6 +82,7 @@ type Options struct {
 	style_encoding string
 	log            string
 	quiet          bool
+	cpuprofile     string
 }
 
 type InputOptions struct {
@@ -108,6 +121,7 @@ func NewOptions() *Options {
 	flag.StringVar(&o.log, "t", "", "日志文件名")
 	flag.StringVar(&o.encoding, "enc", "utf-8", "读写索引文件的编码")
 	flag.StringVar(&o.style_encoding, "senc", "utf-8", "格式文件的编码")
+	flag.StringVar(&o.cpuprofile, "cpuprofile", "", "将 CPU 性能调试信息写入文件")
 	return o
 }
 
@@ -208,12 +222,12 @@ zhmakeindex [-c] [-i] [-o <ind>] [-q] [-r] [-s <sty>] [-t <log>]
             [-enc <enc>] [-senc <senc>] [-strict] [-z <sort>]
             [<输入文件1> <输入文件2> ...]`)
 	fmt.Fprintln(os.Stderr, "\n中文索引处理程序")
-	fmt.Fprintf(os.Stderr, "\n  %-5s %-5s %s\n", "选项", "默认值", "说明")
+	fmt.Fprintf(os.Stderr, "\n  %-10s %-5s %s\n", "选项", "默认值", "说明")
 	flag.VisitAll(func(f *flag.Flag) {
 		if f.Value.String() == "" {
-			fmt.Fprintf(os.Stderr, "  -%-6s %-7s %s\n", f.Name, "无", f.Usage)
+			fmt.Fprintf(os.Stderr, "  -%-11s %-7s %s\n", f.Name, "无", f.Usage)
 		} else {
-			fmt.Fprintf(os.Stderr, "  -%-6s %-8s %s\n", f.Name, f.DefValue, f.Usage)
+			fmt.Fprintf(os.Stderr, "  -%-11s %-8s %s\n", f.Name, f.DefValue, f.Usage)
 		}
 	})
 	fmt.Fprintf(os.Stderr, "\n版本：%s-%s\t作者：%s\n", Version, Revision, ProgramAuthor)

@@ -141,11 +141,12 @@ func ScanIndexEntry(reader *NumberdReader, option *InputOptions, style *InputSty
 	escaped := false
 	arg_depth := 0
 	var token []rune
+	var entry_input []rune
 	page.rangetype = PAGE_NORMAL
 L_scan_kv:
 	for {
 		r, _, err := reader.ReadRune()
-		entry.input += string(r)
+		entry_input = append(entry_input, r)
 		if err != nil {
 			return nil, err
 		}
@@ -289,6 +290,7 @@ L_scan_kv:
 			panic("扫描状态错误")
 		}
 	}
+	entry.input = string(entry_input)
 	// 跳过空白符
 	if err := skipspaces(reader, style); err != nil {
 		return nil, err
