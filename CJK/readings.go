@@ -1,6 +1,6 @@
 // 这是由程序自动生成的文件，请不要直接编辑此文件
 // 来源：Unihan_Readings.txt
-// Unicode version: 9.0.0
+// Unicode version: 10.0.0
 
 package CJK
 
@@ -1933,6 +1933,7 @@ var readings = map[rune]string{
 	0x3d08: "yin4", // 㴈
 	0x3d09: "ji3", // 㴉
 	0x3d0b: "su4", // 㴋
+	0x3d0e: "nai4", // 㴎
 	0x3d0f: "wang3", // 㴏
 	0x3d10: "mian4", // 㴐
 	0x3d11: "su4", // 㴑
@@ -28564,6 +28565,7 @@ var readings = map[rune]string{
 	0x21b0e: "qiang1", // 𡬎
 	0x21b10: "mi2", // 𡬐
 	0x21b13: "yi2", // 𡬓
+	0x21b15: "long2", // 𡬕
 	0x21b16: "han1", // 𡬖
 	0x21b17: "ni4", // 𡬗
 	0x21b18: "lao4", // 𡬘
@@ -29390,6 +29392,7 @@ var readings = map[rune]string{
 	0x224b1: "sui4", // 𢒱
 	0x224b2: "xi3", // 𢒲
 	0x224b7: "pou2", // 𢒷
+	0x224b9: "shan3", // 𢒹
 	0x224be: "jiao4", // 𢒾
 	0x224c0: "yi4", // 𢓀
 	0x224c3: "wan2", // 𢓃
@@ -29611,6 +29614,7 @@ var readings = map[rune]string{
 	0x2273d: "kui3", // 𢜽
 	0x2273f: "jia4", // 𢜿
 	0x22740: "tu2", // 𢝀
+	0x22741: "hong1", // 𢝁
 	0x22742: "du2", // 𢝂
 	0x22745: "xia2", // 𢝅
 	0x22746: "zhong4", // 𢝆
@@ -33416,6 +33420,7 @@ var readings = map[rune]string{
 	0x2588c: "fan2", // 𥢌
 	0x2588d: "sui4", // 𥢍
 	0x2588e: "zun4", // 𥢎
+	0x2588f: "dian4", // 𥢏
 	0x25890: "gao1", // 𥢐
 	0x25891: "gao3", // 𥢑
 	0x25892: "lao2", // 𥢒
@@ -33452,6 +33457,7 @@ var readings = map[rune]string{
 	0x258f0: "bian3", // 𥣰
 	0x258f8: "mu4", // 𥣸
 	0x258f9: "ran4", // 𥣹
+	0x258fa: "ran4", // 𥣺
 	0x25902: "niao3", // 𥤂
 	0x2590a: "quan2", // 𥤊
 	0x2590b: "zhe2", // 𥤋
@@ -37367,6 +37373,7 @@ var readings = map[rune]string{
 	0x282e9: "bi4", // 𨋩
 	0x282eb: "tiao1", // 𨋫
 	0x282ec: "zheng3", // 𨋬
+	0x282ee: "hong1", // 𨋮
 	0x282ef: "yi4", // 𨋯
 	0x282f0: "ci4", // 𨋰
 	0x282f2: "bing4", // 𨋲
@@ -38069,6 +38076,7 @@ var readings = map[rune]string{
 	0x28ab9: "li4", // 𨪹
 	0x28aba: "cha1", // 𨪺
 	0x28abe: "di4", // 𨪾
+	0x28abf: "liu2", // 𨪿
 	0x28ac0: "zhan3", // 𨫀
 	0x28ac1: "po1", // 𨫁
 	0x28ad2: "lou4", // 𨫒
