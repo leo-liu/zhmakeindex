@@ -219,8 +219,6 @@ func make_reading_table(outdir string, unihan *zip.Reader) {
 				reading_table[r].HanyuPinyin = fields[2]
 			case "kMandarin":
 				reading_table[r].Mandarin = fields[2]
-			case "kXHC1983":
-				reading_table[r].XHC1983 = fields[2]
 			}
 			if r > largest {
 				largest = r
@@ -263,29 +261,16 @@ var readings = map[rune]string{`)
 type ReadingEntry struct {
 	HanyuPinyin string
 	Mandarin    string
-	XHC1983     string
 }
 
 // 取出最常用的一个拼音
-// 按如下优先次序：Mandarin -> XHC1983 -> HanyuPinyin
+// 以 Mandarin 为主，不足的以 HanyuPinyin 补全
 func (entry *ReadingEntry) regular() string {
 	// kMandarin Syntax: [a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+
 	// 如 lüè
 	if entry.Mandarin != "" {
 		// 目前文件中没有多值情况，不过按 UAX #38 允许多值
 		return strings.Split(entry.Mandarin, " ")[0]
-	}
-	// kXHC1983 Syntax: [0-9]{4}\.[0-9]{3}\*?(,[0-9]{4}\.[0-9]{3}\*?)*:[a-z\x{300}\x{301}\x{304}\x{308}\x{30C}]+
-	// 如 1327.041:yán 1333.051:yàn
-	if entry.XHC1983 != "" {
-		// 第一项中第一个引号后的部分
-		b := strings.Index(entry.XHC1983, ":")
-		e := strings.Index(entry.XHC1983, " ")
-		if e > 0 {
-			return entry.XHC1983[b+1 : e]
-		} else {
-			return entry.XHC1983[b+1:]
-		}
 	}
 	// kHanyuPinyin Syntax: (\d{5}\.\d{2}0,)*\d{5}\.\d{2}0:([a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+,)*[a-z\x{300}-\x{302}\x{304}\x{308}\x{30C}]+
 	// 如 10093.130:xī,lǔ 74609.020:lǔ,xī
@@ -358,7 +343,7 @@ func make_radical_table(outdir string, unihan *zip.Reader) {
 	defer outfile.Close()
 	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件
 // 部首来源：CJKRadicals.txt
-// 部首笔画数来源：Unihan_RadicalStrokeCounts.txt`)
+// 部首笔画数来源：Unihan_IRGSources.txt`)
 	fmt.Fprintln(outfile, `//`, version)
 	fmt.Fprintln(outfile, "\n"+`package CJK
 
@@ -489,6 +474,9 @@ func read_radical_strokes(unihan *zip.Reader) (version string, CJKRadicalStrokes
 		}
 		if strings.HasPrefix(line, "U+") {
 			fields := strings.Split(line, "\t")
+			// kRSUnicode 语法：[1-9][0-9]{0,2}\'?\.-?[0-9]{1,2}
+			// 点前面是部首编号，加撇表示简化字部首；
+			// 点后面是除部首笔画数，可能为负数表示是部首简化的部分，但这里将负笔画计为 0
 			if fields[1] == "kRSUnicode" {
 				var r rune
 				fmt.Sscanf(fields[0], "U+%X", &r)
@@ -497,6 +485,9 @@ func read_radical_strokes(unihan *zip.Reader) (version string, CJKRadicalStrokes
 					fmt.Sscanf(fields[2], "%d'.%d", &radical, &stroke)
 				} else {
 					fmt.Sscanf(fields[2], "%d.%d", &radical, &stroke)
+				}
+				if stroke < 0 {
+					stroke = 0
 				}
 				CJKRadicalStrokes[r] = MakeRadicalStroke(r, radical, stroke)
 			}

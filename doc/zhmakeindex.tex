@@ -1,4 +1,4 @@
-\documentclass[UTF8,hyperref]{ctexart}
+\documentclass[UTF8]{ctexart}
 
 \usepackage{etoolbox}
 
@@ -14,7 +14,7 @@
 
 \usepackage[a4paper,centering,margin=1.2in]{geometry}
 
-\CTEXsetup[format=\bfseries\Large]{section}
+\ctexset{section/format=\bfseries\Large}
 
 \usepackage[numbers,square,sort&compress]{natbib}
 \renewcommand\bibname{参考文档}
@@ -114,7 +114,7 @@
 
 \title{\zhm\thanks{版本 \zhmVersion-\zhmRevision} 中文索引处理程序}
 \author{刘海洋}
-\date{2015 年 3 月 6 日}
+\date{2018 年 4 月 11 日}
 
 \begin{document}
 
@@ -136,7 +136,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
 \zhm 是一个通用的中文多级索引处理程序，它从一个或多个输入文件读入索引项，将其
 内容按指定的方式分组、排序，然后按格式将整理好的索引输出到文件。索引项可以有 3
 个级别（0, 1, 2）的嵌套。\zhm 主要用于 \LaTeX{} 索引的处理，其功能和用法与
-\pkg{makeindex}\cite{Rodgers1991} 相似，并支持中文的分组与排序。
+\pkg{makeindex}\cite{Chen1991} 相似，并支持中文的分组与排序。
 
 \index{.idx@\verb+.idx+}
 \index{.ind@\verb+.ind+}
@@ -176,9 +176,10 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
   \optitem[-r] 禁止隐式页码区间构造，要求页码区间必须使用显式区间符号生成。见
     第~\ref{sec:idxsyntax} 节的说明。默认情况下，三个或三个以上连续的页码会自
     动合并为一个页码区间（如 1--5）。
-  \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。\zhm 会首先在当
-    前目录查找格式文件，如果找不到则调用 \TeX{} 发行版的 \pkg{kpathsea} 库在
-    TEXMF 树中查找。
+  \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。如果没有后
+    缀，会加上 ".ist" 后缀。\zhm 会首先在当前目录查找格式文件，如果找不到则调
+    用 \TeX{} 发行版的 \pkg{kpathsea} 库在 TEXMF 树中查找。
+    \index{.ist@\verb+.ist+}
   \optitem[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
     入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
     \index{.ilg@\verb+.ilg+}
@@ -793,7 +794,7 @@ cháng 略高一点，“长”字就会按 zhǎng 的读音分到 Z 组，排�
 \section{版权与许可}
 \index{版权}\index{许可}
 
-版权所有：2014, 2015 年，刘海洋 \email{leoliu.pku@gmail.com}
+版权所有：2014, 2015, 2016, 2018 年，刘海洋 \email{leoliu.pku@gmail.com}
 
 \index{LPPL}
 本作品可在《the \LaTeX{} Project Public License》1.3 或更高版本的条件下发布与

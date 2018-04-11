@@ -7,8 +7,9 @@ if exist VERSION (
 ) else (
   set zhmVersion=devel
 )
-for /f "delims=" %%i in ('git rev-parse --short HEAD') do set zhmRevision=%%i
-set FLAGS=-ldflags "-X main.Version %zhmVersion% -X main.Revision %zhmRevision%"
+for /f "delims=" %%i in ('git log -1 --pretty^=format:"%%h(%%ai"') do set zhmRevision=%%i
+set zhmRevision=%zhmRevision:~0,18%)
+set FLAGS=-ldflags "-X main.Version=%zhmVersion% -X main.Revision=%zhmRevision%"
 
 set GOOS=windows
 set GOARCH=386
