@@ -1,6 +1,7 @@
 *.swp
 *~
 *.ind
+*.log
 doc/zhmakeindex.idx
 *.bbl
 *.blg
