@@ -1,10 +1,10 @@
 package main
 
 import (
-	"path/filepath"
 	"bufio"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"unicode"
@@ -155,7 +155,7 @@ func NewStyles(o *StyleOptions) (*InputStyle, *OutputStyle) {
 		o.style += ".ist"
 	}
 	// 读取格式文件，处理格式
-	o.style = kpathsea.FindFile(o.style, kpathsea.IST_FORMAT, false)
+	o.style = kpathsea.FindFile(o.style)
 	if o.style == "" {
 		log.Fatalln("找不到格式文件。")
 	}

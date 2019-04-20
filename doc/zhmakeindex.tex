@@ -114,7 +114,7 @@
 
 \title{\zhm\thanks{版本 \zhmVersion-\zhmRevision} 中文索引处理程序}
 \author{刘海洋}
-\date{2018 年 4 月 11 日}
+\date{2019 年 4 月 20 日}
 
 \begin{document}
 
@@ -178,7 +178,7 @@ zhmakeindex &[-c] [-i] [-o~<ind>] [-q] [-r] [-s~<sty>] [-t~<log>]\cr
     动合并为一个页码区间（如 1--5）。
   \optitem[-s~\meta{sty}] 设置 \meta{sty} 为格式文件。没有默认值。如果没有后
     缀，会加上 ".ist" 后缀。\zhm 会首先在当前目录查找格式文件，如果找不到则调
-    用 \TeX{} 发行版的 \pkg{kpathsea} 库在 TEXMF 树中查找。
+    用 \TeX{} 发行版的 \pkg{kpsewhich} 工具在 TEXMF 树中查找。
     \index{.ist@\verb+.ist+}
   \optitem[-t~\meta{log}] 设置 \meta{log} 为日志文件。默认情况下，会使用第一个输
     入文件 \meta{idx0} 的主文件名加上 ".ilg" 后缀作为日志文件。
@@ -387,7 +387,7 @@ G\"odel, 5 \\
 件。
 
 格式文件指明了 ".idx" 输入文件和最终输入文件的格式。该文件在当前工作目录或在
-TEXMF 树中由 \pkg{kpathsea} 库查找。一个格式文件由一组 \meta{关键字} \meta{属
+TEXMF 树中由 \pkg{kpsewhich} 工具查找。一个格式文件由一组 \meta{关键字} \meta{属
 性} 的列表组成。\meta{关键字} 分为输出和输出两类。\meta{关键字} \meta{属性} 对
 儿不要求以任何顺序出现。
 \index{%@\verb+%+}
@@ -839,8 +839,6 @@ examples/rangeencap.idx
 examples/suffix.ist
 examples/symorder.idx
 examples/zh.ist
-kpathsea/dynamic_other.go
-kpathsea/dynamic_windows_386.go
 kpathsea/kpathsea.go
 CJK/make-table.cmd
 CJK/maketables.go
