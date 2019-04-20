@@ -10,8 +10,8 @@ import (
 	"unsafe"
 )
 
-// TeX Live 2014 使用的库
-var kpse_dll_name string = "kpathsea620.dll"
+// TeX Live 2018 使用的库
+var kpse_dll_name string = "kpathsea630.dll"
 
 var dll *syscall.LazyDLL
 var kpse uintptr
