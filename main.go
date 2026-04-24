@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -196,7 +195,7 @@ func checkEncoding(encodingName string) encoding.Encoding {
 func setupLog(option *Options) {
 	var stderr io.Writer = os.Stderr
 	if option.quiet {
-		stderr = ioutil.Discard
+		stderr = io.Discard
 	}
 	if option.log == "" {
 		// 只使用标准错误流

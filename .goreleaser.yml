@@ -1,0 +1,49 @@
+version: 2
+
+builds:
+  - main: .
+    binary: zhmakeindex
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.Revision={{.ShortCommit}}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+
+checksum:
+  name_template: 'checksums.txt'
+
+brews:
+  - repository:
+      owner: leo-liu
+      name: homebrew-zhmakeindex
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/leo-liu/zhmakeindex"
+    description: "Chinese-aware makeindex replacement for LaTeX"
+    license: "LPPL-1.3c"
+    install: |
+      bin.install "zhmakeindex"
+    test: |
+      assert_match "zhmakeindex", shell_output("#{bin}/zhmakeindex 2>&1", 0)
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'

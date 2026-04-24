@@ -1,0 +1,4 @@
+github.com/yasushi-saito/rbtree v0.0.0-20180524175743-33ff713a769b h1:xuz0HASvzzkGtI3Vjk6pubq2XrRnkTBCNVtSWeeuZTg=
+github.com/yasushi-saito/rbtree v0.0.0-20180524175743-33ff713a769b/go.mod h1:8AUYxBTmI0AYJUottyv8mxrfCqYSYzkT0cc7W0XpUBc=
+golang.org/x/text v0.36.0 h1:JfKh3XmcRPqZPKevfXVpI1wXPTqbkE5f7JA92a55Yxg=
+golang.org/x/text v0.36.0/go.mod h1:NIdBknypM8iqVmPiuco0Dh6P5Jcdk8lJL0CUebqK164=

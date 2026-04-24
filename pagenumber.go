@@ -207,9 +207,9 @@ func (numfmt NumFormat) Format(num int) string {
 	case NUM_ARABIC:
 		return fmt.Sprint(num)
 	case NUM_ALPH_LOWER:
-		return string('a' + num)
+		return string(rune('a' + num))
 	case NUM_ALPH_UPPER:
-		return string('A' + num)
+		return string(rune('A' + num))
 	case NUM_ROMAN_LOWER:
 		return romanNumString(num, false)
 	case NUM_ROMAN_UPPER:
