@@ -124,7 +124,7 @@ func make_stroke_table(outdir string, unihan *zip.Reader) {
 		}
 	}
 	// 使用 Unihan 数据库，读取笔画数补全其他字符
-	unihan_file := getUnihanFile(unihan, "Unihan_DictionaryLikeData.txt")
+	unihan_file := getUnihanFile(unihan, "Unihan_IRGSources.txt")
 	defer unihan_file.Close()
 	scanner = bufio.NewScanner(unihan_file)
 	for scanner.Scan() {
@@ -166,7 +166,7 @@ func make_stroke_table(outdir string, unihan *zip.Reader) {
 	defer outfile.Close()
 	fmt.Fprintln(outfile, `// 这是由程序自动生成的文件，请不要直接编辑此文件
 // 笔顺来源：sunwb_strokeorder.txt
-// 笔画数来源：Unihan_DictionaryLikeData.txt`)
+// 笔画数来源：Unihan_IRGSources.txt`)
 	fmt.Fprintf(outfile, "// Unicode 版本：%s\n", unicodeVersion)
 	fmt.Fprintln(outfile, "\n"+`package CJK`)
 	fmt.Fprintln(outfile, "\n"+`// Strokes 从字符取得笔顺信息。
